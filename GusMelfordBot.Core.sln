@@ -2,7 +2,9 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GusMelfordBot.Core", "GusMelfordBot.Core\GusMelfordBot.Core.csproj", "{3F7A14BC-52B0-4058-A126-CCD460FC835D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GusMelfordBot.Core.Database", "GusMelfordBot.Core.Database\GusMelfordBot.Core.Database.csproj", "{939AD421-E1C9-44FA-8133-E415F5E1B293}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GusMelfordBot.Database", "GusMelfordBot.Database\GusMelfordBot.Database.csproj", "{939AD421-E1C9-44FA-8133-E415F5E1B293}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GusMelfordBot.DAL", "GusMelfordBot.DAL\GusMelfordBot.DAL.csproj", "{7500D29C-C375-43CD-89BE-637CEF989F40}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -18,5 +20,9 @@ Global
 		{939AD421-E1C9-44FA-8133-E415F5E1B293}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{939AD421-E1C9-44FA-8133-E415F5E1B293}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{939AD421-E1C9-44FA-8133-E415F5E1B293}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7500D29C-C375-43CD-89BE-637CEF989F40}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7500D29C-C375-43CD-89BE-637CEF989F40}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7500D29C-C375-43CD-89BE-637CEF989F40}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7500D29C-C375-43CD-89BE-637CEF989F40}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

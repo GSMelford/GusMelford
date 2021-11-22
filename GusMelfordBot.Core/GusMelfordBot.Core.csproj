@@ -2,6 +2,33 @@
 
     <PropertyGroup>
         <TargetFramework>net5.0</TargetFramework>
+        <UserSecretsId>deaaf75c-4b76-4556-84d1-11f2231a907f</UserSecretsId>
+        <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
     </PropertyGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.11.1" />
+      <PackageReference Include="TBot.Api" Version="1.0.3-alpha1" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Reference Include="Bot.Api">
+        <HintPath>..\TelegramBotLibraries\Bot.Api.dll</HintPath>
+      </Reference>
+      <Reference Include="Telegram.Api">
+        <HintPath>..\TelegramBotLibraries\Telegram.Api.dll</HintPath>
+      </Reference>
+      <Reference Include="Telegram.Dto">
+        <HintPath>..\TelegramBotLibraries\Telegram.Dto.dll</HintPath>
+      </Reference>
+      <Reference Include="Telegram.Exceptions">
+        <HintPath>..\TelegramBotLibraries\Telegram.Exceptions.dll</HintPath>
+      </Reference>
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\GusMelfordBot.DAL\GusMelfordBot.DAL.csproj" />
+      <ProjectReference Include="..\GusMelfordBot.Database\GusMelfordBot.Database.csproj" />
+    </ItemGroup>
 
 </Project>
