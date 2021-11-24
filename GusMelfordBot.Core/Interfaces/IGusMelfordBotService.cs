@@ -8,8 +8,8 @@ namespace GusMelfordBot.Core.Interfaces
     
     public interface IGusMelfordBotService
     {
-        void SendMessage(IParameters parameters);
-        Task<HttpResponseMessage> DeleteMessage(IParameters parameters);
+        Task SendMessage(IParameters parameters);
+        Task DeleteMessage(IParameters parameters);
         void StartListenUpdate();
         bool GetStatus();
         event UpdateListener.MessageHandler OnMessageUpdate;

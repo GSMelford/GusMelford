@@ -102,37 +102,32 @@
             
             _databaseContext.SaveAll();
 
-            SendMessage(message.Chat, $"{user?.FirstName} sent {++_videoCounter} : {videoLink}");
+            SendMessage(message.Chat, $"{user?.FirstName} sent {++_videoCounter}\n{videoLink}");
             DeleteMessage(message);
         }
 
         private void DeleteMessage(Message message)
         {
-            var httpResponseMessage = _gusMelfordBotService.DeleteMessage(
+            _gusMelfordBotService.DeleteMessage(
                 new DeleteMessageParameters
                 {
                     ChatId = message.Chat.Id,
                     MessageId = message.MessageId
-                }).Result;
-
-            if (!httpResponseMessage.IsSuccessStatusCode)
-            {
-                /*_logger.LogWarning("{DeleteMessage} - {StatusCode}", 
-                    nameof(DeleteMessage), httpResponseMessage.StatusCode);*/
-            }
+                });
         }
 
         private void SendMessage(Chat chat, string message)
         {
-            _gusMelfordBotService.SendMessage(new SendMessageParameters
-            {
-                Text = message,
-                ChatId = chat.Id,
-                DisableNotification = true,
-                DisableWebPagePreview = true
-            });
+            _gusMelfordBotService.SendMessage(
+                new SendMessageParameters
+                {
+                    Text = message,
+                    ChatId = chat.Id,
+                    DisableNotification = true,
+                    DisableWebPagePreview = true
+                });
         }
-        
+
         private HttpResponseMessage DoRequest(string requestUrl)
         {
             HttpRequestMessage httpRequestMessage = new HttpRequestMessage(HttpMethod.Get, requestUrl);

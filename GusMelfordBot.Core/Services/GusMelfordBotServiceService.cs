@@ -1,7 +1,6 @@
-﻿using System.Threading.Tasks;
-
-namespace GusMelfordBot.Core.Services
+﻿namespace GusMelfordBot.Core.Services
 {
+    using System.Threading.Tasks;
     using Bot.Api.BotRequests.Interfaces;
     using Interfaces;
     using System.Net.Http;
@@ -27,14 +26,32 @@ namespace GusMelfordBot.Core.Services
             _isActive = true;
         }
         
-        public void SendMessage(IParameters parameters)
+        public async Task SendMessage(IParameters parameters)
         {
-            _telegramBot.SendMessageAsync(parameters);
+            HttpResponseMessage httpResponseMessage;
+            do
+            {
+                httpResponseMessage = await _telegramBot.SendMessageAsync(parameters);
+                if (!httpResponseMessage.IsSuccessStatusCode)
+                {
+                    await Task.Delay(1000);
+                }
+                
+            } while (!httpResponseMessage.IsSuccessStatusCode);
         }
         
-        public async Task<HttpResponseMessage> DeleteMessage(IParameters parameters)
+        public async Task DeleteMessage(IParameters parameters)
         {
-            return await _telegramBot.DeleteMessageAsync(parameters);
+            HttpResponseMessage httpResponseMessage;
+            do
+            {
+                httpResponseMessage = await _telegramBot.DeleteMessageAsync(parameters);
+                if (!httpResponseMessage.IsSuccessStatusCode)
+                {
+                    await Task.Delay(1000);
+                }
+                
+            } while (!httpResponseMessage.IsSuccessStatusCode);
         }
         
         public bool GetStatus()

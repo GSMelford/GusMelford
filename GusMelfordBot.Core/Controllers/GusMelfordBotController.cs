@@ -22,7 +22,7 @@
             _gusMelfordBotService = gusMelfordBotService;
         }
 
-        [HttpGet("gusmelfordbot/start")]
+        [HttpGet("start")]
         public IActionResult Start()
         {
             if (_gusMelfordBotService.GetStatus())
