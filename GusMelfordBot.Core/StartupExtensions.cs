@@ -1,8 +1,8 @@
-﻿using GusMelfordBot.Core.Interfaces;
-using GusMelfordBot.Core.Services;
-
-namespace GusMelfordBot.Core
+﻿namespace GusMelfordBot.Core
 {
+    using Interfaces;
+    using Services;
+    using Services.Data;
     using Database.Context;
     using Settings;
     using Microsoft.Extensions.Configuration;
@@ -18,14 +18,16 @@ namespace GusMelfordBot.Core
             
             services.AddSingleton(commonSettings);
             services.AddControllers();
+            services.AddHealthChecks();
+            services.AddTransient<IDataService, DataService>();
             
             services.AddSingleton<IGusMelfordBotService>(
-                provider => new GusMelfordBotServiceService(provider.GetRequiredService<CommonSettings>().TelegramBotSettings));
-            services.AddSingleton<IDatabaseContext>(
+                provider => new GusMelfordBotService(provider.GetRequiredService<CommonSettings>().TelegramBotSettings));
+            services.AddSingleton<IDatabaseManager>(
                 provider => new DatabaseManager(provider.GetRequiredService<CommonSettings>().DatabaseSettings));
             services.AddSingleton<ITikTokService>(
                 provider => new TikTokService(
-                    provider.GetRequiredService<IDatabaseContext>(), 
+                    provider.GetRequiredService<IDatabaseManager>(), 
                     provider.GetRequiredService<IGusMelfordBotService>()));
         }
     }

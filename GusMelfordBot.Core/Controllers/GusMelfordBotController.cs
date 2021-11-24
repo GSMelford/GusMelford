@@ -1,5 +1,6 @@
 ﻿namespace GusMelfordBot.Core.Controllers
 {
+    using System.Threading.Tasks;
     using GusMelfordBot.Database.Interfaces;
     using Interfaces;
     using Microsoft.AspNetCore.Mvc;
@@ -9,31 +10,39 @@
     [Route("[controller]")]
     public class GusMelfordBotController : Controller
     {
-        private readonly ILogger<GusMelfordBotController> _logger;
         private readonly IGusMelfordBotService _gusMelfordBotService;
+        private readonly IDataService _dataService;
         
         public GusMelfordBotController(
             ILogger<GusMelfordBotController> logger, 
             IGusMelfordBotService gusMelfordBotService,
-            IDatabaseContext databaseContext,
-            ITikTokService tikTokService)
+            IDatabaseManager databaseManager,
+            ITikTokService tikTokService,
+            IDataService dataService)
         {
-            _logger = logger;
+            _dataService = dataService;
             _gusMelfordBotService = gusMelfordBotService;
         }
 
         [HttpGet("start")]
-        public IActionResult Start()
+        public ActionResult<string> Start()
         {
-            if (_gusMelfordBotService.GetStatus())
-            {
-                _logger.LogInformation("GusMelfordBot already started");
-                return Ok();
-            }
             _gusMelfordBotService.StartListenUpdate();
-            _logger.LogInformation("GusMelfordBot started");
+            return new ActionResult<string>("GusMelfordBot worked...");
+        }
 
-            return Ok();
+        [HttpGet("video/new")]
+        public async Task<JsonResult> GetUnwatchVideo()
+        {
+            return Json(await _dataService.GetUnwatchTikTokVideo());
+        }
+        
+        [HttpGet("video")]
+        public async Task<JsonResult> GetUnwatchVideo(
+            [FromQuery] string takeDateSince, 
+            [FromQuery] string takeDateUntil)
+        {
+            return Json(await _dataService.GetTikTokVideo(takeDateSince, takeDateUntil));
         }
     }
 }

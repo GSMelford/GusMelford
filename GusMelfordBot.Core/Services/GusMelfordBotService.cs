@@ -7,14 +7,14 @@
     using Settings;
     using Telegram.Bot.Client;
     
-    public class GusMelfordBotServiceService : IGusMelfordBotService
+    public class GusMelfordBotService : IGusMelfordBotService
     {
-        private bool _isActive;
         private readonly TelegramBot _telegramBot;
+        private bool _isActive;
         
         public event UpdateListener.MessageHandler OnMessageUpdate;
         
-        public GusMelfordBotServiceService(TelegramBotSettings telegramBotSettings)
+        public GusMelfordBotService(TelegramBotSettings telegramBotSettings)
         {
             _telegramBot = new TelegramBot(telegramBotSettings.Token, new HttpClient());
             _telegramBot.OnMessageUpdate += message => OnMessageUpdate?.Invoke(message);
@@ -22,6 +22,11 @@
 
         public void StartListenUpdate()
         {
+            if (_isActive)
+            {
+                return;
+            }
+            
             _telegramBot.StartListenUpdateAsync();
             _isActive = true;
         }
@@ -52,11 +57,6 @@
                 }
                 
             } while (!httpResponseMessage.IsSuccessStatusCode);
-        }
-        
-        public bool GetStatus()
-        {
-            return _isActive;
         }
     }
 }

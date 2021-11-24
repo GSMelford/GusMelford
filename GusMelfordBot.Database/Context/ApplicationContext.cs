@@ -1,7 +1,6 @@
-﻿using GusMelfordBot.Database.Settings;
-
-namespace GusMelfordBot.Database.Context
+﻿namespace GusMelfordBot.Database.Context
 {
+    using Settings;
     using DAL;
     using DAL.TikTok;
     using Microsoft.EntityFrameworkCore;
@@ -12,7 +11,6 @@ namespace GusMelfordBot.Database.Context
 
         public DbSet<User> Users { get; set; }
         public DbSet<Video> Videos { get; set; }
-        public DbSet<Comment> Comments { get; set; }
 
         public ApplicationContext(DatabaseSettings databaseSettings)
         {

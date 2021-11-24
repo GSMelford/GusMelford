@@ -1,5 +1,6 @@
 ﻿namespace GusMelfordBot.Core.Services
 {
+    using System.Threading.Tasks;
     using Telegram.API.TelegramRequests.DeleteMessage;
     using Telegram.API.TelegramRequests.SendMessage;
     using Telegram.Dto;
@@ -14,36 +15,36 @@
     
     public class TikTokService : ITikTokService
     {
-        private readonly IDatabaseContext _databaseContext;
+        private readonly IDatabaseManager _databaseManager;
         private readonly List<DAL.User> _users;
         private readonly HttpClient _httpClient;
         private readonly IGusMelfordBotService _gusMelfordBotService;
         private int _videoCounter;
         
         public TikTokService(
-            IDatabaseContext context, 
+            IDatabaseManager manager, 
             IGusMelfordBotService gusMelfordBotService)
         {
             _httpClient = new HttpClient();
-            _databaseContext = context;
-            _videoCounter = _databaseContext.Count<DAL.TikTok.Video>().Result;
-            _users = _databaseContext.Get<DAL.User>();
+            _databaseManager = manager;
+            _videoCounter = _databaseManager.Count<DAL.TikTok.Video>().Result;
+            _users = _databaseManager.Get<DAL.User>();
             _gusMelfordBotService = gusMelfordBotService;
             _gusMelfordBotService.OnMessageUpdate += ProcessMessage;
         }
 
-        private void ProcessMessage(Message message)
+        private async void ProcessMessage(Message message)
         {
             if (!VerifyTikTokMessage(message))
             {
                 return;
             }
 
-            AddUserIfNotExist(message.From);
+            await AddUserIfNotExist(message.From);
             SaveLink(message);
         }
 
-        private void AddUserIfNotExist(User user)
+        private async Task AddUserIfNotExist(User user)
         {
             if (_users.FirstOrDefault(x => x.TelegramUserId == user.Id) is not null)
             {
@@ -58,10 +59,10 @@
                 TelegramUserId = user.Id
             });
             
-            _databaseContext.SaveAll();
+            await _databaseManager.SaveAll();
         }
 
-        private void SaveLink(Message message)
+        private async void SaveLink(Message message)
         {
             string text = message.Text;
             string videoLink = text.Split(' ').FirstOrDefault(l =>
@@ -72,7 +73,7 @@
                 return;
             }
             
-            string comment = text.Replace(videoLink, "");
+            string signature = text.Replace(videoLink, "");
             Uri uri = DoRequest(videoLink).RequestMessage?.RequestUri;
             string referer = string.Empty;
             
@@ -86,21 +87,12 @@
             var video = new DAL.TikTok.Video {
                 User = user,
                 SentLink = videoLink,
-                RefererLink = referer
+                RefererLink = referer,
+                Signature = signature
             };
             
-            _databaseContext.Add(video);
-
-            if (!string.IsNullOrEmpty(comment))
-            {
-                _databaseContext.Add(new Comment
-                {
-                    Text = comment,
-                    Video = video
-                });
-            }
-            
-            _databaseContext.SaveAll();
+            await _databaseManager.Add(video);
+            await _databaseManager.SaveAll();
 
             SendMessage(message.Chat, $"{user?.FirstName} sent {++_videoCounter}\n{videoLink}");
             DeleteMessage(message);

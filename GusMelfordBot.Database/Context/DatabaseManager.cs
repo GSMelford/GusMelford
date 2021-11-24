@@ -1,41 +1,40 @@
-﻿using GusMelfordBot.Database.Settings;
-using Microsoft.EntityFrameworkCore;
-
-namespace GusMelfordBot.Database.Context
+﻿namespace GusMelfordBot.Database.Context
 {
     using DAL;
-    using System.Collections.Generic;
+    using Settings;
+    using Interfaces;
     using System.Linq;
     using System.Threading.Tasks;
-    using Interfaces;
+    using System.Collections.Generic;
+    using Microsoft.EntityFrameworkCore;
     
-    public class DatabaseManager : IDatabaseContext
+    public class DatabaseManager : IDatabaseManager
     {
-        private static ApplicationContext _applicationContext;
+        public ApplicationContext Context { get; }
         
         public DatabaseManager(DatabaseSettings databaseSettings)
         {
-            _applicationContext = new ApplicationContext(databaseSettings);
+            Context = new ApplicationContext(databaseSettings);
         }
         
         public List<TEntity> Get<TEntity>() where TEntity : DatabaseEntity
         {
-            return _applicationContext.Set<TEntity>().ToList();
+            return Context.Set<TEntity>().ToList();
         }
 
         public async Task Add<TEntity>(TEntity entity) where TEntity : DatabaseEntity
         {
-            await _applicationContext.AddAsync(entity);
+            await Context.AddAsync(entity);
         }
 
         public Task<int> Count<TEntity>() where TEntity : DatabaseEntity
         {
-            return _applicationContext.Set<TEntity>().CountAsync();
+            return Context.Set<TEntity>().CountAsync();
         }
         
         public async Task SaveAll()
         {
-           await _applicationContext.SaveChangesAsync();
+           await Context.SaveChangesAsync();
         }
     }
 }

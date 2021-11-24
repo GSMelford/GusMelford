@@ -1,5 +1,7 @@
 namespace GusMelfordBot.Core
 {
+    using Settings;
+    using Microsoft.AspNetCore.Http;
     using Microsoft.Extensions.Configuration;
     using System;
     using Microsoft.Extensions.Logging;
@@ -21,7 +23,11 @@ namespace GusMelfordBot.Core
             services.AddServices(Configuration);
         }
 
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILogger<Startup> logger)
+        public void Configure(
+            IApplicationBuilder app, 
+            IWebHostEnvironment env, 
+            ILogger<Startup> logger,
+            CommonSettings commonSettings)
         {
             if (env.IsDevelopment())
             {
@@ -29,7 +35,25 @@ namespace GusMelfordBot.Core
             }
 
             app.UseRouting();
-            app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
+            
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapHealthChecks("/health");
+            });
+
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapGet("/", async context =>
+                {
+                    await context.Response.WriteAsync($"GusMelfordBot.Core v{commonSettings.Version}");
+                });
+            });
+
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapControllers();
+            });
+            
             logger.LogInformation("TBot started. Time: {Time}", DateTime.UtcNow);
         }
     }
