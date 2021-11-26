@@ -32,7 +32,7 @@
             return Context.Set<TEntity>().CountAsync();
         }
         
-        public async Task SaveAll()
+        public async Task SaveAllAcync()
         {
            await Context.SaveChangesAsync();
         }

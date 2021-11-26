@@ -7,5 +7,6 @@ namespace GusMelfordBot.Core.Settings
         public string Version { get; set; }
         public TelegramBotSettings TelegramBotSettings { get; set; }
         public DatabaseSettings DatabaseSettings { get; set; }
+        public TikTokSettings TikTokSettings { get; set; }
     }
 }

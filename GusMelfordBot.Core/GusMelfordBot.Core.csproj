@@ -32,4 +32,8 @@
       <ProjectReference Include="..\GusMelfordBot.Database\GusMelfordBot.Database.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <_ContentIncludedByDefault Remove="Views\GusMelfordBotHelloModel.cshtml" />
+    </ItemGroup>
+
 </Project>

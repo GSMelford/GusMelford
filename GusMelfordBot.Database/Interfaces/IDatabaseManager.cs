@@ -11,6 +11,6 @@
         List<TEntity> Get<TEntity>() where TEntity : DatabaseEntity;
         Task Add<TEntity>(TEntity entity) where TEntity : DatabaseEntity;
         Task<int> Count<TEntity>() where TEntity : DatabaseEntity;
-        Task SaveAll();
+        Task SaveAllAcync();
     }
 }

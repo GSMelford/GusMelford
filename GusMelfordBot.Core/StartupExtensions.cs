@@ -1,5 +1,6 @@
 ﻿namespace GusMelfordBot.Core
 {
+    using Services.Requests;
     using Interfaces;
     using Services;
     using Services.Data;
@@ -19,16 +20,17 @@
             services.AddSingleton(commonSettings);
             services.AddControllers();
             services.AddHealthChecks();
-            services.AddTransient<IDataService, DataService>();
             
+            services.AddTransient<IDataService, DataService>();
+            services.AddHttpClient<IRequestService, RequestService>();
+            services.AddRazorPages();
+            
+            services.AddSingleton<IPlayerService, PlayerService>();
             services.AddSingleton<IGusMelfordBotService>(
                 provider => new GusMelfordBotService(provider.GetRequiredService<CommonSettings>().TelegramBotSettings));
             services.AddSingleton<IDatabaseManager>(
                 provider => new DatabaseManager(provider.GetRequiredService<CommonSettings>().DatabaseSettings));
-            services.AddSingleton<ITikTokService>(
-                provider => new TikTokService(
-                    provider.GetRequiredService<IDatabaseManager>(), 
-                    provider.GetRequiredService<IGusMelfordBotService>()));
+            services.AddSingleton<ITikTokService, TikTokService>();
         }
     }
 }

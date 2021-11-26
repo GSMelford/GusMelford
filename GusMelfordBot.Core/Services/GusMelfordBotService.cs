@@ -13,11 +13,13 @@
         private bool _isActive;
         
         public event UpdateListener.MessageHandler OnMessageUpdate;
+        public event UpdateListener.CallbackQueryHandler OnCallbackQueryUpdate;
         
         public GusMelfordBotService(TelegramBotSettings telegramBotSettings)
         {
             _telegramBot = new TelegramBot(telegramBotSettings.Token, new HttpClient());
             _telegramBot.OnMessageUpdate += message => OnMessageUpdate?.Invoke(message);
+            _telegramBot.OnCallbackQueryUpdate += query => OnCallbackQueryUpdate?.Invoke(query);
         }
 
         public void StartListenUpdate()
@@ -31,7 +33,7 @@
             _isActive = true;
         }
         
-        public async Task SendMessage(IParameters parameters)
+        public async Task<HttpResponseMessage> SendMessage(IParameters parameters)
         {
             HttpResponseMessage httpResponseMessage;
             do
@@ -43,20 +45,18 @@
                 }
                 
             } while (!httpResponseMessage.IsSuccessStatusCode);
+            
+            return httpResponseMessage;
         }
         
         public async Task DeleteMessage(IParameters parameters)
         {
-            HttpResponseMessage httpResponseMessage;
-            do
-            {
-                httpResponseMessage = await _telegramBot.DeleteMessageAsync(parameters);
-                if (!httpResponseMessage.IsSuccessStatusCode)
-                {
-                    await Task.Delay(1000);
-                }
-                
-            } while (!httpResponseMessage.IsSuccessStatusCode);
+            await _telegramBot.DeleteMessageAsync(parameters);
+        }
+
+        public async Task SendVideoAsync(IParameters parameters)
+        {
+            await _telegramBot.SendVideoAsync(parameters);
         }
     }
 }

@@ -7,7 +7,6 @@
     using Microsoft.Extensions.Logging;
     
     [ApiController]
-    [Route("[controller]")]
     public class GusMelfordBotController : Controller
     {
         private readonly IGusMelfordBotService _gusMelfordBotService;

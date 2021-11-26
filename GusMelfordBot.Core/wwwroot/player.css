@@ -1,0 +1,28 @@
+.player-body{
+    margin: 0;
+    padding: 0;
+    background: black;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    grid-gap: 2vw;
+}
+
+.info-container{
+    font-size: 5vw;
+    padding: .5em;
+}
+
+.video-container{
+    font-size: 5vw;
+    padding: .5em;
+    text-align: center;
+}
+
+#video-block{
+}
+
+.log-container{
+    font-size: 5vw;
+    padding: .5em;
+    text-align: center;
+}
