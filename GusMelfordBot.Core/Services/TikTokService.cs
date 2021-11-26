@@ -1,10 +1,12 @@
-﻿using System.IO;
-using GusMelfordBot.Core.Settings;
-using Microsoft.EntityFrameworkCore;
-using Telegram.API.TelegramRequests.SendVideo;
-
-namespace GusMelfordBot.Core.Services
+﻿namespace GusMelfordBot.Core.Services
 {
+    using Settings;
+    using Microsoft.EntityFrameworkCore;
+    using Newtonsoft.Json.Linq;
+    using Telegram.API.TelegramRequests.SendVideo;
+    using Telegram.Dto.SendMessage.ReplyMarkup.Abstracts;
+    using Telegram.Dto.SendMessage.ReplyMarkup.InlineKeyboard;
+    using VideoFile = Telegram.API.TelegramRequests.SendVideo.VideoFile;
     using Requests;
     using System.Threading.Tasks;
     using Telegram.API.TelegramRequests.DeleteMessage;
@@ -25,13 +27,16 @@ namespace GusMelfordBot.Core.Services
         private readonly IGusMelfordBotService _gusMelfordBotService;
         private readonly IRequestService _requestService;
         private readonly IPlayerService _playerService;
+        private readonly CommonSettings _commonSettings;
+        private string _currentVideoInfoMessageId;
         private int _videoCounter;
 
         public TikTokService(
             IDatabaseManager manager,
             IRequestService requestService,
             IGusMelfordBotService gusMelfordBotService,
-            IPlayerService playerService)
+            IPlayerService playerService,
+            CommonSettings commonSettings)
         {
             _databaseManager = manager;
             _videoCounter = _databaseManager.Count<DAL.TikTok.Video>().Result;
@@ -41,6 +46,7 @@ namespace GusMelfordBot.Core.Services
             _gusMelfordBotService.OnCallbackQueryUpdate += ProcessCallbackQuery;
             _requestService = requestService;
             _playerService = playerService;
+            _commonSettings = commonSettings;
         }
 
         private async void ProcessCallbackQuery(CallbackQuery callbackQuery)
@@ -67,7 +73,7 @@ namespace GusMelfordBot.Core.Services
                 await _gusMelfordBotService.SendVideoAsync(new SendVideoParameters
                 {
                     ChatId = callbackQuery.FromUser.Id,
-                    Video = new VideoFile(_playerService.GetCurrentVideoStream(), "video")
+                    Video = new VideoFile(await _playerService.GetCurrentVideoFileStream(), "video")
                 });
             }
         }
@@ -169,5 +175,61 @@ namespace GusMelfordBot.Core.Services
         {
             return Constants.TikTokDomains.FirstOrDefault(x => message.Text.Contains(x)) is not null;
         }
+
+        public async Task SendVideoInfo()
+        {
+            DAL.TikTok.Video video = _playerService.GetCurrentVideo();
+            InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
+            KeyboardRaw<InlineKeyboardButton> keyboardRaw = new KeyboardRaw<InlineKeyboardButton>();
+            
+            keyboardRaw.AddButtons(new List<InlineKeyboardButton>
+            {
+                new () {
+                    Text = TikTokCallbackQueryButton.Like,
+                    CallbackData = TikTokCallbackQueryButton.Like + " " + video.Id
+                },
+                new () {
+                    Text = TikTokCallbackQueryButton.Save,
+                    CallbackData = TikTokCallbackQueryButton.Save + " " + video.Id
+                }
+            });
+            
+            inlineKeyboardMarkup.AddRaw(keyboardRaw);
+            HttpResponseMessage httpResponseMessage = await _gusMelfordBotService.SendMessage(
+                new SendMessageParameters
+                {
+                    ChatId = _commonSettings.TikTokSettings.TikTokChatId,
+                    Text = "Gus Melford Bot Playing now... 🥵\n\n" +
+                           $"Video № {video.Id}\n" +
+                           $"From user {video.User.FirstName}\n" +
+                           $"{video.RefererLink}",
+                    ReplyMarkup = inlineKeyboardMarkup
+                });
+
+            _currentVideoInfoMessageId =
+                JToken.Parse(await httpResponseMessage.Content.ReadAsStringAsync())["result"]?["message_id"]
+                    ?.ToString();
+        }
+
+        public async Task DeleteVideoInfo()
+        {
+            if (string.IsNullOrEmpty(_currentVideoInfoMessageId))
+            {
+                return;
+            }
+            
+            await _gusMelfordBotService.DeleteMessage(
+                new DeleteMessageParameters
+                {
+                    ChatId = _commonSettings.TikTokSettings.TikTokChatId,
+                    MessageId = int.Parse(_currentVideoInfoMessageId)
+                });
+        }
+    }
+    
+    public static class TikTokCallbackQueryButton
+    {
+        public const string Like = "❤️";
+        public const string Save = "💾";
     }
 }

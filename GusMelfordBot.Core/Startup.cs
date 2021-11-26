@@ -67,9 +67,7 @@ namespace GusMelfordBot.Core
             });
 
             app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
-
             app.UseEndpoints(endpoints => { endpoints.MapRazorPages(); });
-
             logger.LogInformation("TBot started. Time: {Time}", DateTime.UtcNow);
         }
     }

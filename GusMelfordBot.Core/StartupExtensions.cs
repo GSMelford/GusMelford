@@ -9,6 +9,7 @@
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
     using Database.Interfaces;
+    using Services.PlayerServices;
     
     public static class StartupExtensions
     {
@@ -22,6 +23,7 @@
             services.AddHealthChecks();
             
             services.AddTransient<IDataService, DataService>();
+            services.AddTransient<IVideoDownloadService, VideoDownloadService>();
             services.AddHttpClient<IRequestService, RequestService>();
             services.AddRazorPages();
             

@@ -3,13 +3,13 @@
     padding: 0;
     background: black;
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-columns: 1fr 2fr 1fr;
     grid-gap: 2vw;
 }
 
 .info-container{
-    font-size: 5vw;
     padding: .5em;
+    color: snow;
 }
 
 .video-container{
