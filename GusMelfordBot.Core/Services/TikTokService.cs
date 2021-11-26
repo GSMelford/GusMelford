@@ -124,10 +124,19 @@
                 new Request(videoLink)
                     .AddHeaders(new Dictionary<string, string> {{"User-Agent", Constants.UserAgent}})
                     .Build();
+
+            HttpResponseMessage httpResponseMessage = await _requestService.ExecuteAsync(requestMessage);
+            Uri uri = httpResponseMessage.RequestMessage?.RequestUri;
             
-            Uri uri = (await _requestService.ExecuteAsync(requestMessage)).RequestMessage?.RequestUri;
+            requestMessage =
+                new Request(uri?.ToString())
+                    .AddHeaders(new Dictionary<string, string> {{"User-Agent", Constants.UserAgent}})
+                    .Build();
+            
+            httpResponseMessage = await _requestService.ExecuteAsync(requestMessage);
+            uri = httpResponseMessage.RequestMessage?.RequestUri;
+            
             string referer = string.Empty;
-            
             if (uri is not null)
             {
                 referer = uri.Scheme + "://" + uri.Host + uri.AbsolutePath;
