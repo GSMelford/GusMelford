@@ -52,7 +52,7 @@ namespace GusMelfordBot.Core.Controllers
         {
             await _tikTokService.DeleteVideoInfo();
             FileStreamResult fileStreamResult = 
-                new FileStreamResult(_playerService.GetCurrentVideoStream(), ContentType);
+                new FileStreamResult(_playerService.CurrentVideoFile.Stream, ContentType);
             await _tikTokService.SendVideoInfo();
             return fileStreamResult;
         }

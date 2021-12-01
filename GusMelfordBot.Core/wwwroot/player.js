@@ -1,6 +1,7 @@
 let playerPath = "player.html";
 let baseUrl = document.location.href.replace(playerPath, "");
 let isVideoChanging = false;
+let isRotate = false;
 
 async function start() {
     document.addEventListener("keyup", keyDownHandler);
@@ -17,6 +18,16 @@ async function keyDownHandler(event) {
         }
         else if (event.key === "z" || event.key === "ArrowLeft" || event.key === "Z") {
             await changeVideo("player/video/new/prev");
+        }
+        else if(event.key === "r"){
+            if(isRotate){
+                document.getElementById("video-block").style.transform = "rotate(0deg)";
+                isRotate = false;
+            }
+            else {
+                document.getElementById("video-block").style.transform = "rotate(90deg)";
+                isRotate = true;
+            }
         }
 
         isVideoChanging = false;

@@ -16,25 +16,5 @@
         {
             Context = new ApplicationContext(databaseSettings);
         }
-        
-        public List<TEntity> Get<TEntity>() where TEntity : DatabaseEntity
-        {
-            return Context.Set<TEntity>().ToList();
-        }
-
-        public async Task Add<TEntity>(TEntity entity) where TEntity : DatabaseEntity
-        {
-            await Context.AddAsync(entity);
-        }
-
-        public Task<int> Count<TEntity>() where TEntity : DatabaseEntity
-        {
-            return Context.Set<TEntity>().CountAsync();
-        }
-        
-        public async Task SaveAllAcync()
-        {
-           await Context.SaveChangesAsync();
-        }
     }
 }

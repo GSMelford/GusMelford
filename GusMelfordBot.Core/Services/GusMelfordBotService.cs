@@ -1,4 +1,6 @@
-﻿namespace GusMelfordBot.Core.Services
+﻿using Newtonsoft.Json.Linq;
+
+namespace GusMelfordBot.Core.Services
 {
     using System.Threading.Tasks;
     using Bot.Api.BotRequests.Interfaces;
@@ -56,7 +58,8 @@
 
         public async Task SendVideoAsync(IParameters parameters)
         {
-            await _telegramBot.SendVideoAsync(parameters);
+            HttpResponseMessage httpResponseMessage = _telegramBot.SendVideoAsync(parameters).Result;
+            JToken token = JToken.Parse(await httpResponseMessage.Content.ReadAsStringAsync());
         }
     }
 }

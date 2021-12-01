@@ -21,18 +21,17 @@
             services.AddSingleton(commonSettings);
             services.AddControllers();
             services.AddHealthChecks();
-            
             services.AddTransient<IDataService, DataService>();
             services.AddTransient<IVideoDownloadService, VideoDownloadService>();
             services.AddHttpClient<IRequestService, RequestService>();
             services.AddRazorPages();
-            
+            services.AddSingleton<ITikTokService, TikTokService>();
             services.AddSingleton<IPlayerService, PlayerService>();
-            services.AddSingleton<IGusMelfordBotService>(
-                provider => new GusMelfordBotService(provider.GetRequiredService<CommonSettings>().TelegramBotSettings));
             services.AddSingleton<IDatabaseManager>(
                 provider => new DatabaseManager(provider.GetRequiredService<CommonSettings>().DatabaseSettings));
-            services.AddSingleton<ITikTokService, TikTokService>();
+            services.AddSingleton<IGusMelfordBotService>(
+                provider => new GusMelfordBotService(
+                    provider.GetRequiredService<CommonSettings>().TelegramBotSettings));
         }
     }
 }
