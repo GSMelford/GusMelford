@@ -9,5 +9,6 @@
 
         public const string TikTokDomain = "https://vm.tiktok.com/";
         public const string TikTokMobileDomain = "https://m.tiktok.com/";
+        public const string SetCommand = "###";
     }
 }

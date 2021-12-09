@@ -40,7 +40,7 @@ namespace GusMelfordBot.Core.Services
         {
             _databaseManager = manager;
             _gusMelfordBotService = gusMelfordBotService;
-            _gusMelfordBotService.OnMessageUpdate += SaveVideoAsync;
+            _gusMelfordBotService.OnMessageUpdate += ProcessMessage;
             _gusMelfordBotService.OnCallbackQueryUpdate += ProcessCallbackQuery;
             _requestService = requestService;
             _playerService = playerService;
@@ -61,17 +61,49 @@ namespace GusMelfordBot.Core.Services
             }
         }
         
-        public void SaveVideoAsync(Message message)
+        public void ProcessMessage(Message message)
         {
-            if (!VerifyTikTokMessage(message))
+            try
+            {
+                SetCommand(message);
+            
+                if (!VerifyTikTokMessage(message))
+                {
+                    return;
+                }
+
+                SaveNewUser(message.From);
+                SaveLink(message);
+            }
+            catch (Exception e)
+            {
+                SendMessage(message.Chat, $"Something went wrong...\nError:\n{e.Message}");
+            }
+        }
+
+        private void SetCommand(Message message)
+        {
+            string text = message.Text;
+            if (string.IsNullOrEmpty(text) || !text.Contains(Constants.SetCommand))
             {
                 return;
             }
-
-            SaveNewUser(message.From);
-            SaveLink(message);
+            
+            string signature = text.Replace(Constants.SetCommand, "");
+            DAL.TikTok.Video video = _databaseManager.Context.Set<DAL.TikTok.Video>()
+                .OrderBy(x=>x.CreatedOn)
+                .Include(x => x.User)
+                .LastOrDefault(x => x.User.TelegramUserId == message.From.Id);
+                
+            if (video is null)
+            {
+                return;
+            }
+                
+            video.Signature = signature;
+            _databaseManager.Context.SaveChanges();
         }
-
+        
         private void SaveNewUser(User user)
         {
             if (_databaseManager.Context.Set<DAL.User>().FirstOrDefault(x => x.TelegramUserId == user.Id) is not null)
@@ -199,7 +231,13 @@ namespace GusMelfordBot.Core.Services
 
         private static bool VerifyTikTokMessage(Message message)
         {
-            return Constants.TikTokDomains.FirstOrDefault(x => message.Text.Contains(x)) is not null;
+            string text = message.Text;
+            if (string.IsNullOrEmpty(text))
+            {
+                return false;
+            }
+            
+            return Constants.TikTokDomains.FirstOrDefault(x => text.Contains(x)) is not null;
         }
 
         public async Task SendVideoInfo()

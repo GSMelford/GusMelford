@@ -7,6 +7,6 @@
     {
         Task SendVideoInfo();
         Task DeleteVideoInfo();
-        void SaveVideoAsync(Message message);
+        void ProcessMessage(Message message);
     }
 }
