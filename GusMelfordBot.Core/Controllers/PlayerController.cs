@@ -1,7 +1,4 @@
-﻿using System.IO;
-using GusMelfordBot.DAL.TikTok;
-
-namespace GusMelfordBot.Core.Controllers
+﻿namespace GusMelfordBot.Core.Controllers
 {
     using System.Threading.Tasks;
     using Interfaces;
@@ -16,7 +13,7 @@ namespace GusMelfordBot.Core.Controllers
         private readonly IPlayerService _playerService;
         private readonly ITikTokService _tikTokService;
         
-        private const string ContentType = "application/octet-stream";
+        private const string ContentType = "video/mp4";
         
         public PlayerController(
             ILogger<PlayerController> logger,
@@ -48,11 +45,13 @@ namespace GusMelfordBot.Core.Controllers
         }
         
         [HttpGet("video/current")]
-        public async Task<FileStreamResult> GetCurrentVideo()
+        public async Task<FileResult> GetCurrentVideo()
         {
             await _tikTokService.DeleteVideoInfo();
-            FileStreamResult fileStreamResult = 
-                new FileStreamResult(_playerService.CurrentVideoFile.Stream, ContentType);
+            FileResult fileStreamResult =
+                new FileContentResult(_playerService.CurrentVideoFile.VideoArray, ContentType);
+            HttpContext.Response.Headers.Add("Content-Length", _playerService.CurrentVideoFile.VideoArray.Length.ToString());
+            HttpContext.Response.Headers.Add("Accept-Ranges", "bytes");
             await _tikTokService.SendVideoInfo();
             return fileStreamResult;
         }

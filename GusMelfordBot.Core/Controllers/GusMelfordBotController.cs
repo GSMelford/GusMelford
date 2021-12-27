@@ -1,7 +1,7 @@
 ﻿namespace GusMelfordBot.Core.Controllers
 {
+    using System;
     using System.Threading.Tasks;
-    using GusMelfordBot.Database.Interfaces;
     using Interfaces;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.Extensions.Logging;
@@ -11,23 +11,25 @@
     {
         private readonly IGusMelfordBotService _gusMelfordBotService;
         private readonly IDataService _dataService;
+        private readonly ILogger<GusMelfordBotController> _logger;
         
         public GusMelfordBotController(
             ILogger<GusMelfordBotController> logger, 
             IGusMelfordBotService gusMelfordBotService,
-            IDatabaseManager databaseManager,
             ITikTokService tikTokService,
             IDataService dataService)
         {
             _dataService = dataService;
             _gusMelfordBotService = gusMelfordBotService;
+            _logger = logger;
         }
 
         [HttpGet("start")]
         public ActionResult<string> Start()
         {
             _gusMelfordBotService.StartListenUpdate();
-            return new ActionResult<string>("GusMelfordBot worked...");
+            _logger.LogInformation("GusMelfordBot started listen update Time: {Time}", DateTime.UtcNow);
+            return Ok();
         }
 
         [HttpGet("video/new")]
@@ -42,6 +44,12 @@
             [FromQuery] string takeDateUntil)
         {
             return Json(await _dataService.GetTikTokVideo(takeDateSince, takeDateUntil));
+        }
+        
+        [HttpGet("systemData")]
+        public JsonResult GetSystemData()
+        {
+            return Json(_dataService.GetSystemData());
         }
     }
 }

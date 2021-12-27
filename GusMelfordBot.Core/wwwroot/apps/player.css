@@ -9,7 +9,6 @@
 
 .info-container{
     padding: .5em;
-    color: snow;
 }
 
 .video-container{
@@ -18,11 +17,16 @@
     text-align: center;
 }
 
-#video-block{
-}
-
 .log-container{
     font-size: 5vw;
     padding: .5em;
     text-align: center;
+}
+
+.player-title{
+    color: #e74c3c;
+}
+
+#info{
+    color: snow;
 }

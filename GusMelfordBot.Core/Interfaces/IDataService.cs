@@ -7,5 +7,6 @@
     {
         Task<VideoData> GetUnwatchTikTokVideo();
         Task<VideoData> GetTikTokVideo(string takeDateSince, string takeDateUntil);
+        BotSystemData GetSystemData();
     }
 }

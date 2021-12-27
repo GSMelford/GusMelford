@@ -1,12 +1,18 @@
-let playerPath = "player.html";
+let playerPath = "apps/player.html";
 let baseUrl = document.location.href.replace(playerPath, "");
 let isVideoChanging = false;
-let degreeOfCoup = 0;
+let degreeOfCoup = 450;
 
-async function start() {
+async function initPlayer() {
     document.addEventListener("keyup", keyDownHandler);
-    await executeRequest(baseUrl + "player/start");
+    await executeRequest("player/start");
     createElementVideoInfo();
+    
+    let information = await executeRequest("systemData");
+    document.title = information["playerInformation"]["name"] + " v" + information["playerInformation"]["version"];
+    
+    let playerTitle = document.getElementById("player-title");
+    playerTitle.innerText = information["playerInformation"]["name"] + " v" + information["playerInformation"]["version"];
 }
 
 async function keyDownHandler(event) {
@@ -20,9 +26,9 @@ async function keyDownHandler(event) {
             await changeVideo("player/video/new/prev");
         }
         else if(event.key === "r"){
-            degreeOfCoup += 90;
-            if(degreeOfCoup === 450){
-                degreeOfCoup = 0;
+            degreeOfCoup -= 90;
+            if(degreeOfCoup === 0){
+                degreeOfCoup = 450;
             }
             
             document.getElementById("video-block").style.transform = "rotate(" + degreeOfCoup + "deg)";
@@ -38,7 +44,7 @@ async function changeVideo(methodName) {
         videoBlocks[i].remove();
     }
 
-    createElementVideoInfo(await executeRequest(baseUrl + methodName));
+    createElementVideoInfo(await executeRequest(methodName));
     let video = createElementVideo();
     let source = createElementVideoSource("player/video/current");
     
@@ -82,11 +88,11 @@ function createElementVideoInfo(info){
         div.appendChild(p);
     }
     
-    let infoContainer = document.getElementById("info-container");
+    let infoContainer = document.getElementById("info");
     infoContainer.appendChild(div);
 }
 
 async function executeRequest(requestUrl) {
-    let response = await fetch(requestUrl);
+    let response = await fetch(baseUrl + requestUrl);
     return await response.json();
 }

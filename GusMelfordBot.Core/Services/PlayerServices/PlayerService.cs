@@ -15,7 +15,6 @@
     {
         private readonly IDatabaseManager _databaseManager;
         private readonly IVideoDownloadService _videoDownloadService;
-        private readonly CommonSettings _commonSettings;
 
         private List<Video> _videos;
         private int _cursor = -1;
@@ -25,12 +24,10 @@
 
         public PlayerService(
             IDatabaseManager databaseManager,
-            IVideoDownloadService videoDownloadService, 
-            CommonSettings commonSettings)
+            IVideoDownloadService videoDownloadService)
         {
             _databaseManager = databaseManager;
             _videoDownloadService = videoDownloadService;
-            _commonSettings = commonSettings;
         }
 
         public async Task Start()
@@ -89,7 +86,6 @@
         {
             return new VideoInfo
             {
-                PlayerNameVersion = "GusMelfordBot Player v" +  _commonSettings.PlayerVersion,
                 Id = CurrentVideo?.Id.ToString(),
                 DateTime = CurrentVideo?.CreatedOn ?? DateTime.Now,
                 RefererLink = CurrentVideo?.RefererLink,
