@@ -46,7 +46,7 @@ async function changeVideo(methodName) {
 
     createElementVideoInfo(await executeRequest(methodName));
     let video = createElementVideo();
-    let source = createElementVideoSource("player/video/current");
+    let source = createElementVideoSource("player/video/current" + "?updated=" + new Date());
     
     let videoContainer = document.getElementById("video-container");
     video.appendChild(source);

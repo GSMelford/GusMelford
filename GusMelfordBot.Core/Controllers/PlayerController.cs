@@ -1,5 +1,6 @@
 ﻿namespace GusMelfordBot.Core.Controllers
 {
+    using System.IO;
     using System.Threading.Tasks;
     using Interfaces;
     using Microsoft.AspNetCore.Mvc;
@@ -13,7 +14,7 @@
         private readonly IPlayerService _playerService;
         private readonly ITikTokService _tikTokService;
         
-        private const string ContentType = "video/mp4";
+        private const string CONTENT_TYPE = "video/mp4";
         
         public PlayerController(
             ILogger<PlayerController> logger,
@@ -45,14 +46,20 @@
         }
         
         [HttpGet("video/current")]
-        public async Task<FileResult> GetCurrentVideo()
+        public async Task<FileStreamResult> GetCurrentVideo([FromQuery] string updated)
         {
             await _tikTokService.DeleteVideoInfo();
-            FileResult fileStreamResult =
-                new FileContentResult(_playerService.CurrentVideoFile.VideoArray, ContentType);
+            FileStreamResult fileStreamResult =
+                new FileStreamResult(new MemoryStream(_playerService.CurrentVideoFile.VideoArray), CONTENT_TYPE);
+            
             HttpContext.Response.Headers.Add("Content-Length", _playerService.CurrentVideoFile.VideoArray.Length.ToString());
             HttpContext.Response.Headers.Add("Accept-Ranges", "bytes");
+            HttpContext.Response.Headers.Add("Cache-Control", "no-cache, no-store, must-revalidate");
+            HttpContext.Response.Headers.Add("Pragma", "no-cache");
+            HttpContext.Response.Headers.Add("Expires", "0");
+           
             await _tikTokService.SendVideoInfo();
+            _logger.LogInformation("Update to new video. Request time: {Updated}", updated);
             return fileStreamResult;
         }
     }
