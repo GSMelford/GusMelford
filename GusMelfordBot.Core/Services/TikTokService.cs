@@ -1,7 +1,7 @@
-﻿using System.IO;
-
-namespace GusMelfordBot.Core.Services
+﻿namespace GusMelfordBot.Core.Services
 {
+    using System.IO;
+    using System.Threading;
     using Settings;
     using Microsoft.EntityFrameworkCore;
     using Newtonsoft.Json.Linq;
@@ -31,6 +31,11 @@ namespace GusMelfordBot.Core.Services
         private readonly CommonSettings _commonSettings;
         private string _currentVideoInfoMessageId;
 
+        private readonly List<string> _emojiList = new()
+        {
+            "😳", "🥵", "😂", "😘", "❤️", "😜", "💋", "😒", "😍", "🙊", "😆", "😋", "😍", "🙈", "😖", "🥸", "😎", "🥺", "🥳"
+        }; 
+        
         public TikTokService(
             IDatabaseManager manager,
             IRequestService requestService,
@@ -45,8 +50,50 @@ namespace GusMelfordBot.Core.Services
             _requestService = requestService;
             _playerService = playerService;
             _commonSettings = commonSettings;
+            //Task.Run(SendStatisticsTimer);
         }
 
+        private void SendStatisticsTimer()
+        {
+            TimeSpan timeForStatistics = new TimeSpan(21, 0, 0);
+            while (true)
+            {
+                if (DateTime.Now.TimeOfDay.Hours == timeForStatistics.Hours)
+                {
+                    GetStatistics();
+                    Thread.Sleep(600000);
+                }
+                else
+                {
+                    Thread.Sleep(60000);
+                }
+            }
+        }
+        
+        private string GetStatistics()
+        {
+            List<DAL.User> users = _databaseManager.Context.Set<DAL.User>().ToList();
+            List<DAL.TikTok.Video> videos = _databaseManager.Context
+                .Set<DAL.TikTok.Video>()
+                .Where(x => x.CreatedOn.Date == DateTime.Now.Date)
+                .ToList();
+
+            Dictionary<string, int> userAndCount = new Dictionary<string, int>(
+                users.ToDictionary(x => x.FirstName, y => videos
+                        .Count(x => x.User.FirstName == y.FirstName))
+                        .OrderByDescending(x => x.Value));
+
+            Chat chat = new Chat
+            {
+                Id = _commonSettings.TikTokSettings.TikTokChatId
+            };
+            
+            string[] medals = {"🥇", "🥈", "🥉"}; //TODO может быть вылет за массив, если будет больше трех пользователей
+            int count = 0;
+            return $"🥳 Statistics for {DateTime.Now:d}\n\n" +
+                   $"{string.Join("\n", userAndCount.Keys.Select(x => medals[count++] + " " + x + userAndCount[x]))}";
+        }
+        
         private void ProcessCallbackQuery(CallbackQuery callbackQuery)
         {
             string[] data = callbackQuery.Data.Split(" ");
@@ -65,7 +112,7 @@ namespace GusMelfordBot.Core.Services
         {
             try
             {
-                SetCommand(message);
+                SetSignature(message);
             
                 if (!VerifyTikTokMessage(message))
                 {
@@ -77,11 +124,11 @@ namespace GusMelfordBot.Core.Services
             }
             catch (Exception e)
             {
-                SendMessage(message.Chat, $"Something went wrong...\nError:\n{e.Message}");
+                SendMessage(message.Chat, $"Something went wrong!\n{e.Message}");
             }
         }
 
-        private void SetCommand(Message message)
+        private void SetSignature(Message message)
         {
             string text = message.Text;
             if (string.IsNullOrEmpty(text) || !text.Contains(Constants.SetCommand))
@@ -126,8 +173,10 @@ namespace GusMelfordBot.Core.Services
         private void SaveLink(Message message)
         {
             string text = message.Text;
-            string videoLink = text.Split(' ').FirstOrDefault(l =>
-                l.Contains(Constants.TikTokDomain) || l.Contains(Constants.TikTokMobileDomain))?.Trim();
+            string videoLink = text.Split(new []{' ', '\n'}).FirstOrDefault(l =>
+                l.Contains(Constants.TikTokVMDomain) 
+                || l.Contains(Constants.TikTokMDomain)
+                || l.Contains(Constants.TikTokWWWDomain))?.Trim();
 
             if (string.IsNullOrEmpty(videoLink))
             {
@@ -181,7 +230,8 @@ namespace GusMelfordBot.Core.Services
             _databaseManager.Context.SaveChanges();
             
             int counter = _databaseManager.Context.Set<DAL.TikTok.Video>().Count();
-            SendMessage(message.Chat, $"{user?.FirstName} sent {counter}\n{videoLink}");
+            SendMessage(message.Chat, 
+                $"{_emojiList[new Random().Next(0, _emojiList.Count)]} {user?.FirstName} sent {counter}\n{videoLink}");
             DeleteMessage(message);
         }
         
@@ -263,10 +313,11 @@ namespace GusMelfordBot.Core.Services
                 new SendMessageParameters
                 {
                     ChatId = _commonSettings.TikTokSettings.TikTokChatId,
-                    Text = "Gus Melford Bot Playing now... 🥵\n\n" +
-                           $"Video № {video.Id}\n" +
-                           $"From user {video.User.FirstName}\n" +
-                           $"{video.RefererLink}",
+                    Text = "GusMelfordBot Player 🥵🥵🥵\n\n" +
+                           $"{video.Id}\n" +
+                           $"{video.User.FirstName}\n" +
+                           $"{video.RefererLink}\n\n" +
+                           $"{GetStatistics()}",
                     ReplyMarkup = inlineKeyboardMarkup
                 });
 

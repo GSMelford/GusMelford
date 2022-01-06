@@ -92,7 +92,7 @@
         private string GetVideoId(string referer)
         {
             return referer
-                .Replace(Constants.TikTokDomain, "")
+                .Replace(Constants.TikTokVMDomain, "")
                 .Replace("/video/", " ")
                 .Split(" ")[1];
         }
