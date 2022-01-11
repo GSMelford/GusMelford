@@ -83,11 +83,6 @@
                         .Count(x => x.User.FirstName == y.FirstName))
                         .OrderByDescending(x => x.Value));
 
-            Chat chat = new Chat
-            {
-                Id = _commonSettings.TikTokSettings.TikTokChatId
-            };
-            
             string[] medals = {"🥇", "🥈", "🥉"}; //TODO может быть вылет за массив, если будет больше трех пользователей
             int count = 0;
             return $"🥳 Statistics for {DateTime.Now:d}\n\n" +
@@ -172,18 +167,43 @@
 
         private void SaveLink(Message message)
         {
-            string text = message.Text;
-            string videoLink = text.Split(new []{' ', '\n'}).FirstOrDefault(l =>
+            var video = CreateVideo(message.Text);
+            if (video is null)
+            {
+                return;
+            }
+            
+            DAL.TikTok.Video oldVideo = _databaseManager.Context.Set<DAL.TikTok.Video>()
+                .FirstOrDefaultAsync(v => v.RefererLink == video.RefererLink).Result;
+            if (oldVideo is not null)
+            {
+                DeleteMessage(message);
+                return;
+            }
+            
+            _databaseManager.Context.Add(video);
+            _databaseManager.Context.SaveChanges();
+            
+            int counter = _databaseManager.Context.Set<DAL.TikTok.Video>().Count();
+            SendMessage(message.Chat, 
+                $"{_emojiList[new Random().Next(0, _emojiList.Count)]} " +
+                $"{video.User?.FirstName} sent {counter}\n{video.RefererLink}");
+            DeleteMessage(message);
+        }
+
+        public DAL.TikTok.Video CreateVideo(string link, long userId = 443763853)
+        {
+            string videoLink = link.Split(new []{' ', '\n'}).FirstOrDefault(l =>
                 l.Contains(Constants.TikTokVMDomain) 
                 || l.Contains(Constants.TikTokMDomain)
                 || l.Contains(Constants.TikTokWWWDomain))?.Trim();
 
             if (string.IsNullOrEmpty(videoLink))
             {
-                return;
+                return null;
             }
             
-            string signature = text.Replace(videoLink, "");
+            string signature = link.Replace(videoLink, "");
             
             HttpRequestMessage requestMessage =
                 new Request(videoLink)
@@ -207,32 +227,15 @@
                 referer = uri.Scheme + "://" + uri.Host + uri.AbsolutePath;
             }
 
-            DAL.TikTok.Video oldVideo = _databaseManager.Context.Set<DAL.TikTok.Video>()
-                .FirstOrDefaultAsync(v => v.RefererLink == referer).Result;
-            
-            if (oldVideo is not null)
-            {
-                DeleteMessage(message);
-                return;
-            }
-            
             var user = _databaseManager.Context.Set<DAL.User>()
-                .FirstOrDefault(u => u.TelegramUserId == message.From.Id);
+                .FirstOrDefault(u => u.TelegramUserId == userId);
             
-            var video = new DAL.TikTok.Video {
+            return new DAL.TikTok.Video {
                 User = user,
                 SentLink = videoLink,
                 RefererLink = referer,
                 Signature = signature
             };
-
-            _databaseManager.Context.Add(video);
-            _databaseManager.Context.SaveChanges();
-            
-            int counter = _databaseManager.Context.Set<DAL.TikTok.Video>().Count();
-            SendMessage(message.Chat, 
-                $"{_emojiList[new Random().Next(0, _emojiList.Count)]} {user?.FirstName} sent {counter}\n{videoLink}");
-            DeleteMessage(message);
         }
         
         private void SendVideo(CallbackQuery callbackQuery, string[] data)

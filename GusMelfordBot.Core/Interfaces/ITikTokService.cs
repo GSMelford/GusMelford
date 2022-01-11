@@ -8,5 +8,6 @@
         Task SendVideoInfo();
         Task DeleteVideoInfo();
         void ProcessMessage(Message message);
+        public DAL.TikTok.Video CreateVideo(string link, long userId = 443763853);
     }
 }

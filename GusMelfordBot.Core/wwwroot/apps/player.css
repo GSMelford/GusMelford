@@ -30,3 +30,9 @@
 #info{
     color: snow;
 }
+
+#input-new-video, #send-new-video{
+    color: snow;
+    background: #232422;
+    border: none;
+}

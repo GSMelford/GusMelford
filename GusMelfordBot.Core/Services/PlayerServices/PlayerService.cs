@@ -1,4 +1,8 @@
-﻿namespace GusMelfordBot.Core.Services.PlayerServices
+﻿using System.Net.Http;
+using GusMelfordBot.Core.Services.Requests;
+using Newtonsoft.Json.Linq;
+
+namespace GusMelfordBot.Core.Services.PlayerServices
 {
     using Settings;
     using System;
@@ -15,7 +19,8 @@
     {
         private readonly IDatabaseManager _databaseManager;
         private readonly IVideoDownloadService _videoDownloadService;
-
+        private readonly IRequestService _requestService;
+        
         private List<Video> _videos;
         private int _cursor = -1;
 
@@ -24,10 +29,12 @@
 
         public PlayerService(
             IDatabaseManager databaseManager,
-            IVideoDownloadService videoDownloadService)
+            IVideoDownloadService videoDownloadService,
+            IRequestService requestService)
         {
             _databaseManager = databaseManager;
             _videoDownloadService = videoDownloadService;
+            _requestService = requestService;
         }
 
         public async Task Start()
@@ -106,6 +113,68 @@
 
             video.IsValid = true;
             return CurrentVideoFile.Stream;
+        }
+
+        public void AddNewVideos(JToken videos)
+        {
+            if (videos["itemList"] is not JArray itemList)
+            {
+                return;
+            }
+            
+            foreach (JToken item in itemList)
+            {
+                string link = $"https://www.tiktok.com/@{item["author"]?["nickname"]}/video/{item["video"]?["id"]}";
+                Video video = CreateVideo(link);
+                _videos.Add(video);
+            }
+        }
+        
+        public DAL.TikTok.Video CreateVideo(string link, long userId = 443763853)
+        {
+            string videoLink = link.Split(new []{' ', '\n'}).FirstOrDefault(l =>
+                l.Contains(Constants.TikTokVMDomain) 
+                || l.Contains(Constants.TikTokMDomain)
+                || l.Contains(Constants.TikTokWWWDomain))?.Trim();
+
+            if (string.IsNullOrEmpty(videoLink))
+            {
+                return null;
+            }
+            
+            string signature = link.Replace(videoLink, "");
+            
+            HttpRequestMessage requestMessage =
+                new Request(videoLink)
+                    .AddHeaders(new Dictionary<string, string> {{"User-Agent", Constants.UserAgent}})
+                    .Build();
+
+            HttpResponseMessage httpResponseMessage = _requestService.ExecuteAsync(requestMessage).Result;
+            Uri uri = httpResponseMessage.RequestMessage?.RequestUri;
+            
+            requestMessage =
+                new Request(uri?.ToString())
+                    .AddHeaders(new Dictionary<string, string> {{"User-Agent", Constants.UserAgent}})
+                    .Build();
+            
+            httpResponseMessage = _requestService.ExecuteAsync(requestMessage).Result;
+            uri = httpResponseMessage.RequestMessage?.RequestUri;
+            
+            string referer = string.Empty;
+            if (uri is not null)
+            {
+                referer = uri.Scheme + "://" + uri.Host + uri.AbsolutePath;
+            }
+
+            var user = _databaseManager.Context.Set<DAL.User>()
+                .FirstOrDefault(u => u.TelegramUserId == userId);
+            
+            return new DAL.TikTok.Video {
+                User = user,
+                SentLink = videoLink,
+                RefererLink = referer,
+                Signature = signature
+            };
         }
     }
 }

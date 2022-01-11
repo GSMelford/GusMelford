@@ -1,4 +1,7 @@
-﻿namespace GusMelfordBot.Core.Controllers
+﻿using Microsoft.AspNetCore.Http;
+using Newtonsoft.Json.Linq;
+
+namespace GusMelfordBot.Core.Controllers
 {
     using System.IO;
     using System.Threading.Tasks;
@@ -61,6 +64,12 @@
             await _tikTokService.SendVideoInfo();
             _logger.LogInformation("Update to new video. Request time: {Updated}", updated);
             return fileStreamResult;
+        }
+        
+        [HttpPost("video/new")]
+        public void SetNewVideos([FromBody]string body)
+        {
+            _playerService.AddNewVideos(JToken.Parse(body));
         }
     }
 }

@@ -1,7 +1,7 @@
 let playerPath = "apps/player.html";
 let baseUrl = document.location.href.replace(playerPath, "");
-let isVideoChanging = false;
-let degreeOfCoup = 450;
+let isKeyInputActive = false;
+let degreeOfCoup = 360;
 
 async function initPlayer() {
     document.addEventListener("keyup", keyDownHandler);
@@ -16,8 +16,8 @@ async function initPlayer() {
 }
 
 async function keyDownHandler(event) {
-    if(!isVideoChanging){
-        isVideoChanging = true;
+    if(!isKeyInputActive){
+        isKeyInputActive = true;
         
         if (event.key === "x" || event.key === "ArrowRight" || event.key === "X") {
             await changeVideo("player/video/new/next");
@@ -26,16 +26,21 @@ async function keyDownHandler(event) {
             await changeVideo("player/video/new/prev");
         }
         else if(event.key === "r"){
-            degreeOfCoup -= 90;
-            if(degreeOfCoup === 0){
-                degreeOfCoup = 450;
-            }
-            
-            document.getElementById("video-block").style.transform = "rotate(" + degreeOfCoup + "deg)";
+            rotateVideo();
         }
-
-        isVideoChanging = false;
+        
+        isKeyInputActive = false;
     }
+}
+
+function rotateVideo(){
+    degreeOfCoup -= 90;
+    if(degreeOfCoup === 0){
+        degreeOfCoup = 360;
+    }
+
+    document.getElementById("video-block")
+        .style.transform = "rotate(" + degreeOfCoup + "deg)";
 }
 
 async function changeVideo(methodName) {
@@ -80,16 +85,34 @@ function createElementVideoInfo(info){
     
     div = document.createElement("div");
     div.setAttribute("id", "video-info");
-
+    
     for (let prop in info) {
-        console.log("info." + prop + " = " + info[prop]);
         let p = document.createElement("p");
         p.innerText = info[prop];
+        
+        if(prop === "signature"){
+            let div = document.getElementById("signature");
+            p.style.fontSize = "xx-large";
+            p.style.color = "yellow";
+            div.appendChild(p);
+            continue;
+        }
+        
         div.appendChild(p);
     }
     
     let infoContainer = document.getElementById("info");
     infoContainer.appendChild(div);
+}
+
+async function sendNewVideos() {
+    await fetch('https://localhost:5001/player/video/new', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json;charset=utf-8'
+        },
+        body: JSON.stringify(document.getElementById("input-new-video").value)
+    });
 }
 
 async function executeRequest(requestUrl) {

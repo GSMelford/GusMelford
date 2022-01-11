@@ -1,4 +1,6 @@
-﻿namespace GusMelfordBot.Core.Interfaces
+﻿using Newtonsoft.Json.Linq;
+
+namespace GusMelfordBot.Core.Interfaces
 {
     using Services.PlayerServices;
     using DAL.TikTok;
@@ -11,5 +13,6 @@
         Task<VideoInfo> SetPreviousVideo();
         Video CurrentVideo { get; }
         VideoFile CurrentVideoFile { get; }
+        void AddNewVideos(JToken videos);
     }
 }
