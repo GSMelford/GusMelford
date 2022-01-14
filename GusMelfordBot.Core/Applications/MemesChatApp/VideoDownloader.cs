@@ -1,36 +1,39 @@
-﻿namespace GusMelfordBot.Core.Services.PlayerServices
+﻿using System.Collections.Generic;
+using System.Net.Http;
+using System.Text.RegularExpressions;
+using System.Threading.Tasks;
+using GusMelfordBot.Core.Interfaces;
+using GusMelfordBot.Core.Services.Requests;
+using GusMelfordBot.DAL.Applications.MemesChat.TikTok;
+using Microsoft.Extensions.Logging;
+using Newtonsoft.Json.Linq;
+
+namespace GusMelfordBot.Core.Applications.MemesChatApp
 {
-    using System.Text.RegularExpressions;
-    using DAL.TikTok;
-    using Newtonsoft.Json.Linq;
-    using System.Collections.Generic;
-    using System.IO;
-    using System.Net.Http;
-    using System.Threading.Tasks;
-    using Interfaces;
-    using Requests;
-    using Microsoft.Extensions.Logging;
-    
-    public class VideoDownloadService : IVideoDownloadService
+    public class VideoDownloader
     {
         private readonly IRequestService _requestService;
-        private readonly ILogger<VideoDownloadService> _logger;
+        private readonly ILogger _logger;
         
-        public VideoDownloadService(
+        public VideoDownloader(
             IRequestService requestService, 
-            ILogger<VideoDownloadService> logger)
+            ILogger logger)
         {
             _requestService = requestService;
             _logger = logger;
         }
         
-        public async Task<VideoFile> DownloadVideo(Video video)
+        public async Task<byte[]> DownloadTikTokVideo(TikTokVideoContent video)
         {
-            string originalLink = GetOriginalLink(await GetVideoInformation(video));
+            JToken videoInformation = await GetVideoInformation(video);
+            string originalLink = GetOriginalLink(videoInformation);
+            string description = GetDescription(videoInformation);
 
+            video.Description = description;
+            
             if (string.IsNullOrEmpty(originalLink))
             {
-                return new VideoFile();
+                return null;
             }
             
             try
@@ -44,19 +47,12 @@
 
                 HttpResponseMessage httpResponseMessage = await _requestService.ExecuteAsync(requestMessage);
                 byte[] videoArray = await httpResponseMessage.Content.ReadAsByteArrayAsync();
-                Stream videoStream = await httpResponseMessage.Content.ReadAsStreamAsync();
-
-                return new VideoFile
-                {
-                    IsDownloaded = true,
-                    Stream = videoStream,
-                    VideoArray = videoArray
-                };
+                return videoArray;
             }
             catch
             {
                 _logger.LogError("Download Video error {RefererLink}", video.RefererLink);
-                return new VideoFile();
+                return null;
             }
         }
         
@@ -65,7 +61,12 @@
             return videoInformation["itemInfo"]?["itemStruct"]?["video"]?["downloadAddr"]?.ToString();
         }
         
-        private async Task<JToken> GetVideoInformation(Video video)
+        private string GetDescription(JToken videoInformation)
+        {
+            return videoInformation["seoProps"]?["metaParams"]?["description"]?.ToString();
+        }
+        
+        private async Task<JToken> GetVideoInformation(TikTokVideoContent video)
         {
             HttpRequestMessage requestMessage =
                 new Request(BuildVideoInformationUrl(video))
@@ -75,7 +76,7 @@
             return await (await _requestService.ExecuteAsync(requestMessage)).GetJTokenAsync();
         }
         
-        private string BuildVideoInformationUrl(Video video)
+        private string BuildVideoInformationUrl(TikTokVideoContent video)
         {
             return $"https://www.tiktok.com/node/share/video/{GetVideoUser(video.RefererLink)}" +
                    $"/{GetVideoId(video.RefererLink)}";
@@ -92,7 +93,7 @@
         private string GetVideoId(string referer)
         {
             return referer
-                .Replace(Constants.TikTokVMDomain, "")
+                .Replace(Constants.TikTok, "")
                 .Replace("/video/", " ")
                 .Split(" ")[1];
         }

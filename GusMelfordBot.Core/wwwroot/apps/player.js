@@ -4,11 +4,10 @@ let isKeyInputActive = false;
 let degreeOfCoup = 360;
 
 async function initPlayer() {
-    document.addEventListener("keyup", keyDownHandler);
-    await executeRequest("player/start");
+    document.addEventListener("keydown", keyDownHandler);
     createElementVideoInfo();
     
-    let information = await executeRequest("systemData");
+    let information = await executeRequest("info");
     document.title = information["playerInformation"]["name"] + " v" + information["playerInformation"]["version"];
     
     let playerTitle = document.getElementById("player-title");
@@ -20,10 +19,10 @@ async function keyDownHandler(event) {
         isKeyInputActive = true;
         
         if (event.key === "x" || event.key === "ArrowRight" || event.key === "X") {
-            await changeVideo("player/video/new/next");
+            await changeVideo("player/video/next");
         }
         else if (event.key === "z" || event.key === "ArrowLeft" || event.key === "Z") {
-            await changeVideo("player/video/new/prev");
+            await changeVideo("player/video/prev");
         }
         else if(event.key === "r"){
             rotateVideo();
@@ -79,8 +78,13 @@ function createElementVideoSource(methodName){
 
 function createElementVideoInfo(info){
     let div = document.getElementById("video-info");
+    let divAccompanyingCommentary = document.getElementById("accompanyingCommentary");
     if(div !== null){
         div.remove();
+    }
+
+    if(divAccompanyingCommentary !== null){
+        divAccompanyingCommentary.remove();
     }
     
     div = document.createElement("div");
@@ -90,29 +94,20 @@ function createElementVideoInfo(info){
         let p = document.createElement("p");
         p.innerText = info[prop];
         
-        if(prop === "signature"){
-            let div = document.getElementById("signature");
+        if(prop === "accompanyingCommentary"){
+            divAccompanyingCommentary = document.createElement("div");
+            divAccompanyingCommentary.setAttribute("id", "accompanyingCommentary")
             p.style.fontSize = "xx-large";
             p.style.color = "yellow";
-            div.appendChild(p);
+            divAccompanyingCommentary.appendChild(p);
+            document.getElementById("info-container").appendChild(divAccompanyingCommentary);
             continue;
         }
-        
         div.appendChild(p);
     }
     
     let infoContainer = document.getElementById("info");
     infoContainer.appendChild(div);
-}
-
-async function sendNewVideos() {
-    await fetch('https://localhost:5001/player/video/new', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json;charset=utf-8'
-        },
-        body: JSON.stringify(document.getElementById("input-new-video").value)
-    });
 }
 
 async function executeRequest(requestUrl) {

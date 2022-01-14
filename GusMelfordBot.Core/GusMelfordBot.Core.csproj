@@ -36,4 +36,8 @@
       <_ContentIncludedByDefault Remove="Views\GusMelfordBotHelloModel.cshtml" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="Applications\MemesChatApp\ContentProviders\YouTube" />
+    </ItemGroup>
+
 </Project>

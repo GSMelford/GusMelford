@@ -1,11 +1,11 @@
-﻿namespace GusMelfordBot.Core.Services.Requests
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net.Http;
+using System.Net.Http.Headers;
+
+namespace GusMelfordBot.Core.Services.Requests
 {
-    using System.Net.Http.Headers;
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Net.Http;
-    
     public class Request
     {
         private readonly HttpMethod _httpMethod;

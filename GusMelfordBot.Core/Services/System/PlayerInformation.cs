@@ -1,4 +1,6 @@
-﻿namespace GusMelfordBot.Core.Services.Data
+﻿using System.Threading.Tasks;
+
+namespace GusMelfordBot.Core.Services.Data.Entities
 {
     public class PlayerInformation
     {

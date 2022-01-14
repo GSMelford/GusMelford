@@ -1,15 +1,22 @@
-﻿namespace GusMelfordBot.Core
+﻿using GusMelfordBot.Core.Applications.Commander;
+using GusMelfordBot.Core.Applications.MemesChatApp.ContentProviders.TikTok;
+using GusMelfordBot.Core.Services.System;
+using GusMelfordBot.Core.Services.Update;
+using GusMelfordBot.Database.Context;
+using GusMelfordBot.Database.Interfaces;
+
+namespace GusMelfordBot.Core
 {
-    using Services.Requests;
     using Interfaces;
-    using Services;
-    using Services.Data;
-    using Database.Context;
     using Settings;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
-    using Database.Interfaces;
-    using Services.PlayerServices;
+    using Applications.MemesChatApp.Player;
+    using Services;
+    using Services.Requests;
+    using Applications;
+    using Applications.MemesChatApp;
+    using GusMelfordBot.Core.Applications.MemesChatApp.Interfaces;
     
     public static class StartupExtensions
     {
@@ -21,17 +28,19 @@
             services.AddSingleton(commonSettings);
             services.AddControllers();
             services.AddHealthChecks();
-            services.AddTransient<IDataService, DataService>();
-            services.AddTransient<IVideoDownloadService, VideoDownloadService>();
-            services.AddHttpClient<IRequestService, RequestService>();
-            services.AddRazorPages();
-            services.AddSingleton<ITikTokService, TikTokService>();
-            services.AddSingleton<IPlayerService, PlayerService>();
-            services.AddSingleton<IDatabaseManager>(
+
+            services.AddTransient<IDatabaseManager>(
                 provider => new DatabaseManager(provider.GetRequiredService<CommonSettings>().DatabaseSettings));
-            services.AddSingleton<IGusMelfordBotService>(
-                provider => new GusMelfordBotService(
-                    provider.GetRequiredService<CommonSettings>().TelegramBotSettings));
+
+            services.AddTransient<ICommanderService, CommanderService>();
+            services.AddTransient<IUpdateService, UpdateService>();
+            services.AddTransient<ISystemService, SystemService>();
+            services.AddTransient<IGusMelfordBotService, GusMelfordBotService>();
+            services.AddHttpClient<IRequestService, RequestService>();
+            services.AddTransient<ITikTokService, TikTokService>();
+            services.AddSingleton<IPlayerService, PlayerService>();
+            services.AddTransient<IMemeChatService, MemeChatService>();
+            services.AddTransient<IApplicationService, ApplicationService>();
         }
     }
 }

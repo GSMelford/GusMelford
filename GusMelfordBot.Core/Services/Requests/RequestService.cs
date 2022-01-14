@@ -1,8 +1,8 @@
-﻿namespace GusMelfordBot.Core.Services.Requests
+﻿using System.Net.Http;
+using System.Threading.Tasks;
+
+namespace GusMelfordBot.Core.Services.Requests
 {
-    using System;
-    using System.Net.Http;
-    using System.Threading.Tasks;
     using Interfaces;
     using Newtonsoft.Json.Linq;
     
@@ -10,8 +10,7 @@
     {
         private readonly HttpClient _httpClient;
 
-        public RequestService(
-            HttpClient httpClient)
+        public RequestService(HttpClient httpClient)
         {
             _httpClient = httpClient;
         }

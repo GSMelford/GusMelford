@@ -1,8 +1,8 @@
 ﻿let homePath = "home.html";
 let baseUrl = document.location.href.replace(homePath, "");
 
-async function initHomePage(){
-    let information = await executeRequest("systemData");
+async function load(){
+    let information = await executeRequest("info");
     let botFullName = information.name + " v" + information.version;
     document.title = botFullName;
     
