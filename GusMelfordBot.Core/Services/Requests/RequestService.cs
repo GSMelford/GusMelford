@@ -10,9 +10,9 @@ namespace GusMelfordBot.Core.Services.Requests
     {
         private readonly HttpClient _httpClient;
 
-        public RequestService(HttpClient httpClient)
+        public RequestService()
         {
-            _httpClient = httpClient;
+            _httpClient = new HttpClient();
         }
         
         public async Task<HttpResponseMessage> ExecuteAsync(HttpRequestMessage httpRequestMessage)

@@ -36,7 +36,7 @@ namespace GusMelfordBot.Core
             services.AddTransient<IUpdateService, UpdateService>();
             services.AddTransient<ISystemService, SystemService>();
             services.AddTransient<IGusMelfordBotService, GusMelfordBotService>();
-            services.AddHttpClient<IRequestService, RequestService>();
+            services.AddSingleton<IRequestService, RequestService>();
             services.AddTransient<ITikTokService, TikTokService>();
             services.AddSingleton<IPlayerService, PlayerService>();
             services.AddTransient<IMemeChatService, MemeChatService>();

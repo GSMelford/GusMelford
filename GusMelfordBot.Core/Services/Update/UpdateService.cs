@@ -15,9 +15,14 @@ namespace GusMelfordBot.Core.Services.Update
         
         public void ProcessUpdate(Telegram.Dto.UpdateModule.Update update)
         {
-            if (update.Message is not null)
+            if(update.Message is not null)
             {
                _applicationService.DefineApplicationFromMessage(update.Message);
+            }
+
+            if(update.CallbackQuery is not null)
+            {
+                _applicationService.DefineApplicationFromCallbackQuery(update.CallbackQuery);
             }
         }
     }

@@ -7,5 +7,6 @@ namespace GusMelfordBot.Core.Applications
     public interface IApplicationService
     {
         void DefineApplicationFromMessage(Message message);
+        void DefineApplicationFromCallbackQuery(CallbackQuery updateCallbackQuery);
     }
 }

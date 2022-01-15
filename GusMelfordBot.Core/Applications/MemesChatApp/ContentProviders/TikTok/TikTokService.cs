@@ -1,14 +1,11 @@
-﻿using System.Linq;
-using GusMelfordBot.Core.Interfaces;
-
-namespace GusMelfordBot.Core.Applications.MemesChatApp.ContentProviders.TikTok
+﻿namespace GusMelfordBot.Core.Applications.MemesChatApp.ContentProviders.TikTok
 {
+    using System.Linq;
+    using GusMelfordBot.Core.Interfaces;
     using System;
     using System.Net.Http;
-    using System.Threading.Tasks;
     using GusMelfordBot.DAL.Applications.MemesChat.TikTok;
     using GusMelfordBot.Database.Interfaces;
-    using Microsoft.EntityFrameworkCore;
     using Microsoft.Extensions.Logging;
     using Newtonsoft.Json.Linq;
     using Telegram.API.TelegramRequests.DeleteMessage;
@@ -130,117 +127,5 @@ namespace GusMelfordBot.Core.Applications.MemesChatApp.ContentProviders.TikTok
                 MessageId = messageId
             });
         }
-        
-        /*private string GetStatistics()
-        {
-            List<DAL.User> users = _databaseManager.Context.Set<DAL.User>().ToList();
-            List<TikTokVideoContent> videos = _databaseManager.Context
-                .Set<TikTokVideoContent>()
-                .Where(x => x.CreatedOn.Date == DateTime.Now.Date)
-                .ToList();
-
-            Dictionary<string, int> userAndCount = new Dictionary<string, int>(
-                users.ToDictionary(x => x.FirstName, y => videos
-                        .Count(x => x.User.FirstName == y.FirstName))
-                        .OrderByDescending(x => x.Value));
-
-            string[] medals = {"🥇", "🥈", "🥉"}; //TODO может быть вылет за массив, если будет больше трех пользователей
-            int count = 0;
-            return $"🥳 Statistics for {DateTime.Now:d}\n\n" +
-                   $"{string.Join("\n", userAndCount.Keys.Select(x => medals[count++] + " " + x + userAndCount[x]))}";
-        }
-        
-        private void ProcessCallbackQuery(CallbackQuery callbackQuery)
-        {
-            string[] data = callbackQuery.Data.Split(" ");
-
-            switch (data[0])
-            {
-                case TikTokCallbackQueryButton.Save:
-                {
-                    SendVideo(callbackQuery, data);
-                    break;
-                }
-            }
-        }
-        
-        private void SendVideo(CallbackQuery callbackQuery, string[] data)
-        {
-            TikTokVideoContent video = _databaseManager.Context.Set<TikTokVideoContent>()
-                .FirstOrDefaultAsync(v=>string.Equals(v.Id.ToString(), data[1])).Result;
-
-            try
-            {
-                if (video != null)
-                {
-                    _gusMelfordBotService.SendVideoAsync(new SendVideoParameters
-                    {
-                        ChatId = callbackQuery.FromUser.Id,
-                        Video = new VideoFile(new MemoryStream(_playerService.CurrentVideoFile.VideoArray), "video")
-                    });
-                }
-            }
-            catch (Exception e)
-            {
-                //ingnore
-            }
-        }
-
-        public async Task SendVideoInfo()
-        {
-            TikTokVideoContent video = _playerService.CurrentVideo;
-            InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
-            KeyboardRaw<InlineKeyboardButton> keyboardRaw = new KeyboardRaw<InlineKeyboardButton>();
-            
-            keyboardRaw.AddButtons(new List<InlineKeyboardButton>
-            {
-                new () {
-                    Text = TikTokCallbackQueryButton.Like,
-                    CallbackData = TikTokCallbackQueryButton.Like + " " + video.Id
-                },
-                new () {
-                    Text = TikTokCallbackQueryButton.Save,
-                    CallbackData = TikTokCallbackQueryButton.Save + " " + video.Id
-                }
-            });
-            
-            inlineKeyboardMarkup.AddRaw(keyboardRaw);
-            HttpResponseMessage httpResponseMessage = await _gusMelfordBotService.SendMessageAsync(
-                new SendMessageParameters
-                {
-                    ChatId = _commonSettings.TikTokSettings.TikTokChatId,
-                    Text = "GusMelfordBot Player 🥵🥵🥵\n\n" +
-                           $"{video.Id}\n" +
-                           $"{video.User.FirstName}\n" +
-                           $"{video.RefererLink}\n\n" +
-                           $"{GetStatistics()}",
-                    ReplyMarkup = inlineKeyboardMarkup
-                });
-
-            _currentVideoInfoMessageId =
-                JToken.Parse(await httpResponseMessage.Content.ReadAsStringAsync())["result"]?["message_id"]
-                    ?.ToString();
-        }
-
-        public async Task DeleteVideoInfo()
-        {
-            if (string.IsNullOrEmpty(_currentVideoInfoMessageId))
-            {
-                return;
-            }
-            
-            await _gusMelfordBotService.DeleteMessageAsync(
-                new DeleteMessageParameters
-                {
-                    ChatId = _commonSettings.TikTokSettings.TikTokChatId,
-                    MessageId = int.Parse(_currentVideoInfoMessageId)
-                });
-        }*/
-    }
-    
-    public static class TikTokCallbackQueryButton
-    {
-        public const string Like = "❤️";
-        public const string Save = "💾";
     }
 }

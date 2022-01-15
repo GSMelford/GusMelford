@@ -1,22 +1,27 @@
-﻿using System.Threading.Tasks;
-using GusMelfordBot.Core.Applications.MemesChatApp.ContentProviders.TikTok;
+﻿using System.Linq;
+using GusMelfordBot.DAL.Applications.MemesChat.TikTok;
+using GusMelfordBot.Database.Interfaces;
 
 namespace GusMelfordBot.Core.Applications.MemesChatApp
 {
+    using ContentProviders.TikTok;
     using Interfaces;
     using Telegram.Dto.UpdateModule;
     
     public class MemeChatService : IMemeChatService
     {
-        private const string TIK_TOK_VM_DOMAIN = "https://vm.tiktok.com/";
-        private const string TIK_TOK_M_DOMAIN = "https://m.tiktok.com/";
-        private const string TIK_TOK_WWW_DOMAIN = "https://www.tiktok.com/";
-
         private readonly ITikTokService _tikTokService;
+        private readonly IPlayerService _playerService;
+        private readonly IDatabaseManager _databaseManager;
         
-        public MemeChatService(ITikTokService tikTokService)
+        public MemeChatService(
+            IDatabaseManager databaseManager,
+            ITikTokService tikTokService, 
+            IPlayerService playerService)
         {
             _tikTokService = tikTokService;
+            _playerService = playerService;
+            _databaseManager = databaseManager;
         }
         
         public void ProcessMessage(Message message)
@@ -28,18 +33,34 @@ namespace GusMelfordBot.Core.Applications.MemesChatApp
                     _tikTokService.ProcessMessage(message);
                     break;
             }
+
+            if (message.ReplyToMessage is not null)
+            {
+                SetAccompanyingCommentary(message);
+            }
+        }
+
+        public void ProcessCallbackQuery(CallbackQuery updateCallbackQuery)
+        {
+            _playerService.ProcessCallbackQuery(updateCallbackQuery);
         }
 
         private ContentProvider SelectProvider(string messageText)
         {
-            if (messageText.Contains(TIK_TOK_VM_DOMAIN) 
-                || messageText.Contains(TIK_TOK_M_DOMAIN) 
-                || messageText.Contains(TIK_TOK_WWW_DOMAIN))
+            return messageText.Contains(Constants.TikTok) ? ContentProvider.TikTok : ContentProvider.Other;
+        }
+
+        private void SetAccompanyingCommentary(Message message)
+        {
+            TikTokVideoContent tikTokVideoContent = _databaseManager.Context.Set<TikTokVideoContent>()
+                .FirstOrDefault(x => x.MessageId == message.ReplyToMessage.MessageId);
+
+            if (tikTokVideoContent is not null)
             {
-                return ContentProvider.TikTok;
+                tikTokVideoContent.AccompanyingCommentary = message.Text;
             }
 
-            return ContentProvider.Other;
+            _databaseManager.Context.SaveChanges();
         }
     }
 

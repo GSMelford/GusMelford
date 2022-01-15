@@ -36,6 +36,14 @@ namespace GusMelfordBot.Core.Applications
             }
         }
 
+        public void DefineApplicationFromCallbackQuery(CallbackQuery updateCallbackQuery)
+        {
+            if (IsMemesChatService(updateCallbackQuery.Message))
+            {
+                _memeChatService.ProcessCallbackQuery(updateCallbackQuery);
+            }
+        }
+
         private bool IsCommand(Message message)
         {
             return message.Text.Contains(CommandConst.Determinant);
