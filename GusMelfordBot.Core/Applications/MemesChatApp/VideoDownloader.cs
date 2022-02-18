@@ -25,19 +25,19 @@ namespace GusMelfordBot.Core.Applications.MemesChatApp
         
         public async Task<byte[]> DownloadTikTokVideo(TikTokVideoContent video)
         {
-            JToken videoInformation = await GetVideoInformation(video);
-            string originalLink = GetOriginalLink(videoInformation);
-            string description = GetDescription(videoInformation);
-
-            video.Description = description;
-            
-            if (string.IsNullOrEmpty(originalLink))
-            {
-                return null;
-            }
-            
             try
             {
+                JToken videoInformation = await GetVideoInformation(video);
+                string originalLink = GetOriginalLink(videoInformation);
+                string description = GetDescription(videoInformation);
+
+                video.Description = description;
+            
+                if (string.IsNullOrEmpty(originalLink))
+                {
+                    return null;
+                }
+                
                 HttpRequestMessage requestMessage = new Request(originalLink)
                     .AddHeaders(new Dictionary<string, string>
                     {

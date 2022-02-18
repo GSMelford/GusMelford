@@ -31,7 +31,7 @@
         private readonly ILogger<PlayerService> _logger;
         
         private List<TikTokVideoContent> _videos;
-        private int _cursor = -1;
+        private int _cursor;
         private string _playerInformationMessageId;
 
         private TikTokVideoContent CurrentContent { get; set; }
@@ -49,37 +49,65 @@
             _gusMelfordBotService = gusMelfordBotService;
             _logger = logger;
             _commonSettings = commonSettings;
-            Init();
         }
 
-        private void Init()
+        public void Reset()
         {
+            _cursor = -1;
             _videos = _databaseManager.Context
                 .Set<TikTokVideoContent>()
                 .Include(video => video.User)
                 .Where(x => !x.IsViewed)
                 .OrderBy(x => x.CreatedOn)
-                .ToListAsync().Result;
+                .ToList();
         }
         
         public void ProcessCallbackQuery(CallbackQuery callbackQuery)
         {
+            //TODO Сделать нормально
             string[] data = callbackQuery.Data.Split(" ");
-
-            switch (data[0])
+            string button = data[0] + " " + data[1];
+            
+            if (button.Contains(TikTokCallbackQueryButton.Save))
             {
-                case TikTokCallbackQueryButton.Save:
-                {
-                    SendVideo(callbackQuery, data);
-                    break;
-                }
+                SendVideo(callbackQuery, data);
+                return;
             }
+            
+            if(button.Contains(TikTokCallbackQueryButton.Anime))
+            {
+                CurrentContent.AccompanyingCommentary =
+                    $"{CurrentContent.AccompanyingCommentary} #{nameof(TikTokCallbackQueryButton.Anime)}";
+            }
+            else if(button.Contains(TikTokCallbackQueryButton.Film))
+            {
+                CurrentContent.AccompanyingCommentary =
+                    $"{CurrentContent.AccompanyingCommentary} #{nameof(TikTokCallbackQueryButton.Film)}";
+            }
+            else if(button.Contains(TikTokCallbackQueryButton.Horny))
+            {
+                CurrentContent.AccompanyingCommentary =
+                    $"{CurrentContent.AccompanyingCommentary} #{nameof(TikTokCallbackQueryButton.Horny)}";
+            }
+            else if(button.Contains(TikTokCallbackQueryButton.Wallpaper))
+            {
+                CurrentContent.AccompanyingCommentary =
+                    $"{CurrentContent.AccompanyingCommentary} #{nameof(TikTokCallbackQueryButton.Wallpaper)}";
+            }
+            else if(button.Contains(TikTokCallbackQueryButton.ChatCollection))
+            {
+                CurrentContent.AccompanyingCommentary =
+                    $"{CurrentContent.AccompanyingCommentary} #{nameof(TikTokCallbackQueryButton.ChatCollection)}";
+            }
+            
+            _databaseManager.Context.Update(CurrentContent);
+            _databaseManager.Context.SaveChanges();
         }
         
         private void SendVideo(CallbackQuery callbackQuery, string[] data)
         {
             TikTokVideoContent video = _databaseManager.Context.Set<TikTokVideoContent>()
-                .FirstOrDefaultAsync(v=>string.Equals(v.Id.ToString(), data[1])).Result;
+                .FirstOrDefaultAsync(v=>string.Equals(v.Id.ToString(), data[2])).Result;
 
             try
             {
@@ -137,7 +165,7 @@
                 }
 
                 CurrentContent = _videos[--_cursor];
-                CurrentContentBytes = await GetVideoBytes(CurrentContent);
+                await GetVideoBytes(CurrentContent);
                 if (CurrentContentBytes is null)
                 {
                     CurrentContent.IsValid = false;
@@ -176,24 +204,51 @@
         private void SendPlayerInformation()
         {
             InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
-            KeyboardRaw<InlineKeyboardButton> keyboardRaw = new KeyboardRaw<InlineKeyboardButton>();
+            KeyboardRaw<InlineKeyboardButton> keyboardRawFirst = new KeyboardRaw<InlineKeyboardButton>();
+            KeyboardRaw<InlineKeyboardButton> keyboardRawSecond = new KeyboardRaw<InlineKeyboardButton>();
             
-            keyboardRaw.AddButtons(new List<InlineKeyboardButton>
+            keyboardRawFirst.AddButtons(new List<InlineKeyboardButton>
             {
                 new () {
-                    Text = TikTokCallbackQueryButton.Save,
-                    CallbackData = TikTokCallbackQueryButton.Save + " " + CurrentContent.Id
+                    Text = TikTokCallbackQueryButton.Anime,
+                    CallbackData = TikTokCallbackQueryButton.Anime + " " + CurrentContent.Id
+                },
+                new () {
+                    Text = TikTokCallbackQueryButton.Horny,
+                    CallbackData = TikTokCallbackQueryButton.Horny + " " + CurrentContent.Id
+                },
+                new () {
+                    Text = TikTokCallbackQueryButton.Film,
+                    CallbackData = TikTokCallbackQueryButton.Film + " " + CurrentContent.Id
                 }
             });
             
-            inlineKeyboardMarkup.AddRaw(keyboardRaw);
+            keyboardRawSecond.AddButtons(new List<InlineKeyboardButton>
+            {
+                new () {
+                    Text = TikTokCallbackQueryButton.Wallpaper,
+                    CallbackData = TikTokCallbackQueryButton.Wallpaper + " " + CurrentContent.Id
+                },
+                new () {
+                    Text = TikTokCallbackQueryButton.Save,
+                    CallbackData = TikTokCallbackQueryButton.Save + " " + CurrentContent.Id
+                },
+                new () {
+                    Text = TikTokCallbackQueryButton.ChatCollection,
+                    CallbackData = TikTokCallbackQueryButton.ChatCollection + " " + CurrentContent.Id
+                }
+            });
+            
+            inlineKeyboardMarkup.AddRaw(keyboardRawFirst);
+            inlineKeyboardMarkup.AddRaw(keyboardRawSecond);
+            
             HttpResponseMessage httpResponseMessage = _gusMelfordBotService.SendMessage(
                 new SendMessageParameters
                 {
                     ChatId = -1001529315725, //TODO Сделать нормально
                     Text = $"GusMelfordBot Player v. {_commonSettings.PlayerVersion} 🥵🥵🥵\n\n" +
                            $"{CurrentContent.Id}\n" +
-                           $"{CurrentContent.User.FirstName}\n" +
+                           $"{CurrentContent.User.FirstName} {CurrentContent.User.LastName}\n" +
                            $"{CurrentContent.RefererLink}\n\n",
                     ReplyMarkup = inlineKeyboardMarkup
                 });
@@ -221,7 +276,11 @@
     
     public static class TikTokCallbackQueryButton
     {
-        public const string Like = "❤️";
-        public const string Save = "💾";
+        public const string Anime = "Anime ❤️";
+        public const string Wallpaper = "Wallpaper 🎇";
+        public const string Film = "Film 🎬";
+        public const string Horny = "Horny 🥵";
+        public const string ChatCollection = "All 💾";
+        public const string Save = "Yourself 💾";
     }
 }

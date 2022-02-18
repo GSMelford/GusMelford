@@ -17,23 +17,21 @@
     {
         private readonly IDatabaseManager _databaseManager;
         private readonly IGusMelfordBotService _gusMelfordBotService;
-        private readonly IRequestService _requestService;
         private readonly ILogger<TikTokService> _logger;
         
         public TikTokService(
             ILogger<TikTokService> logger,
             IDatabaseManager manager,
-            IRequestService requestService,
             IGusMelfordBotService gusMelfordBotService)
         {
             _databaseManager = manager;
             _gusMelfordBotService = gusMelfordBotService;
-            _requestService = requestService;
             _logger = logger;
         }
 
         public void ProcessMessage(Message message)
         {
+            string messageId = SendMessageToTelegram($"⚙️ Processing a new tiktok content\nfrom {message.From.FirstName} ...", message.Chat.Id);
             try
             {
                 SaveUserIfNew(message.From);
@@ -41,9 +39,15 @@
 
                 if (tokVideoContent is not null)
                 {
-                    string messageId = SendMessageToTelegram(tokVideoContent.User.FirstName, tokVideoContent.RefererLink, message.Chat.Id);
-                    tokVideoContent.MessageId = int.Parse(messageId);
+                    int tikTokVideoContentCount = _databaseManager.Context.Set<TikTokVideoContent>().Count();
                     
+                    _gusMelfordBotService.EditTelegramMessage(
+                        message.Chat.Id.ToString(),
+                        $"{Helper.GetRandomEmoji()} {message.From.FirstName} " +
+                        $"sent meme №{tikTokVideoContentCount + 1}\n{tokVideoContent.RefererLink}",
+                        messageId);
+                   
+                    tokVideoContent.MessageId = int.Parse(messageId);
                     _databaseManager.Context.Add(tokVideoContent);
                     _databaseManager.Context.SaveChanges();
                 }
@@ -53,6 +57,14 @@
             catch (Exception e)
             {
                 _logger.LogError("We were unable to save tik tok video content.\n{Message}", e.Message);
+
+                if (string.IsNullOrEmpty(messageId))
+                {
+                    return;
+                }
+                
+                _gusMelfordBotService.EditTelegramMessage(message.Chat.Id.ToString(), 
+                    $"Bad message from {message.From.FirstName}\n {message.Text}", messageId);
             }
         }
         
@@ -64,6 +76,19 @@
             
             if (botUser is not null)
             {
+                if (botUser.FirstName == user.FirstName 
+                    && botUser.LastName == user.LastName 
+                    && botUser.UserName == user.Username)
+                {
+                    return;
+                }
+                
+                botUser.FirstName = user.FirstName;
+                botUser.LastName = user.LastName;
+                botUser.UserName = user.Username;
+                _databaseManager.Context.Update(botUser);
+                _databaseManager.Context.SaveChanges();
+                
                 return;
             }
 
@@ -83,7 +108,7 @@
         {
             TikTokServiceHelper tikTokServiceHelper = new TikTokServiceHelper();
             string sentLink = tikTokServiceHelper.WithdrawSendLink(message.Text);
-            string refererLink = tikTokServiceHelper.WithdrawRefererLink(_requestService, sentLink);
+            string refererLink = tikTokServiceHelper.WithdrawRefererLink(sentLink);
             
             TikTokVideoContent tokVideoContent = 
                 tikTokServiceHelper.BuildTikTokVideoContent(_databaseManager, sentLink, refererLink, message.From.Id);
@@ -99,12 +124,11 @@
             return oldTokVideoContent is not null ? null : tokVideoContent;
         }
 
-        private string SendMessageToTelegram(string firstName, string refererLink, long chatId)
+        private string SendMessageToTelegram(string text, long chatId)
         {
-            int tikTokVideoContentCount = _databaseManager.Context.Set<TikTokVideoContent>().Count();
             HttpResponseMessage httpResponseMessage = _gusMelfordBotService.SendMessage(new SendMessageParameters
             {
-                Text = $"{Helper.GetRandomEmoji()} {firstName} sent meme №{tikTokVideoContentCount + 1}\n{refererLink}",
+                Text = text,
                 ChatId = chatId,
                 DisableNotification = true,
                 DisableWebPagePreview = true

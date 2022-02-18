@@ -24,6 +24,13 @@ namespace GusMelfordBot.Core.Applications.MemesChatApp.Player
             _playerService = playerService;
         }
         
+        [HttpGet("reset")]
+        public IActionResult Reset()
+        {
+            _playerService.Reset();
+            return Ok();
+        }
+        
         [HttpGet("next")]
         public async Task<JsonResult> GetNextVideoStream()
         {

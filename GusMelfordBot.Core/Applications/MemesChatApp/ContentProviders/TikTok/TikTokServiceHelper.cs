@@ -1,16 +1,16 @@
 ﻿namespace GusMelfordBot.Core.Applications.MemesChatApp.ContentProviders.TikTok
 {
+    using System.Threading;
+    using RestSharp;
     using System;
-    using System.Collections.Generic;
     using System.Linq;
-    using System.Net.Http;
-    using Services.Requests;
     using GusMelfordBot.DAL.Applications.MemesChat.TikTok;
     using GusMelfordBot.Database.Interfaces;
-    using GusMelfordBot.Core.Interfaces;
     
     public class TikTokServiceHelper
     {
+        private readonly RestClient _client = new ();
+        
         public string WithdrawSendLink(string messageText)
         {
             return messageText.Split(' ', '\n')
@@ -36,30 +36,22 @@
             };
         }
 
-        public string WithdrawRefererLink(IRequestService requestService, string sentLink)
+        public string WithdrawRefererLink(string sentLink)
         {
-            HttpRequestMessage requestMessage =
-                new Request(sentLink)
-                    .AddHeaders(new Dictionary<string, string> {{"User-Agent", Constants.UserAgent}})
-                    .Build();
-
-            HttpResponseMessage httpResponseMessage = requestService.ExecuteAsync(requestMessage).Result;
-            Uri uri = httpResponseMessage.RequestMessage?.RequestUri;
-
-            requestMessage =
-                new Request(uri?.ToString())
-                    .AddHeaders(new Dictionary<string, string> {{"User-Agent", Constants.UserAgent}})
-                    .Build();
-
-            httpResponseMessage = requestService.ExecuteAsync(requestMessage).Result;
-            uri = httpResponseMessage.RequestMessage?.RequestUri;
-
+            RestResponse response = _client.ExecuteAsync(new RestRequest(sentLink)).Result;
+            
+            Uri uri = response.ResponseUri;
+            response = _client.ExecuteAsync(new RestRequest(uri?.ToString())).Result;
+            
+            uri = response.ResponseUri;
             string refererLink = string.Empty;
             if (uri is not null)
             {
                 refererLink = uri.Scheme + "://" + uri.Host + uri.AbsolutePath;
             }
 
+            Thread.Sleep(1000);
+            
             return refererLink;
         }
     }

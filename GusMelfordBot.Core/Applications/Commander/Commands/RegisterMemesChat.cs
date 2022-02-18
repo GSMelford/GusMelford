@@ -1,7 +1,6 @@
-﻿using System.Linq;
-
-namespace GusMelfordBot.Core.Applications.Commander.Commands
+﻿namespace GusMelfordBot.Core.Applications.Commander.Commands
 {
+    using System.Linq;
     using Interfaces;
     using GusMelfordBot.DAL.Applications.MemesChat;
     using GusMelfordBot.Database.Interfaces;
@@ -15,7 +14,9 @@ namespace GusMelfordBot.Core.Applications.Commander.Commands
             IGusMelfordBotService gusMelfordBotService,
             Chat chat)
         {
-            MemesChat memesChat = databaseManager.Context.Set<MemesChat>().FirstOrDefault(x => x.ChatId == chat.Id);
+            //TODO Add save name of chat
+            MemesChat memesChat = databaseManager.Context.Set<MemesChat>()
+                .FirstOrDefault(x => x.ChatId == chat.Id);
 
             if (memesChat is not null)
             {
@@ -30,7 +31,7 @@ namespace GusMelfordBot.Core.Applications.Commander.Commands
             memesChat = new MemesChat
             {
                 ChatId = chat.Id,
-                //Type = chat.Type
+                //TODO Add to Bot.Api Type = chat.Type
             };
             
             databaseManager.Context.Add(memesChat);

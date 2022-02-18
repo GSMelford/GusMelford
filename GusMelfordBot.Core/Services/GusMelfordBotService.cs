@@ -1,5 +1,6 @@
 ﻿using System.Net.Http;
 using System.Threading;
+using RestSharp;
 
 namespace GusMelfordBot.Core.Services
 {
@@ -11,10 +12,12 @@ namespace GusMelfordBot.Core.Services
     public class GusMelfordBotService : IGusMelfordBotService
     {
         private readonly TelegramBot _telegramBot;
+        private readonly CommonSettings _commonSettings; //TODO Delete after add method to Bot.Api
 
         public GusMelfordBotService(CommonSettings commonSettings)
         {
             _telegramBot = new TelegramBot(commonSettings.TelegramBotSettings.Token, new HttpClient());
+            _commonSettings = commonSettings;
         }
         
         public HttpResponseMessage SendMessage(IParameters parameters)
@@ -41,6 +44,18 @@ namespace GusMelfordBot.Core.Services
         public async void SendVideo(IParameters parameters)
         {
             await _telegramBot.SendVideoAsync(parameters);
+        }
+        
+        public void EditTelegramMessage(string chatId, string text, string messageId)
+        {
+            //TODO Add method to Bot.Api
+            string requestUrl =
+                $"https://api.telegram.org/bot{_commonSettings.TelegramBotSettings.Token}/editMessageText";
+            
+            RestClient restClient = new RestClient();
+            RestRequest restRequest = new RestRequest(requestUrl + $"?chat_id={chatId}&text={text}&message_id={messageId}&disable_web_page_preview=true");
+
+            var restResponse = restClient.ExecuteAsync(restRequest).Result;
         }
     }
 }

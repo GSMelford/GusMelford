@@ -4,6 +4,7 @@ let isKeyInputActive = false;
 let degreeOfCoup = 360;
 
 async function initPlayer() {
+    await fetch(baseUrl + "player/video/reset");
     document.addEventListener("keydown", keyDownHandler);
     createElementVideoInfo();
     
@@ -24,7 +25,7 @@ async function keyDownHandler(event) {
         else if (event.key === "z" || event.key === "ArrowLeft" || event.key === "Z") {
             await changeVideo("player/video/prev");
         }
-        else if(event.key === "r"){
+        else if(event.key === "r" || event.key === "R" || event.key === "К" || event.key === "к"){
             rotateVideo();
         }
         
@@ -43,11 +44,13 @@ function rotateVideo(){
 }
 
 async function changeVideo(methodName) {
+    
     let videoBlocks = document.getElementsByClassName("video-block");
     for (let i = 0; i < videoBlocks.length; i++) {
         videoBlocks[i].remove();
     }
-
+    
+    degreeOfCoup = 360;
     createElementVideoInfo(await executeRequest(methodName));
     let video = createElementVideo();
     let source = createElementVideoSource("player/video/current" + "?updated=" + new Date());

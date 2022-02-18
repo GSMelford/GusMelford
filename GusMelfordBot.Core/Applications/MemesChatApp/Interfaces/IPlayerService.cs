@@ -10,5 +10,6 @@ namespace GusMelfordBot.Core.Applications.MemesChatApp.Interfaces
         Task<PlayerInfo> SetNextVideo();
         Task<PlayerInfo> SetPreviousVideo();
         void ProcessCallbackQuery(CallbackQuery updateCallbackQuery);
+        void Reset();
     }
 }

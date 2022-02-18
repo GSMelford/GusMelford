@@ -1,7 +1,6 @@
-﻿using Newtonsoft.Json.Linq;
-
-namespace GusMelfordBot.Core.Controllers
+﻿namespace GusMelfordBot.Core.Controllers
 {
+    using Newtonsoft.Json.Linq;
     using System;
     using Newtonsoft.Json;
     using Services.Update;
@@ -33,11 +32,10 @@ namespace GusMelfordBot.Core.Controllers
             }
             
             var updateEntity = JsonConvert.DeserializeObject<Update>(content);
-            JToken token = JToken.Parse(content);
-
+            
             if (updateEntity?.Message is not null)
             {
-                JToken replayToMessage = JToken.Parse(content)?["message"]?["reply_to_message"];
+                JToken replayToMessage = JToken.Parse(content)["message"]?["reply_to_message"];
                 if (replayToMessage is not null)
                 {
                     updateEntity.Message.ReplyToMessage =
@@ -45,7 +43,7 @@ namespace GusMelfordBot.Core.Controllers
                 }
             }
             
-            _logger.LogInformation("Update. Token: {Token}, Body: {@UpdateText}", token, update);
+            _logger.LogInformation("Update. Body: {Update}", update);
             try {
                 _updateService.ProcessUpdate(updateEntity);
             }
