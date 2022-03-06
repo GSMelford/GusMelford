@@ -31,7 +31,8 @@
 
         public void ProcessMessage(Message message)
         {
-            string messageId = SendMessageToTelegram($"⚙️ Processing a new tiktok content\nfrom {message.From.FirstName} ...", message.Chat.Id);
+            string messageId = SendMessageToTelegram(
+                $"⚙️ Processing a new tiktok content\nfrom {message.From.FirstName} ...", message.Chat.Id);
             try
             {
                 SaveUserIfNew(message.From);
@@ -50,6 +51,13 @@
                     tokVideoContent.MessageId = int.Parse(messageId);
                     _databaseManager.Context.Add(tokVideoContent);
                     _databaseManager.Context.SaveChanges();
+                }
+                else
+                {
+                    _gusMelfordBotService.EditTelegramMessage(
+                        message.Chat.Id.ToString(),
+                        $"{message.From.FirstName + message.From.LastName} sent a meme that was already in the database",
+                        messageId);
                 }
 
                 DeleteMessageInTelegram(message.Chat.Id, message.MessageId);
