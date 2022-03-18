@@ -163,13 +163,14 @@
                 {
                     _cursor = _videos.Count;
                 }
-
-                CurrentContent = _videos[--_cursor];
-                await GetVideoBytes(CurrentContent);
+                
                 if (CurrentContentBytes is null)
                 {
                     CurrentContent.IsValid = false;
                 }
+                
+                CurrentContent = _videos[--_cursor];
+                CurrentContentBytes = await GetVideoBytes(CurrentContent);
             } while (CurrentContentBytes == null);
 
             CurrentContent.IsValid = true;

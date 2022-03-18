@@ -47,7 +47,7 @@ namespace GusMelfordBot.Core
             });
 
             app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
-            logger.LogInformation("TBot started. Time: {Time}", DateTime.UtcNow);
+            logger.LogInformation("GusMelfordBot started. Time: {Time}", DateTime.UtcNow);
         }
 
         private async Task SetStartPage(HttpContext context)
