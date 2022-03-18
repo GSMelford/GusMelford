@@ -1,4 +1,6 @@
-﻿namespace GusMelfordBot.Core.Controllers
+﻿using System.Threading.Tasks;
+
+namespace GusMelfordBot.Core.Controllers
 {
     using Newtonsoft.Json.Linq;
     using System;
@@ -23,7 +25,7 @@
         }
 
         [HttpPost("update")]
-        public IActionResult Update([FromBody]object update)
+        public async Task<IActionResult> Update([FromBody]object update)
         {
             string content = update?.ToString();
             if (string.IsNullOrEmpty(content))
@@ -45,7 +47,7 @@
             
             _logger.LogInformation("Update. Body: {Update}", update);
             try {
-                _updateService.ProcessUpdate(updateEntity);
+                await _updateService.ProcessUpdate(updateEntity);
             }
             catch (Exception ex) {
                 _logger.LogError(ex, "ProcessUpdate error. UpdateId: {UpdateId}", updateEntity?.UpdateId);

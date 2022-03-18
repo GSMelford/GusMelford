@@ -51,18 +51,41 @@
             _commonSettings = commonSettings;
         }
 
-        public void Reset()
+        public async Task SetRandom(int number)
+        {
+            List<Guid> guids = await _databaseManager.Context
+                .Set<TikTokVideoContent>()
+                .Select(x => x.Id)
+                .ToListAsync();
+
+            Random random = new Random();
+            HashSet<int> useVideos = new HashSet<int>();
+            
+            for (int i = 0; i < number; i++)
+            {
+                int videoNumber;
+                do
+                { 
+                    videoNumber = random.Next(0, guids.Count);
+                } while (!useVideos.Add(videoNumber));
+                _videos.Add(await _databaseManager.Context
+                    .Set<TikTokVideoContent>()
+                    .FirstOrDefaultAsync(x=>x.Id == guids[number]));
+            }
+        }
+        
+        public async Task SetNotViewed()
         {
             _cursor = -1;
-            _videos = _databaseManager.Context
+            _videos = await _databaseManager.Context
                 .Set<TikTokVideoContent>()
                 .Include(video => video.User)
                 .Where(x => !x.IsViewed)
                 .OrderBy(x => x.CreatedOn)
-                .ToList();
+                .ToListAsync();
         }
         
-        public void ProcessCallbackQuery(CallbackQuery callbackQuery)
+        public async Task ProcessCallbackQuery(CallbackQuery callbackQuery)
         {
             //TODO Сделать нормально
             string[] data = callbackQuery.Data.Split(" ");
@@ -70,7 +93,7 @@
             
             if (button.Contains(TikTokCallbackQueryButton.Save))
             {
-                SendVideo(callbackQuery, data);
+                await SendVideo(callbackQuery, data);
                 return;
             }
             
@@ -101,10 +124,10 @@
             }
             
             _databaseManager.Context.Update(CurrentContent);
-            _databaseManager.Context.SaveChanges();
+            await _databaseManager.Context.SaveChangesAsync();
         }
         
-        private void SendVideo(CallbackQuery callbackQuery, string[] data)
+        private async Task SendVideo(CallbackQuery callbackQuery, string[] data)
         {
             TikTokVideoContent video = _databaseManager.Context.Set<TikTokVideoContent>()
                 .FirstOrDefaultAsync(v=>string.Equals(v.Id.ToString(), data[2])).Result;
@@ -114,7 +137,7 @@
                 if (video == null) return;
                 if (CurrentContentBytes is not null)
                 {
-                    _gusMelfordBotService.SendVideo(new SendVideoParameters
+                    await _gusMelfordBotService.SendVideoAsync(new SendVideoParameters
                     {
                         ChatId = callbackQuery.FromUser.Id,
                         Video = new VideoFile(new MemoryStream(CurrentContentBytes), "video")
@@ -151,7 +174,7 @@
             
             CurrentContent.IsValid = true;
             await _databaseManager.Context.SaveChangesAsync();
-            UpdatePlayerInformation();
+            await UpdatePlayerInformation();
             return GetVideoInfoForPlayer();
         }
         
@@ -175,7 +198,7 @@
 
             CurrentContent.IsValid = true;
             await _databaseManager.Context.SaveChangesAsync();
-            UpdatePlayerInformation();
+            await UpdatePlayerInformation();
             return GetVideoInfoForPlayer();
         }
 
@@ -196,13 +219,13 @@
             return await videoDownloader.DownloadTikTokVideo(video);
         }
 
-        private void UpdatePlayerInformation()
+        private async Task UpdatePlayerInformation()
         {
-            DeletePlayerInformation();
-            SendPlayerInformation();
+            await DeletePlayerInformation();
+            await SendPlayerInformation();
         }
         
-        private void SendPlayerInformation()
+        private async Task SendPlayerInformation()
         {
             InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
             KeyboardRaw<InlineKeyboardButton> keyboardRawFirst = new KeyboardRaw<InlineKeyboardButton>();
@@ -243,7 +266,7 @@
             inlineKeyboardMarkup.AddRaw(keyboardRawFirst);
             inlineKeyboardMarkup.AddRaw(keyboardRawSecond);
             
-            HttpResponseMessage httpResponseMessage = _gusMelfordBotService.SendMessage(
+            HttpResponseMessage httpResponseMessage = await _gusMelfordBotService.SendMessageAsync(
                 new SendMessageParameters
                 {
                     ChatId = -1001529315725, //TODO Сделать нормально
@@ -259,14 +282,14 @@
                     ?.ToString();
         }
         
-        private void DeletePlayerInformation()
+        private async Task DeletePlayerInformation()
         {
             if (string.IsNullOrEmpty(_playerInformationMessageId))
             {
                 return;
             }
             
-            _gusMelfordBotService.DeleteMessage(
+            await _gusMelfordBotService.DeleteMessageAsync(
                 new DeleteMessageParameters
                 {
                     ChatId = _commonSettings.TikTokSettings.TikTokChatId,

@@ -1,12 +1,7 @@
 ﻿namespace GusMelfordBot.Database.Context
 {
-    using DAL;
     using Settings;
     using Interfaces;
-    using System.Linq;
-    using System.Threading.Tasks;
-    using System.Collections.Generic;
-    using Microsoft.EntityFrameworkCore;
     
     public class DatabaseManager : IDatabaseManager
     {

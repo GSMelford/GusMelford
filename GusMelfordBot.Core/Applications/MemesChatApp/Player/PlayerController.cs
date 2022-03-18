@@ -1,7 +1,6 @@
-﻿using GusMelfordBot.Core.Applications.MemesChatApp.Interfaces;
-
-namespace GusMelfordBot.Core.Applications.MemesChatApp.Player
+﻿namespace GusMelfordBot.Core.Applications.MemesChatApp.Player
 {
+    using Interfaces;
     using System.IO;
     using System.Threading.Tasks;
     using Microsoft.AspNetCore.Mvc;
@@ -24,10 +23,17 @@ namespace GusMelfordBot.Core.Applications.MemesChatApp.Player
             _playerService = playerService;
         }
         
-        [HttpGet("reset")]
-        public IActionResult Reset()
+        [HttpGet("setNotViewed")]
+        public IActionResult SetNotViewed()
         {
-            _playerService.Reset();
+            _playerService.SetNotViewed();
+            return Ok();
+        }
+        
+        [HttpGet("setRandom")]
+        public IActionResult SetRandom(string number)
+        {
+            _playerService.SetRandom(int.Parse(number));
             return Ok();
         }
         

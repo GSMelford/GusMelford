@@ -1,5 +1,6 @@
 ﻿using GusMelfordBot.Core.Applications.Commander;
 using GusMelfordBot.Core.Applications.MemesChatApp.ContentProviders.TikTok;
+using GusMelfordBot.Core.Services.GusMelfordBot;
 using GusMelfordBot.Core.Services.System;
 using GusMelfordBot.Core.Services.Update;
 using GusMelfordBot.Database.Context;

@@ -36,3 +36,7 @@
     background: #232422;
     border: none;
 }
+
+input{
+    margin-bottom: 10px;
+}

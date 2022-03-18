@@ -13,11 +13,11 @@ namespace GusMelfordBot.Core.Services.Update
             _applicationService = applicationService;
         }
         
-        public void ProcessUpdate(Telegram.Dto.UpdateModule.Update update)
+        public async Task ProcessUpdate(Telegram.Dto.UpdateModule.Update update)
         {
             if(update.Message is not null)
-            {
-               _applicationService.DefineApplicationFromMessage(update.Message);
+            { 
+                await _applicationService.DefineApplicationFromMessage(update.Message);
             }
 
             if(update.CallbackQuery is not null)

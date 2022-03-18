@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using System.Threading.Tasks;
 
 namespace GusMelfordBot.Core.Applications
 {
@@ -24,7 +25,7 @@ namespace GusMelfordBot.Core.Applications
             _commanderService = commanderService;
         }
         
-        public void DefineApplicationFromMessage(Message message)
+        public async Task DefineApplicationFromMessage(Message message)
         {
             if (IsCommand(message))
             {
@@ -32,7 +33,7 @@ namespace GusMelfordBot.Core.Applications
             }
             if (IsMemesChatService(message))
             {
-                _memeChatService.ProcessMessage(message);
+                await _memeChatService.ProcessMessage(message);
             }
         }
 

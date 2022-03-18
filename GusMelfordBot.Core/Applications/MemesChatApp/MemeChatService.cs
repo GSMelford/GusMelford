@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using System.Threading.Tasks;
 using GusMelfordBot.DAL.Applications.MemesChat.TikTok;
 using GusMelfordBot.Database.Interfaces;
 
@@ -24,13 +25,13 @@ namespace GusMelfordBot.Core.Applications.MemesChatApp
             _databaseManager = databaseManager;
         }
         
-        public void ProcessMessage(Message message)
+        public async Task ProcessMessage(Message message)
         {
             string messageText = message.Text;
             switch (SelectProvider(messageText))
             {
                 case ContentProvider.TikTok:
-                    _tikTokService.ProcessMessage(message);
+                    await _tikTokService.ProcessMessage(message);
                     break;
             }
 

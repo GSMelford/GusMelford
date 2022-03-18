@@ -1,15 +1,15 @@
-﻿using System.Collections.Generic;
-using System.Net.Http;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using GusMelfordBot.Core.Interfaces;
-using GusMelfordBot.Core.Services.Requests;
-using GusMelfordBot.DAL.Applications.MemesChat.TikTok;
-using Microsoft.Extensions.Logging;
-using Newtonsoft.Json.Linq;
-
-namespace GusMelfordBot.Core.Applications.MemesChatApp
+﻿namespace GusMelfordBot.Core.Applications.MemesChatApp
 {
+    using System.Collections.Generic;
+    using System.Net.Http;
+    using System.Text.RegularExpressions;
+    using System.Threading.Tasks;
+    using GusMelfordBot.Core.Interfaces;
+    using Services.Requests;
+    using GusMelfordBot.DAL.Applications.MemesChat.TikTok;
+    using Microsoft.Extensions.Logging;
+    using Newtonsoft.Json.Linq;
+    
     public class VideoDownloader
     {
         private readonly IRequestService _requestService;
@@ -46,8 +46,7 @@ namespace GusMelfordBot.Core.Applications.MemesChatApp
                     }).Build();
 
                 HttpResponseMessage httpResponseMessage = await _requestService.ExecuteAsync(requestMessage);
-                byte[] videoArray = await httpResponseMessage.Content.ReadAsByteArrayAsync();
-                return videoArray;
+                return await httpResponseMessage.Content.ReadAsByteArrayAsync();
             }
             catch
             {
@@ -56,12 +55,12 @@ namespace GusMelfordBot.Core.Applications.MemesChatApp
             }
         }
         
-        private string GetOriginalLink(JToken videoInformation)
+        private static string GetOriginalLink(JToken videoInformation)
         {
             return videoInformation["itemInfo"]?["itemStruct"]?["video"]?["downloadAddr"]?.ToString();
         }
         
-        private string GetDescription(JToken videoInformation)
+        private static string GetDescription(JToken videoInformation)
         {
             return videoInformation["seoProps"]?["metaParams"]?["description"]?.ToString();
         }
@@ -82,7 +81,7 @@ namespace GusMelfordBot.Core.Applications.MemesChatApp
                    $"/{GetVideoId(video.RefererLink)}";
         }
         
-        private string GetVideoUser(string referer)
+        private static string GetVideoUser(string referer)
         {
             return Regex
                 .Match(referer, "com/(.*?)/video")
@@ -90,7 +89,7 @@ namespace GusMelfordBot.Core.Applications.MemesChatApp
                 .Value;
         }
 
-        private string GetVideoId(string referer)
+        private static string GetVideoId(string referer)
         {
             return referer
                 .Replace(Constants.TikTok, "")

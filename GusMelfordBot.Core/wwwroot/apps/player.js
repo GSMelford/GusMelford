@@ -3,16 +3,29 @@ let baseUrl = document.location.href.replace(playerPath, "");
 let isKeyInputActive = false;
 let degreeOfCoup = 360;
 
-async function initPlayer() {
-    await fetch(baseUrl + "player/video/reset");
+async function Init(){
     document.addEventListener("keydown", keyDownHandler);
     createElementVideoInfo();
-    
+
     let information = await executeRequest("info");
     document.title = information["playerInformation"]["name"] + " v" + information["playerInformation"]["version"];
-    
+
     let playerTitle = document.getElementById("player-title");
     playerTitle.innerText = information["playerInformation"]["name"] + " v" + information["playerInformation"]["version"];
+}
+
+async function setRandom() {
+    let number = document.getElementById("numberOfRandom").value;
+    if(number === undefined || number === 0){
+        return;
+    }
+    await fetch(baseUrl + "player/video/setRandom?number=" + number);
+    await changeVideo("player/video/next");
+}
+
+async function setNew() {
+    await fetch(baseUrl + "player/video/setNotViewed");
+    await changeVideo("player/video/next");
 }
 
 async function keyDownHandler(event) {

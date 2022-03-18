@@ -5,6 +5,6 @@
     
     public interface ITikTokService
     {
-        void ProcessMessage(Message message);
+        Task ProcessMessage(Message message);
     }
 }
