@@ -1,9 +1,8 @@
 ﻿using System.Threading.Tasks;
 
-namespace GusMelfordBot.Core.Services.Update
+namespace GusMelfordBot.Core.Services.Update;
+
+public interface IUpdateService
 {
-    public interface IUpdateService
-    {
-        Task ProcessUpdate(Telegram.Dto.UpdateModule.Update update);
-    }
+    Task ProcessUpdate(Telegram.Dto.UpdateModule.Update update);
 }

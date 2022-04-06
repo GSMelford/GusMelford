@@ -6,34 +6,33 @@ using GusMelfordBot.DAL.Applications.MemesChat.TikTok;
 using GusMelfordBot.Database.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
-namespace GusMelfordBot.Core.Services.System
-{
-    public class SystemService : ISystemService
-    {
-        private readonly IDatabaseManager _databaseManager;
-        private readonly CommonSettings _commonSettings;
+namespace GusMelfordBot.Core.Services.System;
 
-        public SystemService(
-            IDatabaseManager databaseManager,
-            CommonSettings commonSettings)
-        {
-            _databaseManager = databaseManager;
-            _commonSettings = commonSettings;
-        }
+public class SystemService : ISystemService
+{
+    private readonly IDatabaseManager _databaseManager;
+    private readonly CommonSettings _commonSettings;
+
+    public SystemService(
+        IDatabaseManager databaseManager,
+        CommonSettings commonSettings)
+    {
+        _databaseManager = databaseManager;
+        _commonSettings = commonSettings;
+    }
         
-        public async Task<SystemInfo> GetSystemData()
+    public async Task<SystemInfo> GetSystemData()
+    {
+        return new SystemInfo
         {
-            return new SystemInfo
+            Name = _commonSettings.Name,
+            Version = _commonSettings.Version,
+            PlayerInformation = new PlayerInformation
             {
-                Name = _commonSettings.Name,
-                Version = _commonSettings.Version,
-                PlayerInformation = new PlayerInformation
-                {
-                    Count = await _databaseManager.Context.Set<TikTokVideoContent>().CountAsync(x => !x.IsViewed),
-                    Name = $"{_commonSettings.Name} Player",
-                    Version = _commonSettings.PlayerVersion
-                }
-            };
-        }
+                Count = await _databaseManager.Context.Set<TikTokVideoContent>().CountAsync(x => !x.IsViewed),
+                Name = $"{_commonSettings.Name} Player",
+                Version = _commonSettings.PlayerVersion
+            }
+        };
     }
 }

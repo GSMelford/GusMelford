@@ -1,7 +1,6 @@
-﻿namespace GusMelfordBot.Core.Settings
+﻿namespace GusMelfordBot.Core.Settings;
+
+public class TelegramBotSettings
 {
-    public class TelegramBotSettings
-    {
-        public string Token { get; set; }
-    }
+    public string Token { get; set; }
 }

@@ -4,71 +4,70 @@ using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 
-namespace GusMelfordBot.Core.Services.Requests
+namespace GusMelfordBot.Core.Services.Requests;
+
+public class Request
 {
-    public class Request
+    private readonly HttpMethod _httpMethod;
+    private Dictionary<string, string> _headers;
+    private Dictionary<string, string> _parameters;
+    private object _body;
+    private string _requestUri;
+        
+    public Request(string requestUri, HttpMethod httpMethod = null)
     {
-        private readonly HttpMethod _httpMethod;
-        private Dictionary<string, string> _headers;
-        private Dictionary<string, string> _parameters;
-        private object _body;
-        private string _requestUri;
+        _requestUri = requestUri;
+        _httpMethod = httpMethod ?? HttpMethod.Get;
+    }
+
+    public Request AddHeaders(Dictionary<string, string> headers)
+    {
+        _headers = headers;
+        return this;
+    }
         
-        public Request(string requestUri, HttpMethod httpMethod = null)
+    public Request AddParameters(Dictionary<string, string> parameters)
+    {
+        _parameters = parameters;
+        return this;
+    }
+
+    public Request AddBody(object body)
+    {
+        _body = body;
+        return this;
+    }
+        
+    public HttpRequestMessage Build()
+    {
+        HttpRequestMessage httpRequestMessage = new HttpRequestMessage();
+            
+        if (_parameters?.Count > 0)
         {
-            _requestUri = requestUri;
-            _httpMethod = httpMethod ?? HttpMethod.Get;
+            _requestUri += BuildQuery(_parameters);
+        }
+            
+        if (_headers?.Count > 0)
+        {
+            foreach (var (key, value) in _headers)
+            {
+                httpRequestMessage.Headers.Add(key, value);
+            }
         }
 
-        public Request AddHeaders(Dictionary<string, string> headers)
+        if (_body is not null)
         {
-            _headers = headers;
-            return this;
+            httpRequestMessage.Content = new StringContent(_body.ToString()!);
+            httpRequestMessage.Content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
         }
-        
-        public Request AddParameters(Dictionary<string, string> parameters)
-        {
-            _parameters = parameters;
-            return this;
-        }
-
-        public Request AddBody(object body)
-        {
-            _body = body;
-            return this;
-        }
-        
-        public HttpRequestMessage Build()
-        {
-            HttpRequestMessage httpRequestMessage = new HttpRequestMessage();
             
-            if (_parameters?.Count > 0)
-            {
-                _requestUri += BuildQuery(_parameters);
-            }
-            
-            if (_headers?.Count > 0)
-            {
-                foreach (var (key, value) in _headers)
-                {
-                    httpRequestMessage.Headers.Add(key, value);
-                }
-            }
-
-            if (_body is not null)
-            {
-                httpRequestMessage.Content = new StringContent(_body.ToString()!);
-                httpRequestMessage.Content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
-            }
-            
-            httpRequestMessage.Method = _httpMethod;
-            httpRequestMessage.RequestUri = new Uri(_requestUri);
-            return httpRequestMessage;
-        }
+        httpRequestMessage.Method = _httpMethod;
+        httpRequestMessage.RequestUri = new Uri(_requestUri);
+        return httpRequestMessage;
+    }
         
-        private static string BuildQuery(Dictionary<string, string> parameters)
-        {
-            return "?" + string.Join("&", parameters.Select(pair => $"{pair.Key}={pair.Value}"));
-        }
+    private static string BuildQuery(Dictionary<string, string> parameters)
+    {
+        return "?" + string.Join("&", parameters.Select(pair => $"{pair.Key}={pair.Value}"));
     }
 }

@@ -1,9 +1,9 @@
-﻿using Telegram.Dto.UpdateModule;
+﻿using System.Threading.Tasks;
+using Telegram.Dto.UpdateModule;
 
-namespace GusMelfordBot.Core.Applications.Commander
+namespace GusMelfordBot.Core.Applications.Commander;
+
+public interface ICommanderService
 {
-    public interface ICommanderService
-    {
-        void ProcessMessage(Message message);
-    }
+    Task ProcessMessage(Message message);
 }

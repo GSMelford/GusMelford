@@ -2,73 +2,73 @@
 using System.Threading.Tasks;
 using GusMelfordBot.DAL.Applications.MemesChat.TikTok;
 using GusMelfordBot.Database.Interfaces;
+using Microsoft.EntityFrameworkCore;
 
-namespace GusMelfordBot.Core.Applications.MemesChatApp
-{
-    using ContentProviders.TikTok;
-    using Interfaces;
-    using Telegram.Dto.UpdateModule;
+namespace GusMelfordBot.Core.Applications.MemesChatApp;
+
+using ContentProviders.TikTok;
+using Interfaces;
+using Telegram.Dto.UpdateModule;
     
-    public class MemeChatService : IMemeChatService
+public class MemeChatService : IMemeChatService
+{
+    private readonly ITikTokService _tikTokService;
+    private readonly IPlayerService _playerService;
+    private readonly IDatabaseManager _databaseManager;
+        
+    public MemeChatService(
+        IDatabaseManager databaseManager,
+        ITikTokService tikTokService, 
+        IPlayerService playerService)
     {
-        private readonly ITikTokService _tikTokService;
-        private readonly IPlayerService _playerService;
-        private readonly IDatabaseManager _databaseManager;
+        _tikTokService = tikTokService;
+        _playerService = playerService;
+        _databaseManager = databaseManager;
+    }
         
-        public MemeChatService(
-            IDatabaseManager databaseManager,
-            ITikTokService tikTokService, 
-            IPlayerService playerService)
+    public async Task ProcessMessage(Message message)
+    {
+        string messageText = message.Text;
+        switch (SelectProvider(messageText))
         {
-            _tikTokService = tikTokService;
-            _playerService = playerService;
-            _databaseManager = databaseManager;
-        }
-        
-        public async Task ProcessMessage(Message message)
-        {
-            string messageText = message.Text;
-            switch (SelectProvider(messageText))
-            {
-                case ContentProvider.TikTok:
-                    await _tikTokService.ProcessMessage(message);
-                    break;
-            }
-
-            if (message.ReplyToMessage is not null)
-            {
-                SetAccompanyingCommentary(message);
-            }
+            case ContentProvider.TikTok:
+                await _tikTokService.ProcessMessage(message);
+                break;
         }
 
-        public void ProcessCallbackQuery(CallbackQuery updateCallbackQuery)
+        if (message.ReplyToMessage is not null)
         {
-            _playerService.ProcessCallbackQuery(updateCallbackQuery);
-        }
-
-        private ContentProvider SelectProvider(string messageText)
-        {
-            return messageText.Contains(Constants.TikTok) ? ContentProvider.TikTok : ContentProvider.Other;
-        }
-
-        private void SetAccompanyingCommentary(Message message)
-        {
-            TikTokVideoContent tikTokVideoContent = _databaseManager.Context.Set<TikTokVideoContent>()
-                .FirstOrDefault(x => x.MessageId == message.ReplyToMessage.MessageId);
-
-            if (tikTokVideoContent is not null)
-            {
-                tikTokVideoContent.AccompanyingCommentary = message.Text;
-            }
-
-            _databaseManager.Context.SaveChanges();
+            await SetAccompanyingCommentary(message);
         }
     }
 
-    public enum ContentProvider
+    public async Task ProcessCallbackQuery(CallbackQuery updateCallbackQuery)
     {
-        TikTok,
-        YouTube,
-        Other
+        await _playerService.ProcessCallbackQuery(updateCallbackQuery);
     }
+
+    private ContentProvider SelectProvider(string messageText)
+    {
+        return messageText.Contains(Constants.TikTok) ? ContentProvider.TikTok : ContentProvider.Other;
+    }
+
+    private async Task SetAccompanyingCommentary(Message message)
+    {
+        TikTokVideoContent tikTokVideoContent = await _databaseManager.Context.Set<TikTokVideoContent>()
+            .FirstOrDefaultAsync(x => x.MessageId == message.ReplyToMessage.MessageId);
+
+        if (tikTokVideoContent is not null)
+        {
+            tikTokVideoContent.AccompanyingCommentary = message.Text;
+        }
+
+        await _databaseManager.Context.SaveChangesAsync();
+    }
+}
+
+public enum ContentProvider
+{
+    TikTok,
+    YouTube,
+    Other
 }

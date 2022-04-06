@@ -1,8 +1,7 @@
-﻿namespace GusMelfordBot.DAL.Applications.MemesChat
+﻿namespace GusMelfordBot.DAL.Applications.MemesChat;
+
+public class MemesChat : DatabaseEntity
 {
-    public class MemesChat : DatabaseEntity
-    {
-        public long ChatId { get; set; }
-        public string Type { get; set; }
-    }
+    public long ChatId { get; set; }
+    public string Type { get; set; }
 }

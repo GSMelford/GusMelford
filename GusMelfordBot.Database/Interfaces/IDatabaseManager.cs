@@ -1,9 +1,8 @@
-﻿namespace GusMelfordBot.Database.Interfaces
-{
-    using Context;
+﻿namespace GusMelfordBot.Database.Interfaces;
 
-    public interface IDatabaseManager
-    {
-        ApplicationContext Context { get; }
-    }
+using Context;
+
+public interface IDatabaseManager
+{
+    ApplicationContext Context { get; }
 }

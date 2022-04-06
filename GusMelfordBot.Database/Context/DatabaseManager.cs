@@ -1,15 +1,14 @@
-﻿namespace GusMelfordBot.Database.Context
+﻿using GusMelfordBot.Database.Interfaces;
+using GusMelfordBot.Database.Settings;
+
+namespace GusMelfordBot.Database.Context;
+
+public class DatabaseManager : IDatabaseManager
 {
-    using Settings;
-    using Interfaces;
-    
-    public class DatabaseManager : IDatabaseManager
-    {
-        public ApplicationContext Context { get; }
+    public ApplicationContext Context { get; }
         
-        public DatabaseManager(DatabaseSettings databaseSettings)
-        {
-            Context = new ApplicationContext(databaseSettings);
-        }
+    public DatabaseManager(DatabaseSettings databaseSettings)
+    {
+        Context = new ApplicationContext(databaseSettings);
     }
 }

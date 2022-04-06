@@ -1,12 +1,11 @@
 ﻿using System;
 
-namespace GusMelfordBot.Core.Applications
+namespace GusMelfordBot.Core.Applications;
+
+public static class Helper
 {
-    public static class Helper
+    public static string GetRandomEmoji()
     {
-        public static string GetRandomEmoji()
-        {
-            return Constants.EmojiList[new Random().Next(0, Constants.EmojiList.Count)];
-        }
+        return Constants.EmojiList[new Random().Next(0, Constants.EmojiList.Count)];
     }
 }

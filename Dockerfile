@@ -1,11 +1,9 @@
-#See https://aka.ms/containerfastmode to understand how Visual Studio uses this Dockerfile to build your images for faster debugging.
-
-FROM mcr.microsoft.com/dotnet/aspnet:5.0-bullseye-slim-arm64v8 AS base
+FROM mcr.microsoft.com/dotnet/aspnet:6.0.3-bullseye-slim-arm64v8 AS base
 WORKDIR /app
 EXPOSE 80
 EXPOSE 443
 
-FROM mcr.microsoft.com/dotnet/sdk:5.0.402-bullseye-slim-arm64v8 AS build
+FROM mcr.microsoft.com/dotnet/sdk:6.0.201-bullseye-slim-arm64v8 AS build
 WORKDIR /src
 COPY ["GusMelfordBot.Core/GusMelfordBot.Core.csproj", "GusMelfordBot.Core/"]
 COPY ["GusMelfordBot.Database/GusMelfordBot.Database.csproj", "GusMelfordBot.Database/"]
