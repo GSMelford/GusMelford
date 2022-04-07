@@ -1,57 +1,51 @@
-﻿using System.Threading.Tasks;
+﻿using System;
 
 namespace GusMelfordBot.Core.Controllers;
 
-using Newtonsoft.Json.Linq;
-using System;
-using Newtonsoft.Json;
+using System.Threading.Tasks;
 using Services.Update;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using Telegram.Dto.UpdateModule;
-    
+
 [ApiController]
+[Route("update")]
 public class UpdateController : Controller
 {
     private readonly ILogger<UpdateController> _logger;
     private readonly IUpdateService _updateService;
-        
+
     public UpdateController(
-        ILogger<UpdateController> logger, 
+        ILogger<UpdateController> logger,
         IUpdateService updateService)
     {
         _logger = logger;
         _updateService = updateService;
     }
 
-    [HttpPost("update")]
-    public async Task<IActionResult> Update([FromBody]object update)
+    [HttpPost]
+    public async Task<IActionResult> Update([FromBody] object update)
     {
-        string content = update?.ToString();
-        if (string.IsNullOrEmpty(content))
+        string updateContent = update?.ToString();
+        _logger.LogInformation("New update: {Update}", updateContent);
+        
+        if (string.IsNullOrEmpty(updateContent))
         {
-            return Ok();
+            return BadRequest();
         }
-            
-        var updateEntity = JsonConvert.DeserializeObject<Update>(content);
-            
-        if (updateEntity?.Message is not null)
+        
+        try
         {
-            JToken replayToMessage = JToken.Parse(content)["message"]?["reply_to_message"];
-            if (replayToMessage is not null)
+            if (!await _updateService.ProcessUpdate(updateContent))
             {
-                updateEntity.Message.ReplyToMessage =
-                    JsonConvert.DeserializeObject<Message>(replayToMessage.ToString());
+                return BadRequest();
             }
         }
-            
-        _logger.LogInformation("Update. Body: {Update}", update);
-        try {
-            await _updateService.ProcessUpdate(updateEntity);
+        catch (Exception exception)
+        {
+            _logger.LogError("Update error: {Exception}", exception);
+            return BadRequest();
         }
-        catch (Exception ex) {
-            _logger.LogError(ex, "ProcessUpdate error. UpdateId: {UpdateId}", updateEntity?.UpdateId);
-        }
+
         return Ok();
     }
 }
