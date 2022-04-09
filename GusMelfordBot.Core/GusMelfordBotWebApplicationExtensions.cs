@@ -1,25 +1,26 @@
-﻿using GusMelfordBot.Core.Applications.Commander;
-using GusMelfordBot.Core.Applications.MemesChatApp.ContentProviders.TikTok;
-using GusMelfordBot.Core.Services.GusMelfordBot;
-using GusMelfordBot.Core.Services.System;
-using GusMelfordBot.Core.Services.Update;
-using GusMelfordBot.Database.Context;
-using GusMelfordBot.Database.Interfaces;
-
 namespace GusMelfordBot.Core;
 
+using Applications;
+using Applications.Commander;
+using Applications.MemesChatApp;
+using Applications.MemesChatApp.ContentProviders.TikTok;
+using GusMelfordBot.Core.Applications.MemesChatApp.Interfaces;
+using Applications.MemesChatApp.Player;
 using Interfaces;
+using GusMelfordBot.Core.Services.GusMelfordBot;
+using Services.Requests;
+using GusMelfordBot.Core.Services.System;
+using Services.Update;
 using Settings;
+using Database.Context;
+using GusMelfordBot.Database.Interfaces;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Applications.MemesChatApp.Player;
-using Services;
-using Services.Requests;
-using Applications;
-using Applications.MemesChatApp;
-using GusMelfordBot.Core.Applications.MemesChatApp.Interfaces;
-    
-public static class StartupExtensions
+using Microsoft.Extensions.Logging;
+using Serilog;
+
+public static class GusMelfordBotWebApplicationExtensions
 {
     public static void AddServices(this IServiceCollection services, IConfiguration configuration)
     {
@@ -42,5 +43,17 @@ public static class StartupExtensions
         services.AddSingleton<IPlayerService, PlayerService>();
         services.AddTransient<IMemeChatService, MemeChatService>();
         services.AddTransient<IApplicationService, ApplicationService>();
+    }
+    
+    public static Serilog.ILogger AddGraylog(this WebApplicationBuilder builder)
+    {
+        var logger = new LoggerConfiguration()
+            .ReadFrom.Configuration(builder.Configuration)
+            .CreateLogger();
+
+        builder.Logging.ClearProviders();
+        builder.Logging.AddSerilog(logger);
+        
+        return logger;
     }
 }
