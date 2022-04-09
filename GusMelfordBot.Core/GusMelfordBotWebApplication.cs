@@ -16,6 +16,8 @@ public class GusMelfordBotWebApplication
         ILogger logger = builder.AddGraylog();
         builder.Services.AddServices(builder.Configuration);
         
+        AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
+        
         WebApplication app = builder.Build();
         if (builder.Environment.IsDevelopment())
         {
