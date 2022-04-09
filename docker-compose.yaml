@@ -32,13 +32,5 @@ services:
       - CommonSettings__DatabaseSettings__Password=$POSTGRES_PASSWORD
       - CommonSettings__TikTokSettings__TikTokChatId=-1001529315725
 
-  gusmelfordbot.core.addone:
-    image: gsmelford/gusmelfordbot.core.addon:latest
-    restart: always
-    depends_on:
-      - gusmelfordbot.core
-    environment:
-      - Token=1810879107:AAGc-YixPWnWDNUO9__-z47N95ypGUl9k_0
-      - RequestUrl=http://$GUSMELFORDBOT_HOST:$PORT/update
 volumes:
   gusmelforddb:
