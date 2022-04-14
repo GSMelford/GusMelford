@@ -1,3 +1,6 @@
+using Serilog.Sinks.Graylog;
+using Serilog.Sinks.Graylog.Core.Transport;
+
 namespace GusMelfordBot.Core;
 
 using Applications;
@@ -49,6 +52,12 @@ public static class GusMelfordBotWebApplicationExtensions
     {
         var logger = new LoggerConfiguration()
             .ReadFrom.Configuration(builder.Configuration)
+            .WriteTo.Graylog(new GraylogSinkOptions
+            {
+                Host = "192.168.31.109",
+                Port = 12201,
+                TransportType = TransportType.Udp
+            })
             .CreateLogger();
 
         builder.Logging.ClearProviders();

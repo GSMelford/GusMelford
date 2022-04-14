@@ -30,17 +30,26 @@ pipeline {
                 sh "docker push $DOCKER_REPO/$CONTAINER_NAME:$DOCKER_CONTAINER_TAG"
             }
         }
-        stage("Down old docker-compose") {
+        stage("Update and preparation docker-compose") {
             steps {
-                echo "=== removing old container ==="
+                echo "=== stop the old docker-compose ==="
                 sh "docker-compose down"
+                echo "=== docker prune ==="
+                sh "docker system prune -a"
+                echo "=== docker pull ==="
+                sh "docker-compose pull"
             }
         }
-        stage("Run docker-compose") {
+        stage("Up docker-compose") {
             steps {
-                echo "=== running new image ==="
+                echo "=== running docker-compose ==="
                 sh "docker-compose up -d"
             }
+        }
+    }
+    post {
+        always {
+            sh "docker logout"
         }
     }
 }

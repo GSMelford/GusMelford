@@ -5,7 +5,7 @@ services:
     image: postgres
     restart: always
     ports:
-      - "5432:5432"
+      - 5432:5432
     environment:
       - POSTGRES_USER=$POSTGRES_USER
       - POSTGRES_PASSWORD=$POSTGRES_PASSWORD
@@ -14,12 +14,12 @@ services:
       - gusmelforddb:/var/lib/postgresql/data
 
   gusmelfordbot.core:
-    image: gsmelford/gusmelfordbot.core:latest
+    image: $DOCKER_REPO/$CONTAINER_NAME:$DOCKER_REPO
     restart: always
     depends_on:
       - gusmelford.db
     ports:
-      - "5665:80"
+      - $PORT:80
     environment:
       - CommonSettings__Name=GusMelfordBot
       - CommonSettings__Version=1.4.8
@@ -30,7 +30,13 @@ services:
       - CommonSettings__DatabaseSettings__Database=dev.gusmelfordbot.db
       - CommonSettings__DatabaseSettings__Username=$POSTGRES_USER
       - CommonSettings__DatabaseSettings__Password=$POSTGRES_PASSWORD
-      - CommonSettings__TikTokSettings__TikTokChatId=-1001529315725
+
+  gusmelfordbot.core.addon:
+    image: gsmelford/gusmelfordbot.core.addon:latest
+    restart: always
+    environment:
+      - Token=$GUSMELFORDBOT_TELEGRAM_TOKEN
+      - UpdateUrl=http://$GUSMELFORDBOT_HOST/update
 
 volumes:
   gusmelforddb:
