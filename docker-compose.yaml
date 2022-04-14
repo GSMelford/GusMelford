@@ -30,6 +30,9 @@ services:
       - CommonSettings__DatabaseSettings__Database=dev.gusmelfordbot.db
       - CommonSettings__DatabaseSettings__Username=$POSTGRES_USER
       - CommonSettings__DatabaseSettings__Password=$POSTGRES_PASSWORD
+      - CommonSettings__GrayLogSettings__Host=$GUSMELFORDBOT_HOST
+      - CommonSettings__GrayLogSettings__Port=12201
+      - CommonSettings__GrayLogSettings__TransportType=Udp
 
   gusmelfordbot.core.addon:
     image: gsmelford/gusmelfordbot.core.addon:latest
