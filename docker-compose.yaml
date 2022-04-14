@@ -39,7 +39,7 @@ services:
     restart: always
     environment:
       - Token=$GUSMELFORDBOT_TELEGRAM_TOKEN
-      - UpdateUrl=http://$GUSMELFORDBOT_HOST/update
+      - UpdateUrl=http://$GUSMELFORDBOT_HOST:$PORT/update
 
 volumes:
   gusmelforddb:
