@@ -1,8 +1,8 @@
-using Serilog.Sinks.Graylog;
-using Serilog.Sinks.Graylog.Core.Transport;
-
 namespace GusMelfordBot.Core;
 
+using System;
+using Serilog.Sinks.Graylog;
+using Serilog.Sinks.Graylog.Core.Transport;
 using Applications;
 using Applications.Commander;
 using Applications.MemesChatApp;
@@ -18,18 +18,14 @@ using Settings;
 using Database.Context;
 using GusMelfordBot.Database.Interfaces;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Serilog;
 
 public static class GusMelfordBotWebApplicationExtensions
 {
-    public static void AddServices(this IServiceCollection services, IConfiguration configuration)
+    public static void AddServices(this IServiceCollection services, CommonSettings commonSettings)
     {
-        CommonSettings commonSettings = new CommonSettings();
-        configuration.Bind(nameof(CommonSettings), commonSettings);
-            
         services.AddSingleton(commonSettings);
         services.AddControllers();
         services.AddHealthChecks();
@@ -47,22 +43,30 @@ public static class GusMelfordBotWebApplicationExtensions
         services.AddTransient<IMemeChatService, MemeChatService>();
         services.AddTransient<IApplicationService, ApplicationService>();
     }
-    
-    public static Serilog.ILogger AddGraylog(this WebApplicationBuilder builder)
+
+    public static Serilog.ILogger AddGraylog(
+        this WebApplicationBuilder builder,
+        CommonSettings commonSettings)
     {
         var logger = new LoggerConfiguration()
             .ReadFrom.Configuration(builder.Configuration)
             .WriteTo.Graylog(new GraylogSinkOptions
             {
-                Host = "192.168.31.109",
-                Port = 12201,
-                TransportType = TransportType.Udp
+                Host = commonSettings.GrayLogSettings.Host,
+                Port = commonSettings.GrayLogSettings.Port.ToInt(),
+                TransportType = commonSettings.GrayLogSettings.TransportType switch
+                {
+                    "Udp" => TransportType.Udp,
+                    "Tcp" => TransportType.Tcp,
+                    "Http" => TransportType.Http,
+                    _ => throw new ArgumentNullException()
+                }
             })
             .CreateLogger();
 
         builder.Logging.ClearProviders();
         builder.Logging.AddSerilog(logger);
-        
+
         return logger;
     }
 }

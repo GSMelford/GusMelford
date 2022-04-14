@@ -308,7 +308,7 @@ public class PlayerService : IPlayerService
         await _gusMelfordBotService.DeleteMessageAsync(
             new DeleteMessageParameters
             {
-                ChatId = _commonSettings.TikTokSettings.TikTokChatId,
+                ChatId = -1001529315725,
                 MessageId = int.Parse(_playerInformationMessageId)
             });
     }

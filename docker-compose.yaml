@@ -22,7 +22,7 @@ services:
       - $PORT:80
     environment:
       - CommonSettings__Name=GusMelfordBot
-      - CommonSettings__Version=1.4.8
+      - CommonSettings__Version=1.4.9
       - CommonSettings__PlayerVersion=4.4
       - CommonSettings__TelegramBotSettings__Token=$GUSMELFORDBOT_TELEGRAM_TOKEN
       - CommonSettings__DatabaseSettings__Host=$GUSMELFORDBOT_HOST

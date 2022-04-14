@@ -1,7 +1,9 @@
 using System;
 using System.Threading.Tasks;
+using GusMelfordBot.Core.Settings;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Serilog;
 
@@ -12,9 +14,11 @@ public class GusMelfordBotWebApplication
     public void Start(string[] args)
     {
         WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
-
-        ILogger logger = builder.AddGraylog();
-        builder.Services.AddServices(builder.Configuration);
+        
+        CommonSettings commonSettings = new CommonSettings();
+        builder.Configuration.Bind(nameof(CommonSettings), commonSettings);
+        builder.Services.AddServices(commonSettings);
+        ILogger logger = builder.AddGraylog(commonSettings);
         
         AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
         
