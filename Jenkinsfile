@@ -36,6 +36,7 @@ pipeline {
                 sh "docker-compose down"
                 echo "=== docker prune ==="
                 sh "docker system prune -a"
+                sh "y"
                 echo "=== docker pull ==="
                 sh "docker-compose pull"
             }
