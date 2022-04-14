@@ -14,7 +14,7 @@ services:
       - gusmelforddb:/var/lib/postgresql/data
 
   gusmelfordbot.core:
-    image: $DOCKER_REPO/$CONTAINER_NAME:$DOCKER_REPO
+    image: $DOCKER_REPO/$CONTAINER_NAME:$DOCKER_CONTAINER_TAG
     restart: always
     depends_on:
       - gusmelford.db
