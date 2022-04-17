@@ -1,4 +1,3 @@
-using GusMelfordBot.Core.Domain.Apps.ContentCollector;
 using GusMelfordBot.Core.Domain.Apps.ContentCollector.Content;
 using GusMelfordBot.Core.Domain.Apps.ContentCollector.ContentDownload;
 using GusMelfordBot.Core.Domain.Requests;

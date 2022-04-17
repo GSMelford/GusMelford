@@ -12,7 +12,7 @@ public class GusMelfordBotService : IGusMelfordBotService
     private const int RETRY_MILLISECONDS = 2000;
     
     public GusMelfordBotService(
-        string token, 
+        string? token, 
         ILogger<GusMelfordBotService> logger,
         HttpClient httpClient)
     {

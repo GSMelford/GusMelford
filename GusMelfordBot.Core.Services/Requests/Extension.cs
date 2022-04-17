@@ -30,7 +30,7 @@ public static class Extension
         }
             
         httpRequestMessage.Method = request.HttpMethod ?? HttpMethod.Get;
-        httpRequestMessage.RequestUri = new Uri(request.RequestUri);
+        if (request.RequestUri != null) httpRequestMessage.RequestUri = new Uri(request.RequestUri);
         return httpRequestMessage;
     }
 }

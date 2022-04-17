@@ -7,9 +7,10 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\GusMelfordBot.Core.CustomExceptions\GusMelfordBot.Core.CustomExceptions.csproj" />
       <ProjectReference Include="..\GusMelfordBot.Core.Domain\GusMelfordBot.Core.Domain.csproj" />
       <ProjectReference Include="..\GusMelfordBot.Core.Extensions\GusMelfordBot.Core.Extensions.csproj" />
-      <ProjectReference Include="..\OldASP\OldASP.csproj" />
+      <ProjectReference Include="..\GusMelfordBot.Database\GusMelfordBot.Database.csproj" />
       <ProjectReference Include="..\Telegram.Bot.Core\Telegram.Bot.Core.csproj" />
     </ItemGroup>
 
