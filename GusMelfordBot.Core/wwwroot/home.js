@@ -2,15 +2,16 @@
 let baseUrl = document.location.href.replace(homePath, "");
 
 async function load(){
-    let information = await executeRequest("info");
-    let botFullName = information.name + " v" + information.version;
+    let information = await executeRequest("system/info");
+    let botFullName = information["systemName"] + " v" + information["systemVersion"];
     document.title = botFullName;
     
     let botTitle = document.getElementById("bot-title");
     botTitle.innerText = botFullName;
 
+    let contentInfo = await executeRequest("app/content/info?chatId=7dfd19cb-33dc-4da6-b157-60177994b696");
     let playerButton = document.getElementById("player-button");
-    playerButton.value = "View " + information["playerInformation"]["count"] + " memes";
+    playerButton.value = "View " + contentInfo.length + " contents";
 }
 
 function redirectToPlayer(){

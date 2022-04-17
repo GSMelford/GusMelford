@@ -1,26 +1,35 @@
+using GusMelfordBot.Core.Domain.Apps;
+using GusMelfordBot.Core.Domain.Apps.ContentCollector;
+using GusMelfordBot.Core.Domain.Apps.ContentCollector.Content;
+using GusMelfordBot.Core.Domain.Apps.ContentCollector.Content.ContentProviders.TikTok;
+using GusMelfordBot.Core.Domain.Apps.ContentCollector.ContentDownload;
+using GusMelfordBot.Core.Domain.Commands;
+using GusMelfordBot.Core.Domain.Requests;
+using GusMelfordBot.Core.Domain.System;
+using GusMelfordBot.Core.Domain.Telegram;
+using GusMelfordBot.Core.Domain.Update;
+using GusMelfordBot.Core.Services;
+using GusMelfordBot.Core.Services.Apps;
+using GusMelfordBot.Core.Services.Apps.ContentCollector;
+using GusMelfordBot.Core.Services.Apps.ContentCollector.Content;
+using GusMelfordBot.Core.Services.Apps.ContentCollector.Content.ContentProviders.TikTok;
+using GusMelfordBot.Core.Services.Apps.ContentCollector.ContentDownload;
+using GusMelfordBot.Core.Services.Commands;
+using GusMelfordBot.Core.Services.Requests;
+using GusMelfordBot.Core.Services.System;
+using GusMelfordBot.Core.Services.Telegram;
+using Microsoft.Extensions.Logging.Abstractions;
+
 namespace GusMelfordBot.Core;
 
-using System;
-using Serilog.Sinks.Graylog;
-using Serilog.Sinks.Graylog.Core.Transport;
-using Applications;
-using Applications.Commander;
-using Applications.MemesChatApp;
-using Applications.MemesChatApp.ContentProviders.TikTok;
-using GusMelfordBot.Core.Applications.MemesChatApp.Interfaces;
-using Applications.MemesChatApp.Player;
-using Interfaces;
-using GusMelfordBot.Core.Services.GusMelfordBot;
-using Services.Requests;
-using GusMelfordBot.Core.Services.System;
-using Services.Update;
+using Extensions;
 using Settings;
 using Database.Context;
-using GusMelfordBot.Database.Interfaces;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
+using Database.Interfaces;
 using Serilog;
+using Serilog.Core;
+using Serilog.Sinks.Graylog;
+using Serilog.Sinks.Graylog.Core.Transport;
 
 public static class GusMelfordBotWebApplicationExtensions
 {
@@ -30,21 +39,34 @@ public static class GusMelfordBotWebApplicationExtensions
         services.AddControllers();
         services.AddHealthChecks();
 
-        services.AddTransient<IDatabaseManager>(
-            provider => new DatabaseManager(provider.GetRequiredService<CommonSettings>().DatabaseSettings));
-
-        services.AddTransient<ICommanderService, CommanderService>();
-        services.AddTransient<IUpdateService, UpdateService>();
-        services.AddTransient<ISystemService, SystemService>();
-        services.AddTransient<IGusMelfordBotService, GusMelfordBotService>();
-        services.AddSingleton<IRequestService, RequestService>();
+        services.AddHttpClient();
+        services.AddTransient<IContentRepository, ContentRepository>();
+        services.AddTransient<IContentService, ContentService>();
+        services.AddTransient<IContentDownloadRepository, ContentDownloadRepository>();
+        services.AddTransient<IContentDownloadService, ContentDownloadService>();
+        services.AddTransient<IApplicationRepository, ApplicationRepository>();
+        
+        services.AddTransient<IGusMelfordBotService, GusMelfordBotService>(
+            provider => new GusMelfordBotService(
+                commonSettings.TelegramBotSettings.Token, 
+                new NullLogger<GusMelfordBotService>(), 
+                provider.GetRequiredService<HttpClient>()));
+        
+        services.AddTransient<ITikTokRepository, TikTokRepository>();
         services.AddTransient<ITikTokService, TikTokService>();
-        services.AddSingleton<IPlayerService, PlayerService>();
-        services.AddTransient<IMemeChatService, MemeChatService>();
+        services.AddTransient<IContentCollectorService, ContentCollectorService>();
         services.AddTransient<IApplicationService, ApplicationService>();
-    }
+        services.AddTransient<IRequestService, RequestService>();
+        services.AddTransient<IUpdateService, UpdateService>();
+        services.AddTransient<ICommandRepository, CommandRepository>();
+        services.AddTransient<ICommandService, CommandService>();
+        services.AddTransient<ISystemService, SystemService>();
 
-    public static Serilog.ILogger AddGraylog(
+        services.AddTransient<IDatabaseManager>(
+            _ => new DatabaseManager(commonSettings.DatabaseSettings));
+    }
+    
+    public static Logger AddGraylog(
         this WebApplicationBuilder builder,
         CommonSettings commonSettings)
     {

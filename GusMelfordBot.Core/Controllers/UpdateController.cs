@@ -1,9 +1,8 @@
-﻿using System;
+﻿using GusMelfordBot.Core.Domain.Update;
 
 namespace GusMelfordBot.Core.Controllers;
 
 using System.Threading.Tasks;
-using Services.Update;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
@@ -25,7 +24,7 @@ public class UpdateController : Controller
     [HttpPost]
     public async Task<IActionResult> Update([FromBody] object update)
     {
-        string updateContent = update?.ToString();
+        string? updateContent = update.ToString();
         _logger.LogInformation("New update: {Update}", updateContent);
         
         if (string.IsNullOrEmpty(updateContent))
@@ -40,7 +39,7 @@ public class UpdateController : Controller
                 return BadRequest();
             }
         }
-        catch (Exception exception)
+        catch (System.Exception exception)
         {
             _logger.LogError("Update error: {Exception}", exception);
             return BadRequest();

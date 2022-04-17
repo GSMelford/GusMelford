@@ -1,19 +1,18 @@
-﻿using GusMelfordBot.DAL.Applications.MemesChat;
-using GusMelfordBot.DAL.Applications.MemesChat.TikTok;
+﻿using GusMelfordBot.DAL.Applications.ContentCollector;
 
 namespace GusMelfordBot.Database.Context;
 
-using Settings;
 using DAL;
 using Microsoft.EntityFrameworkCore;
+using Settings;
     
 public sealed class ApplicationContext : DbContext
 {
     private readonly DatabaseSettings _databaseSettings;
 
     public DbSet<User> Users { get; set; }
-    public DbSet<TikTokVideoContent> TokVideoContents { get; set; }
-    public DbSet<MemesChat> MemesChats { get; set; }
+    public DbSet<Chat> Chats { get; set; }
+    public DbSet<Content> ContentEntities { get; set; }
 
     public ApplicationContext(DatabaseSettings databaseSettings)
     {

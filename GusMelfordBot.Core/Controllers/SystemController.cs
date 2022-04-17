@@ -1,35 +1,27 @@
-﻿using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
+using GusMelfordBot.Core.Domain.System;
+using GusMelfordBot.Core.Dto.System;
+using GusMelfordBot.Core.Settings;
+using Microsoft.AspNetCore.Mvc;
 
 namespace GusMelfordBot.Core.Controllers;
 
-using Interfaces;
-using Microsoft.AspNetCore.Mvc;
-    
 [ApiController]
-public class GusMelfordBotController : Controller
+[Route("system")]
+public class SystemController : Controller
 {
     private readonly ISystemService _systemService;
-    private readonly ILogger<GusMelfordBotController> _logger;
+    private readonly CommonSettings _commonSettings;
     
-    public GusMelfordBotController(
-        ISystemService systemService,
-        ILogger<GusMelfordBotController> logger)
+    public SystemController(
+        ISystemService systemService, CommonSettings commonSettings)
     {
         _systemService = systemService;
-        _logger = logger;
+        _commonSettings = commonSettings;
     }
-        
+
     [HttpGet("info")]
-    public async Task<JsonResult> GetSystemInfo()
+    public JsonResult GetSystemInfo()
     {
-        return Json(await _systemService.GetSystemData());
-    }
-    
-    [HttpGet("check")]
-    public IActionResult CheckSystem()
-    {
-        _logger.LogInformation("The GusMelfordBot works good");
-        return Ok();
+        return Json(_systemService.BuildSystemInfo(_commonSettings.Name, _commonSettings.Version).ToDto());
     }
 }

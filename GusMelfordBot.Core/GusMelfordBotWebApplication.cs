@@ -1,11 +1,6 @@
-using System;
-using System.Threading.Tasks;
+using GusMelfordBot.Core.Middlewares;
 using GusMelfordBot.Core.Settings;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Hosting;
-using Serilog;
+using ILogger = Serilog.ILogger;
 
 namespace GusMelfordBot.Core;
 
@@ -23,14 +18,12 @@ public class GusMelfordBotWebApplication
         AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
         
         WebApplication app = builder.Build();
-        if (builder.Environment.IsDevelopment())
-        {
-            app.UseDeveloperExceptionPage();
-        }
-
+        
         app.UseRouting();
         app.UseStaticFiles();
-
+        app.UseMiddleware(typeof(ExceptionMiddleware));
+        app.UseDeveloperExceptionPage();
+        app.UseStatusCodePages();
         app.UseEndpoints(endpoints => { endpoints.MapHealthChecks("/health"); });
 
         app.UseEndpoints(endpoints =>
