@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net5.0</TargetFramework>
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+        <Version>0.2.2</Version>
+        <Authors>gsMelford, Squik, Zvesdochyot</Authors>
+        <Company>TBotProject</Company>
+        <Description>Bot.Api - universal api library for bots of various social networks.</Description>
+        <PackageId>TBotProject.Bot.Api</PackageId>
+        <Title>Bot.Api</Title>
+        <RepositoryUrl>https://github.com/Squikle/ProjectTBot/tree/main/ProjectTBot/Bot.Api</RepositoryUrl>
+        <PackageTags>Bot.Api, Api, Telegram, Bot</PackageTags>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="6.0.0" />
+      <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+      <PackageReference Include="NuGet.CommandLine" Version="5.11.0">
+        <PrivateAssets>all</PrivateAssets>
+        <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      </PackageReference>
+    </ItemGroup>
+
+</Project>

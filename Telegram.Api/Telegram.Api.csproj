@@ -1,0 +1,28 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net5.0</TargetFramework>
+        <RootNamespace>Telegram.API</RootNamespace>
+        <Version>0.2.2</Version>
+        <Authors>gsMelford, Squik, Zvesdochyot</Authors>
+        <Company>TBotProject</Company>
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+        <PackageId>TBotProject.Telegram.Api</PackageId>
+        <Title>Telegram.Api</Title>
+        <Description>Telegram.Api - api designed to work with telegram api.</Description>
+        <RepositoryUrl>https://github.com/Squikle/TBot.Api/tree/main/TBot.Api/Telegram.Api</RepositoryUrl>
+        <PackageTags>Telegram.Api, Api, Bot.Api, Api</PackageTags>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Bot.Api\Bot.Api.csproj" />
+      <ProjectReference Include="..\Telegram.Dto\Telegram.Dto.csproj" />
+      <ProjectReference Include="..\Telegram.Exceptions\Telegram.Exceptions.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="6.0.0" />
+      <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+    </ItemGroup>
+
+</Project>
