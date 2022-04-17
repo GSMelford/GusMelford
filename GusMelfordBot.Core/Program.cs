@@ -1,4 +1,4 @@
 using GusMelfordBot.Core;
 
-GusMelfordBotWebApplication gusMelfordBotWebApplication = new GusMelfordBotWebApplication();
-gusMelfordBotWebApplication.Start(args);
+GusMelfordBotWebApplication webApplication = new GusMelfordBotWebApplication();
+webApplication.Start(args);

@@ -2,44 +2,30 @@
 
     <PropertyGroup>
         <TargetFramework>net6.0</TargetFramework>
-        <UserSecretsId>deaaf75c-4b76-4556-84d1-11f2231a907f</UserSecretsId>
-        <LangVersion>10</LangVersion>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+        <UserSecretsId>e8211606-8928-4833-820c-deb97f22e38a</UserSecretsId>
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="Gelf.Extensions.Logging" Version="2.3.0" />
-      <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
-      <PackageReference Include="RestSharp" Version="107.3.0" />
-      <PackageReference Include="Serilog" Version="2.10.0" />
-      <PackageReference Include="Serilog.AspNetCore" Version="5.0.0" />
-      <PackageReference Include="Serilog.Extensions.Hosting" Version="4.2.0" />
-      <PackageReference Include="Serilog.Settings.Configuration" Version="3.3.0" />
-      <PackageReference Include="Serilog.Sinks.Graylog" Version="2.3.0" />
-      <PackageReference Include="TBot.Api" Version="1.0.3-alpha1" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <Reference Include="Bot.Api">
-        <HintPath>..\TelegramBotLibraries\Bot.Api.dll</HintPath>
-      </Reference>
-      <Reference Include="Telegram.Api">
-        <HintPath>..\TelegramBotLibraries\Telegram.Api.dll</HintPath>
-      </Reference>
-      <Reference Include="Telegram.Dto">
-        <HintPath>..\TelegramBotLibraries\Telegram.Dto.dll</HintPath>
-      </Reference>
-      <Reference Include="Telegram.Exceptions">
-        <HintPath>..\TelegramBotLibraries\Telegram.Exceptions.dll</HintPath>
-      </Reference>
-    </ItemGroup>
-
-    <ItemGroup>
-      <ProjectReference Include="..\GusMelfordBot.DAL\GusMelfordBot.DAL.csproj" />
+      <ProjectReference Include="..\GusMelfordBot.Core.CustomExceptions\GusMelfordBot.Core.CustomExceptions.csproj" />
+      <ProjectReference Include="..\GusMelfordBot.Core.Domain\GusMelfordBot.Core.Domain.csproj" />
+      <ProjectReference Include="..\GusMelfordBot.Core.Extensions\GusMelfordBot.Core.Extensions.csproj" />
+      <ProjectReference Include="..\GusMelfordBot.Core.Services\GusMelfordBot.Core.Services.csproj" />
       <ProjectReference Include="..\GusMelfordBot.Database\GusMelfordBot.Database.csproj" />
     </ItemGroup>
 
     <ItemGroup>
-      <_ContentIncludedByDefault Remove="Views\GusMelfordBotHelloModel.cshtml" />
+      <PackageReference Include="Gelf.Extensions.Logging" Version="2.3.0" />
+      <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.14.0" />
+      <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+      <PackageReference Include="Serilog" Version="2.10.0" />
+      <PackageReference Include="Serilog.AspNetCore" Version="5.0.0" />
+      <PackageReference Include="Serilog.Extensions.Hosting" Version="4.2.0" />
+      <PackageReference Include="Serilog.Extensions.Logging" Version="3.1.0" />
+      <PackageReference Include="Serilog.Settings.Configuration" Version="3.3.0" />
+      <PackageReference Include="Serilog.Sinks.Graylog" Version="2.3.0" />
     </ItemGroup>
 
 </Project>
