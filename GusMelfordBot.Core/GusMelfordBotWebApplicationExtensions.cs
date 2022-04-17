@@ -48,7 +48,7 @@ public static class GusMelfordBotWebApplicationExtensions
         
         services.AddTransient<IGusMelfordBotService, GusMelfordBotService>(
             provider => new GusMelfordBotService(
-                commonSettings.TelegramBotSettings.Token, 
+                commonSettings.TelegramBotSettings?.Token, 
                 new NullLogger<GusMelfordBotService>(), 
                 provider.GetRequiredService<HttpClient>()));
         
@@ -74,9 +74,9 @@ public static class GusMelfordBotWebApplicationExtensions
             .ReadFrom.Configuration(builder.Configuration)
             .WriteTo.Graylog(new GraylogSinkOptions
             {
-                Host = commonSettings.GrayLogSettings.Host,
-                Port = commonSettings.GrayLogSettings.Port.ToInt(),
-                TransportType = commonSettings.GrayLogSettings.TransportType switch
+                Host = commonSettings.GrayLogSettings?.Host,
+                Port = commonSettings.GrayLogSettings?.Port.ToInt(),
+                TransportType = commonSettings.GrayLogSettings?.TransportType switch
                 {
                     "Udp" => TransportType.Udp,
                     "Tcp" => TransportType.Tcp,
