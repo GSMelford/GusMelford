@@ -20,7 +20,7 @@ public class UpdateService : IUpdateService
 
     public async Task<bool> ProcessUpdate(string json)
     {
-        var updateEntity = JsonConvert.DeserializeObject<global::Telegram.Dto.UpdateModule.Update>(json);
+        var updateEntity = JsonConvert.DeserializeObject<Telegram.Dto.UpdateModule.Update>(json);
         _logger.LogInformation("Update: {Text}", updateEntity?.Message?.Text);
 
         try
@@ -28,6 +28,10 @@ public class UpdateService : IUpdateService
             if (updateEntity?.Message is not null)
             {
                 await _applicationService.ProcessMessage(updateEntity.Message);
+            }
+            else if (updateEntity?.CallbackQuery is not null)
+            {
+                _applicationService.ProcessCallbackQuery(updateEntity.CallbackQuery);
             }
         }
         catch

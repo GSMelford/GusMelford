@@ -21,8 +21,13 @@ public class TikTokDownloadManager
         _requestService = requestService;
     }
         
-    public async Task<byte[]?> DownloadTikTokVideo(DAL.Applications.ContentCollector.Content content)
+    public async Task<byte[]?> DownloadTikTokVideo(DAL.Applications.ContentCollector.Content? content)
     {
+        if (content is null)
+        {
+            return null;
+        }
+        
         try
         {
             JToken videoInformation = await GetVideoInformation(content);
@@ -66,7 +71,7 @@ public class TikTokDownloadManager
         return videoInformation["seoProps"]?["metaParams"]?["description"]?.ToString();
     }
         
-    private async Task<JToken> GetVideoInformation(DAL.Applications.ContentCollector.Content content)
+    private async Task<JToken> GetVideoInformation(DAL.Applications.ContentCollector.Content? content)
     {
         Request request = new Request
         {
@@ -81,7 +86,7 @@ public class TikTokDownloadManager
         return await (await _requestService.ExecuteAsync(request.ToHttpRequestMessage())).GetJTokenAsyncOrEmpty();
     }
         
-    private string BuildVideoInformationUrl(DAL.Applications.ContentCollector.Content content)
+    private string BuildVideoInformationUrl(DAL.Applications.ContentCollector.Content? content)
     {
         return $"https://www.tiktok.com/node/share/video/{GetVideoUser(content.RefererLink)}" +
                $"/{GetVideoId(content.RefererLink)}";

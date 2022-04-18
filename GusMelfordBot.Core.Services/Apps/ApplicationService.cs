@@ -1,6 +1,8 @@
 using GusMelfordBot.Core.Domain.Apps;
 using GusMelfordBot.Core.Domain.Apps.ContentCollector;
 using GusMelfordBot.Core.Domain.Commands;
+using GusMelfordBot.Core.Extensions;
+using GusMelfordBot.DAL;
 using Telegram.Dto.UpdateModule;
 
 namespace GusMelfordBot.Core.Services.Apps;
@@ -24,7 +26,10 @@ public class ApplicationService : IApplicationService
     public async Task ProcessMessage(Message message)
     {
         await _applicationRepository.RegisterNewUserIfNotExist(message.From);
-        switch (await _applicationRepository.GetApplicationType(message.Chat.Id))
+        string? applicationType = (await _applicationRepository.GetChats())
+            .FirstOrDefault(x => x.ChatId == message.Chat.Id)?.ApplicationType;
+        
+        switch (applicationType)
         {
             case App.ContentCollector:
                 _collectorService.ProcessMessage(message);
@@ -32,5 +37,18 @@ public class ApplicationService : IApplicationService
         }
 
         await _commandService.ProcessCommand(message);
+    }
+
+    public async void ProcessCallbackQuery(CallbackQuery callbackQuery)
+    {
+        await _applicationRepository.RegisterNewUserIfNotExist(callbackQuery.FromUser);
+
+        string applicationType = callbackQuery.Data.Split(";")[0];
+        switch (applicationType)
+        {
+            case App.ContentCollector:
+                _collectorService.ProcessCallbackQuery(callbackQuery);
+                break;
+        }
     }
 }

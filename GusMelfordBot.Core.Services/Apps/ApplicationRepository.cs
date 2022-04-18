@@ -14,11 +14,9 @@ public class ApplicationRepository : IApplicationRepository
         _databaseManager = databaseManager;
     }
 
-    public async Task<string?> GetApplicationType(long chatId)
+    public async Task<List<Chat>> GetChats()
     {
-        return (await _databaseManager.Context
-                .Set<Chat>()
-                .FirstOrDefaultAsync(x => x.ChatId == chatId))?.ApplicationType;
+        return await _databaseManager.Context.Set<Chat>().ToListAsync();
     }
 
     public async Task RegisterNewUserIfNotExist(global::Telegram.Dto.User userTelegram)

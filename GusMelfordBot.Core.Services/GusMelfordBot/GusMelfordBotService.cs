@@ -4,7 +4,7 @@ using GusMelfordBot.Core.Domain.Telegram;
 using Microsoft.Extensions.Logging;
 using Telegram.Bot.Client;
 
-namespace GusMelfordBot.Core.Services.Telegram;
+namespace GusMelfordBot.Core.Services.GusMelfordBot;
 
 public class GusMelfordBotService : IGusMelfordBotService
 {

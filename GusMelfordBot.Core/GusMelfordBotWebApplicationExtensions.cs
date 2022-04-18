@@ -15,9 +15,9 @@ using GusMelfordBot.Core.Services.Apps.ContentCollector.Content;
 using GusMelfordBot.Core.Services.Apps.ContentCollector.Content.ContentProviders.TikTok;
 using GusMelfordBot.Core.Services.Apps.ContentCollector.ContentDownload;
 using GusMelfordBot.Core.Services.Commands;
+using GusMelfordBot.Core.Services.GusMelfordBot;
 using GusMelfordBot.Core.Services.Requests;
 using GusMelfordBot.Core.Services.System;
-using GusMelfordBot.Core.Services.Telegram;
 using Microsoft.Extensions.Logging.Abstractions;
 
 namespace GusMelfordBot.Core;

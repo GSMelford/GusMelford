@@ -1,5 +1,5 @@
-using GusMelfordBot.Core.Domain.Apps.ContentCollector;
 using GusMelfordBot.Core.Domain.Apps.ContentCollector.Content;
+using GusMelfordBot.DAL;
 using GusMelfordBot.Database.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
@@ -14,6 +14,20 @@ public class ContentRepository : IContentRepository
         _databaseManager = databaseManager;
     }
 
+    public async Task<long?> GetChatId(Guid chatId)
+    {
+        return (await _databaseManager.Context.Set<Chat>().FirstOrDefaultAsync(x => x.Id == chatId))?.ChatId;
+    }
+    
+    public async Task<DAL.Applications.ContentCollector.Content?> GetContent(Guid contentId)
+    {
+        return (await _databaseManager.Context
+            .Set<DAL.Applications.ContentCollector.Content>()
+            .Include(x=>x.Chat)
+            .Include(x=>x.User)
+            .FirstOrDefaultAsync(x => x.Id == contentId));
+    }
+    
     public IEnumerable<ContentInfo> GetContentList(Filter filter)
     {
         IQueryable<DAL.Applications.ContentCollector.Content> query = _databaseManager.Context

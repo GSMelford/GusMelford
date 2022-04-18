@@ -1,3 +1,5 @@
+using Newtonsoft.Json;
+
 namespace GusMelfordBot.Core.Extensions;
 
 public static class TypeConversion
@@ -25,5 +27,17 @@ public static class TypeConversion
     public static List<string>? ToList(this string? value)
     {
         return string.IsNullOrEmpty(value) ? null : value.Split(",").ToList();
+    }
+
+    public static T? ToObject<T>(this string? value) where T : new()
+    {
+        try
+        {
+            return JsonConvert.DeserializeObject<T>(value!);
+        }
+        catch
+        {
+            return new T();
+        }
     }
 }

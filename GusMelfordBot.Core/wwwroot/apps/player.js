@@ -4,6 +4,7 @@ let isKeyInputActive = false;
 let degreeOfCoup = 360;
 let contents = [];
 let cursor = -1;
+let message;
 
 async function Init(){
     document.addEventListener("keydown", keyDownHandler);
@@ -19,11 +20,24 @@ async function Init(){
 }
 
 async function changeVideo(direction) {
+    try {
+        let request = baseUrl + "contentCollector/deleteInformationPanel" +
+            "?chatId=7dfd19cb-33dc-4da6-b157-60177994b696" +
+            "&messageId=" + message["messageId"];
+        await fetch(request);
+    }catch (e){
+        console.log("We can't delete old message")
+    }
+    
     let videoBlocks = document.getElementsByClassName("video-block");
     for (let i = 0; i < videoBlocks.length; i++) {
         videoBlocks[i].remove();
     }
     degreeOfCoup = 360;
+    
+    if(cursor !== -1){
+        await fetch(baseUrl + "app/content/setViewedVideo?contentId=" + contents[cursor]["id"]);
+    }
     
     updateCursor(direction);
     updateElementVideoInfo();
@@ -37,7 +51,7 @@ async function changeVideo(direction) {
     video.appendChild(source);
     videoContainer.appendChild(video);
     document.body.requestFullscreen().then(r => r);
-    await fetch(baseUrl + "app/content/setViewedVideo?contentId=" + contents[cursor]["id"]);
+    message = await executeRequest("contentCollector/sendInformationPanel?contentId=" + contents[cursor]["id"]);
 }
 
 function updateCursor(direction){
