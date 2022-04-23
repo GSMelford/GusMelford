@@ -19,11 +19,24 @@ public class GusMelfordBotWebApplication
         
         WebApplication app = builder.Build();
         
+        if (builder.Environment.IsDevelopment())  
+        {  
+            app.UseDeveloperExceptionPage();  
+        }  
+        else  
+        {
+            app.UseHsts();  
+        }  
+        
         app.UseRouting();
-        app.UseStaticFiles();
+        app.UseSpaStaticFiles();  
         app.UseMiddleware(typeof(ExceptionMiddleware));
         app.UseDeveloperExceptionPage();
         app.UseStatusCodePages();
+        app.UseCors(x => 
+            x.AllowAnyOrigin()
+                .AllowAnyHeader()
+                .AllowAnyMethod());
         app.UseEndpoints(endpoints => { endpoints.MapHealthChecks("/health"); });
 
         app.UseEndpoints(endpoints =>

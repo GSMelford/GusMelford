@@ -18,6 +18,7 @@
 
     <ItemGroup>
       <PackageReference Include="Gelf.Extensions.Logging" Version="2.3.0" />
+      <PackageReference Include="Microsoft.AspNetCore.SpaServices.Extensions" Version="6.0.4" />
       <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.14.0" />
       <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
       <PackageReference Include="Serilog" Version="2.10.0" />

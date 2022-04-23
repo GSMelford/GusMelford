@@ -38,7 +38,9 @@ public static class GusMelfordBotWebApplicationExtensions
         services.AddSingleton(commonSettings);
         services.AddControllers();
         services.AddHealthChecks();
-
+        services.AddCors();
+        
+        services.AddSpaStaticFiles(options => options.RootPath = "client-app/dist");  
         services.AddHttpClient();
         services.AddTransient<IContentRepository, ContentRepository>();
         services.AddTransient<IContentService, ContentService>();
@@ -61,7 +63,8 @@ public static class GusMelfordBotWebApplicationExtensions
         services.AddTransient<ICommandRepository, CommandRepository>();
         services.AddTransient<ICommandService, CommandService>();
         services.AddTransient<ISystemService, SystemService>();
-
+        services.AddTransient<ISystemRepository, SystemRepository>();
+        
         services.AddTransient<IDatabaseManager>(
             _ => new DatabaseManager(commonSettings.DatabaseSettings));
     }
