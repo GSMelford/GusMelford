@@ -29,7 +29,7 @@ public class FtpServerService : IFtpServerService
         Stream? requestStream = null;
         try
         {
-            _logger.LogInformation("UploadFile starts");
+            _logger.LogInformation("UploadFile starts {FtpUrl}", _ftpUrl + path);
             FtpWebRequest? ftpWebRequest = FtpWebRequest.Create(_ftpUrl + path) as FtpWebRequest;
             ftpWebRequest!.Method = WebRequestMethods.Ftp.UploadFile;
             ftpWebRequest.Credentials = new NetworkCredential(_userName, _password);
