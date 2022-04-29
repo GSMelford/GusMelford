@@ -1,7 +1,10 @@
 using System.Text.RegularExpressions;
 using GusMelfordBot.Core.Domain.Apps.ContentCollector.Content;
 using GusMelfordBot.Core.Domain.Apps.ContentCollector.Content.ContentProviders.TikTok;
+using GusMelfordBot.Core.Domain.Requests;
+using GusMelfordBot.Core.Domain.System;
 using GusMelfordBot.Core.Domain.Telegram;
+using GusMelfordBot.Core.Services.Apps.ContentCollector.ContentDownload.TikTok;
 using Microsoft.Extensions.Logging;
 using RestSharp;
 using Telegram.Dto.UpdateModule;
@@ -13,15 +16,20 @@ public class TikTokService : ITikTokService
     private readonly ILogger<TikTokService> _logger;
     private readonly TelegramHelper _telegramHelper;
     private readonly ITikTokRepository _tikTokRepository;
+    private readonly TikTokDownloadManager _tikTokDownloadManager;
+    private readonly IFtpServerService _ftpServerService;
     
     public TikTokService(
         IGusMelfordBotService gusMelfordBotService, 
         ITikTokRepository tikTokRepository, 
-        ILogger<TikTokService> logger)
+        ILogger<TikTokService> logger,
+        IRequestService requestService, IFtpServerService ftpServerService)
     {
         _tikTokRepository = tikTokRepository;
         _logger = logger;
+        _ftpServerService = ftpServerService;
         _telegramHelper = new TelegramHelper(gusMelfordBotService);
+        _tikTokDownloadManager = new TikTokDownloadManager(requestService, null);
     } 
     
     public async Task ProcessMessage(Message message)
@@ -55,8 +63,19 @@ public class TikTokService : ITikTokService
                     message.Chat.Id,
                     newMessage?.MessageId ?? 0);
 
-                await _tikTokRepository.SaveContentAsync(content);
+                string userName = TikTokServiceHelper.GetUserName(content.RefererLink);
+                string videoId = TikTokServiceHelper.GetVideoId(content.RefererLink);
+                string videoName = $"{userName}-{videoId}";
+                
+                content.Name = videoName;
+                
+                byte[]? array = await _tikTokDownloadManager.DownloadTikTokVideo(content);
+                if (array is not null)
+                    content.IsSaved = await _ftpServerService.UploadFile(
+                        $"Contents/{videoName}.mp4", new MemoryStream(array));
             }
+
+            await _tikTokRepository.SaveContentAsync(content);
         }
         catch (global::System.Exception e)
         {

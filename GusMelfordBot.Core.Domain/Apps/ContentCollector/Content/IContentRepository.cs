@@ -6,4 +6,5 @@ public interface IContentRepository
     Task SetViewedVideo(Guid contentId);
     Task<DAL.Applications.ContentCollector.Content?> GetContent(Guid contentId);
     Task<long?> GetChatId(Guid chatId);
+    Task Cache();
 }

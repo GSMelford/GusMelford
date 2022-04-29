@@ -34,6 +34,13 @@ public class ContentController : Controller
         return Json(_contentService.SetViewedVideo(contentId.ToGuid()));
     }
     
+    [HttpGet("cache")]
+    public async Task<IActionResult> CacheContent()
+    {
+        await _contentService.Cache();
+        return Ok();
+    }
+    
     [HttpGet]
     public async Task<FileStreamResult?> GetContent([FromQuery] string contentId)
     {

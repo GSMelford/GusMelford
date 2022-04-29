@@ -12,7 +12,7 @@ public sealed class ApplicationContext : DbContext
 
     public DbSet<User> Users { get; set; }
     public DbSet<Chat> Chats { get; set; }
-    public DbSet<Content> ContentEntities { get; set; }
+    public DbSet<Content> Content { get; set; }
 
     public ApplicationContext(DatabaseSettings databaseSettings)
     {

@@ -2,6 +2,7 @@ using GusMelfordBot.Core.Domain.Apps.ContentCollector;
 using GusMelfordBot.Core.Domain.Apps.ContentCollector.Content;
 using GusMelfordBot.Core.Domain.Apps.ContentCollector.Content.ContentProviders.TikTok;
 using GusMelfordBot.Core.Domain.Requests;
+using GusMelfordBot.Core.Domain.System;
 using GusMelfordBot.Core.Domain.Telegram;
 using GusMelfordBot.Core.Extensions;
 using GusMelfordBot.Core.Services.Apps.ContentCollector.ContentDownload.TikTok;
@@ -20,17 +21,20 @@ public class ContentCollectorService : IContentCollectorService
     private readonly IContentRepository _contentRepository;
     private readonly IGusMelfordBotService _gusMelfordBotService;
     private readonly IRequestService _requestService;
+    private readonly IFtpServerService _ftpServerService;
     
     public ContentCollectorService(
         ITikTokService tikTokService,
         IContentRepository contentRepository,
         IGusMelfordBotService gusMelfordBotService,
-        IRequestService requestService)
+        IRequestService requestService, 
+        IFtpServerService ftpServerService)
     {
         _tikTokService = tikTokService;
         _contentRepository = contentRepository;
         _gusMelfordBotService = gusMelfordBotService;
         _requestService = requestService;
+        _ftpServerService = ftpServerService;
     }
 
     public void ProcessMessage(Message message)
@@ -54,26 +58,31 @@ public class ContentCollectorService : IContentCollectorService
             switch (content?.ContentProvider)
             {
                 case nameof(ContentProvider.TikTok):
-                    TikTokDownloadManager tikTokDownloadManager =
-                        new TikTokDownloadManager(_requestService, null);
-
-                    byte[]? contentByte = await tikTokDownloadManager.DownloadTikTokVideo(content);
-                    if (contentByte is null)
+                    MemoryStream? memoryStream = await _ftpServerService.DownloadFile($"Contents/{content.Name}.mp4");
+                    if (memoryStream is null)
                     {
-                        await _gusMelfordBotService.SendMessageAsync(new SendMessageParameters
+                        TikTokDownloadManager tikTokDownloadManager =
+                            new TikTokDownloadManager(_requestService, null);
+                        byte[]? contentByte = await tikTokDownloadManager.DownloadTikTokVideo(content);
+                        if (contentByte is null)
                         {
-                            Text =
-                                "I'm sorry, for some reason I can't send you a video( Keep at least the link:\n" +
-                                $"{content.RefererLink ?? "Something is wrong with the link..."}",
-                            ChatId = callbackQuery.FromUser.Id
-                        });
-                        return;
-                    }
+                            await _gusMelfordBotService.SendMessageAsync(new SendMessageParameters
+                            {
+                                Text =
+                                    "I'm sorry, for some reason I can't send you a video( Keep at least the link:\n" +
+                                    $"{content.RefererLink ?? "Something is wrong with the link..."}",
+                                ChatId = callbackQuery.FromUser.Id
+                            });
+                            return;
+                        }
 
+                        memoryStream = new MemoryStream(contentByte);
+                    }
+                    
                     await _gusMelfordBotService.SendVideoAsync(new SendVideoParameters
                     {
-                        Video = new VideoFile(new MemoryStream(contentByte), content?.RefererLink),
-                        Caption = content?.RefererLink,
+                        Video = new VideoFile(memoryStream, content.Name),
+                        Caption = content.RefererLink,
                         ChatId = callbackQuery.FromUser.Id
                     });
                     break;

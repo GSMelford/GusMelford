@@ -1,3 +1,4 @@
+using System.Text.RegularExpressions;
 using Telegram.Dto.UpdateModule;
 
 namespace GusMelfordBot.Core.Services.Apps.ContentCollector.Content.ContentProviders.TikTok;
@@ -53,5 +54,21 @@ public static class TikTokServiceHelper
     private static string GetRandomEmoji()
     {
         return EmojiList[new Random().Next(0, EmojiList.Count)];
+    }
+    
+    public static string GetUserName(string referer)
+    {
+        return Regex
+            .Match(referer, "com/(.*?)/video")
+            .Groups[1]
+            .Value;
+    }
+
+    public static string GetVideoId(string referer)
+    {
+        return referer
+            .Replace(TikTokServiceHelper.TikTok, "")
+            .Replace("/video/", " ")
+            .Split(" ")[1];
     }
 }

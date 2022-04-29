@@ -1,6 +1,7 @@
 using GusMelfordBot.Core.Domain.Apps.ContentCollector.Content;
 using GusMelfordBot.Core.Domain.Apps.ContentCollector.ContentDownload;
 using GusMelfordBot.Core.Domain.Requests;
+using GusMelfordBot.Core.Domain.System;
 using GusMelfordBot.Core.Exception;
 using GusMelfordBot.Core.Services.Apps.ContentCollector.ContentDownload.TikTok;
 using Microsoft.Extensions.Logging;
@@ -12,15 +13,18 @@ public class ContentDownloadService : IContentDownloadService
     private readonly ILogger<ContentDownloadService> _logger;
     private readonly IContentDownloadRepository _contentDownloadRepository;
     private readonly IRequestService _requestService;
+    private readonly IFtpServerService _ftpServerService;
 
     public ContentDownloadService(
         ILogger<ContentDownloadService> logger, 
         IContentDownloadRepository contentDownloadRepository, 
-        IRequestService requestService)
+        IRequestService requestService, 
+        IFtpServerService ftpServerService)
     {
         _logger = logger;
         _contentDownloadRepository = contentDownloadRepository;
         _requestService = requestService;
+        _ftpServerService = ftpServerService;
     }
 
     public async Task<MemoryStream?> GetFileStreamContent(Guid contentId)
@@ -36,6 +40,10 @@ public class ContentDownloadService : IContentDownloadService
         switch (content.ContentProvider)
         {
             case nameof(ContentProvider.TikTok):
+                MemoryStream? memoryStream = await _ftpServerService.DownloadFile($"Contents/{content.Name}.mp4");
+                if (memoryStream is not null)
+                    return memoryStream;
+                
                 TikTokDownloadManager tikTokDownloadManager = new TikTokDownloadManager(_requestService, _logger);
                 byte[]? bytes = await tikTokDownloadManager.DownloadTikTokVideo(content);
                 if (bytes is null)

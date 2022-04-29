@@ -1,4 +1,3 @@
-using System.Text.RegularExpressions;
 using GusMelfordBot.Core.Domain.Requests;
 using GusMelfordBot.Core.Extensions;
 using GusMelfordBot.Core.Services.Apps.ContentCollector.Content.ContentProviders.TikTok;
@@ -21,7 +20,8 @@ public class TikTokDownloadManager
         _requestService = requestService;
     }
         
-    public async Task<byte[]?> DownloadTikTokVideo(DAL.Applications.ContentCollector.Content? content)
+    public async Task<byte[]?> DownloadTikTokVideo
+        (DAL.Applications.ContentCollector.Content? content)
     {
         if (content is null)
         {
@@ -56,7 +56,7 @@ public class TikTokDownloadManager
         }
         catch
         {
-            _logger.LogError("Video Download Error {RefererLink}", content.RefererLink);
+            _logger?.LogError("Video Download Error {RefererLink}", content.RefererLink);
             return null;
         }
     }
@@ -71,7 +71,7 @@ public class TikTokDownloadManager
         return videoInformation["seoProps"]?["metaParams"]?["description"]?.ToString();
     }
         
-    private async Task<JToken> GetVideoInformation(DAL.Applications.ContentCollector.Content? content)
+    private async Task<JToken> GetVideoInformation(DAL.Applications.ContentCollector.Content content)
     {
         Request request = new Request
         {
@@ -86,25 +86,9 @@ public class TikTokDownloadManager
         return await (await _requestService.ExecuteAsync(request.ToHttpRequestMessage())).GetJTokenAsyncOrEmpty();
     }
         
-    private string BuildVideoInformationUrl(DAL.Applications.ContentCollector.Content? content)
+    private string BuildVideoInformationUrl(DAL.Applications.ContentCollector.Content content)
     {
-        return $"https://www.tiktok.com/node/share/video/{GetVideoUser(content.RefererLink)}" +
-               $"/{GetVideoId(content.RefererLink)}";
-    }
-        
-    private static string GetVideoUser(string referer)
-    {
-        return Regex
-            .Match(referer, "com/(.*?)/video")
-            .Groups[1]
-            .Value;
-    }
-
-    private static string GetVideoId(string referer)
-    {
-        return referer
-            .Replace(TikTokServiceHelper.TikTok, "")
-            .Replace("/video/", " ")
-            .Split(" ")[1];
+        return $"https://www.tiktok.com/node/share/video/{TikTokServiceHelper.GetUserName(content.RefererLink)}" +
+               $"/{TikTokServiceHelper.GetVideoId(content.RefererLink)}";
     }
 }

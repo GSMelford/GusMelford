@@ -1,4 +1,5 @@
 using GusMelfordBot.Core.Domain.Apps.ContentCollector.Content;
+using GusMelfordBot.Core.Domain.System;
 using Microsoft.Extensions.Logging;
 
 namespace GusMelfordBot.Core.Services.Apps.ContentCollector.Content;
@@ -25,5 +26,10 @@ public class ContentService : IContentService
     public async Task SetViewedVideo(Guid contentId)
     {
         await _contentRepository.SetViewedVideo(contentId);
+    }
+
+    public async Task Cache()
+    {
+        await _contentRepository.Cache();
     }
 }

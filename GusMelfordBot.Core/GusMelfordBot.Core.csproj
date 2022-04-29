@@ -18,6 +18,7 @@
 
     <ItemGroup>
       <PackageReference Include="Gelf.Extensions.Logging" Version="2.3.0" />
+      <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.4" />
       <PackageReference Include="Microsoft.AspNetCore.SpaServices.Extensions" Version="6.0.4" />
       <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.14.0" />
       <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
@@ -27,6 +28,20 @@
       <PackageReference Include="Serilog.Extensions.Logging" Version="3.1.0" />
       <PackageReference Include="Serilog.Settings.Configuration" Version="3.3.0" />
       <PackageReference Include="Serilog.Sinks.Graylog" Version="2.3.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <_ContentIncludedByDefault Remove="wwwroot\apps\player.css" />
+      <_ContentIncludedByDefault Remove="wwwroot\apps\player.html" />
+      <_ContentIncludedByDefault Remove="wwwroot\apps\player.js" />
+      <_ContentIncludedByDefault Remove="wwwroot\gusMelfordIcon.png" />
+      <_ContentIncludedByDefault Remove="wwwroot\home.css" />
+      <_ContentIncludedByDefault Remove="wwwroot\home.html" />
+      <_ContentIncludedByDefault Remove="wwwroot\home.js" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="wwwroot" />
     </ItemGroup>
 
 </Project>

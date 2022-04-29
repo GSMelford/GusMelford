@@ -29,7 +29,9 @@ public class GusMelfordBotWebApplication
         }  
         
         app.UseRouting();
-        app.UseStaticFiles();  
+        app.UseAuthentication();
+        app.UseAuthorization();
+        app.UseStaticFiles();
         app.UseMiddleware(typeof(ExceptionMiddleware));
         app.UseDeveloperExceptionPage();
         app.UseStatusCodePages();

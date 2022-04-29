@@ -1,3 +1,4 @@
+using GusMelfordBot.Core.Authentication;
 using GusMelfordBot.Core.Domain.Apps;
 using GusMelfordBot.Core.Domain.Apps.ContentCollector;
 using GusMelfordBot.Core.Domain.Apps.ContentCollector.Content;
@@ -18,7 +19,9 @@ using GusMelfordBot.Core.Services.Commands;
 using GusMelfordBot.Core.Services.GusMelfordBot;
 using GusMelfordBot.Core.Services.Requests;
 using GusMelfordBot.Core.Services.System;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Logging.Abstractions;
+using Microsoft.IdentityModel.Tokens;
 
 namespace GusMelfordBot.Core;
 
@@ -39,6 +42,22 @@ public static class GusMelfordBotWebApplicationExtensions
         services.AddControllers();
         services.AddHealthChecks();
         services.AddCors();
+        
+        services.AddAuthorization();
+        services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+            .AddJwtBearer(options =>
+            {
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuer = true,
+                    ValidIssuer = AuthOptions.Issuer,
+                    ValidateAudience = true,
+                    ValidAudience = AuthOptions.Audience,
+                    ValidateLifetime = true,
+                    IssuerSigningKey = AuthOptions.GetSymmetricSecurityKey(),
+                    ValidateIssuerSigningKey = true,
+                };
+            });
         
         services.AddSpaStaticFiles(options => options.RootPath = "client-app/dist");  
         services.AddHttpClient();
@@ -64,6 +83,11 @@ public static class GusMelfordBotWebApplicationExtensions
         services.AddTransient<ICommandService, CommandService>();
         services.AddTransient<ISystemService, SystemService>();
         services.AddTransient<ISystemRepository, SystemRepository>();
+        services.AddTransient<IFtpServerService, FtpServerService>(
+            _ => new FtpServerService(
+                commonSettings.FtpServerSettings.FtpUrl,
+                commonSettings.FtpServerSettings.UserName,
+                commonSettings.FtpServerSettings.Password));
         
         services.AddTransient<IDatabaseManager>(
             _ => new DatabaseManager(commonSettings.DatabaseSettings));

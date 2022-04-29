@@ -11,4 +11,6 @@ public class Content : DatabaseEntity
     public bool IsValid { get; set; } = true;
     public string RefererLink { get; set; }
     public string Description { get; set; }
+    public bool IsSaved { get; set; }
+    public string Name { get; set; }
 }

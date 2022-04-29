@@ -4,4 +4,5 @@ public interface IContentService
 {
     List<ContentInfo> BuildContentInfoList(Filter filter);
     Task SetViewedVideo(Guid contentId);
+    Task Cache();
 }
