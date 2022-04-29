@@ -25,14 +25,11 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace GusMelfordBot.Core;
 
-using Extensions;
 using Settings;
 using Database.Context;
 using Database.Interfaces;
 using Serilog;
 using Serilog.Core;
-using Serilog.Sinks.Graylog;
-using Serilog.Sinks.Graylog.Core.Transport;
 
 public static class GusMelfordBotWebApplicationExtensions
 {
@@ -93,29 +90,15 @@ public static class GusMelfordBotWebApplicationExtensions
             _ => new DatabaseManager(commonSettings.DatabaseSettings));
     }
     
-    public static Logger AddGraylog(
-        this WebApplicationBuilder builder,
-        CommonSettings commonSettings)
+    public static Logger AddGraylog(this WebApplicationBuilder builder)
     {
         var logger = new LoggerConfiguration()
             .ReadFrom.Configuration(builder.Configuration)
-            .WriteTo.Graylog(new GraylogSinkOptions
-            {
-                Host = commonSettings.GrayLogSettings?.Host,
-                Port = commonSettings.GrayLogSettings?.Port.ToInt(),
-                TransportType = commonSettings.GrayLogSettings?.TransportType switch
-                {
-                    "Udp" => TransportType.Udp,
-                    "Tcp" => TransportType.Tcp,
-                    "Http" => TransportType.Http,
-                    _ => throw new ArgumentNullException()
-                }
-            })
             .CreateLogger();
 
         builder.Logging.ClearProviders();
         builder.Logging.AddSerilog(logger);
-
+        
         return logger;
     }
 }

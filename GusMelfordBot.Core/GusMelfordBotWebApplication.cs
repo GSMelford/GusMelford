@@ -13,7 +13,7 @@ public class GusMelfordBotWebApplication
         CommonSettings commonSettings = new CommonSettings();
         builder.Configuration.Bind(nameof(CommonSettings), commonSettings);
         builder.Services.AddServices(commonSettings);
-        ILogger logger = builder.AddGraylog(commonSettings);
+        ILogger logger = builder.AddGraylog();
         
         AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
         
@@ -39,8 +39,8 @@ public class GusMelfordBotWebApplication
             x.AllowAnyOrigin()
                 .AllowAnyHeader()
                 .AllowAnyMethod());
+        
         app.UseEndpoints(endpoints => { endpoints.MapHealthChecks("/health"); });
-
         app.UseEndpoints(endpoints =>
         {
             endpoints.MapGet("/", SetStartPage);
