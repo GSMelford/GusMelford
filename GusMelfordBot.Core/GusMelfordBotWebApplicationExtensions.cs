@@ -81,13 +81,15 @@ public static class GusMelfordBotWebApplicationExtensions
         services.AddTransient<ISystemService, SystemService>();
         services.AddTransient<ISystemRepository, SystemRepository>();
         services.AddTransient<IFtpServerService, FtpServerService>(
-            _ => new FtpServerService(
+            provider => new FtpServerService(
                 commonSettings.FtpServerSettings.FtpUrl,
                 commonSettings.FtpServerSettings.UserName,
-                commonSettings.FtpServerSettings.Password));
+                commonSettings.FtpServerSettings.Password,
+                provider.GetRequiredService<ILogger<FtpServerService>>()));
         
         services.AddTransient<IDatabaseManager>(
-            _ => new DatabaseManager(commonSettings.DatabaseSettings));
+            provider => new DatabaseManager(commonSettings.DatabaseSettings, 
+                provider.GetRequiredService<ILogger<ApplicationContext>>()));
     }
     
     public static Logger AddGraylog(this WebApplicationBuilder builder)

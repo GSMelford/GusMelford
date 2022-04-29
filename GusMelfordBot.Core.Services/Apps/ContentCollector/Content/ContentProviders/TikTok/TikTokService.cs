@@ -73,9 +73,9 @@ public class TikTokService : ITikTokService
                 if (array is not null)
                     content.IsSaved = await _ftpServerService.UploadFile(
                         $"Contents/{videoName}.mp4", new MemoryStream(array));
-            }
 
-            await _tikTokRepository.SaveContentAsync(content);
+                await _tikTokRepository.SaveContentAsync(content);
+            }
         }
         catch (global::System.Exception e)
         {

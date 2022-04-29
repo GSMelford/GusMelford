@@ -1,4 +1,6 @@
-﻿using GusMelfordBot.DAL.Applications.ContentCollector;
+﻿using System;
+using GusMelfordBot.DAL.Applications.ContentCollector;
+using Microsoft.Extensions.Logging;
 
 namespace GusMelfordBot.Database.Context;
 
@@ -14,10 +16,21 @@ public sealed class ApplicationContext : DbContext
     public DbSet<Chat> Chats { get; set; }
     public DbSet<Content> Content { get; set; }
 
-    public ApplicationContext(DatabaseSettings databaseSettings)
+    public ApplicationContext(
+        DatabaseSettings databaseSettings, 
+        ILogger<ApplicationContext> logger)
     {
         _databaseSettings = databaseSettings;
-        Database.EnsureCreated();
+        try
+        {
+            Database.EnsureCreated();
+        }
+        catch (Exception e)
+        {
+            logger.LogError("ERROR Connect to Database. Message: {Message} StackTrace: {StackTrace}", 
+                e.Message, e.StackTrace);
+            throw;
+        }
     }
  
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)

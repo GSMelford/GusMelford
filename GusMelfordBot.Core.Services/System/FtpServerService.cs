@@ -1,5 +1,6 @@
 using System.Net;
 using GusMelfordBot.Core.Domain.System;
+using Microsoft.Extensions.Logging;
 
 namespace GusMelfordBot.Core.Services.System;
 
@@ -9,11 +10,18 @@ public class FtpServerService : IFtpServerService
     private readonly string _userName;
     private readonly string _password;
 
-    public FtpServerService(string ftpUrl, string userName, string password)
+    private readonly ILogger<FtpServerService> _logger;
+
+    public FtpServerService(
+        string ftpUrl, 
+        string userName, 
+        string password, 
+        ILogger<FtpServerService> logger)
     {
         _ftpUrl = ftpUrl;
         _userName = userName;
         _password = password;
+        _logger = logger;
     }
     
     public async Task<bool> UploadFile(string path, MemoryStream fileStream)
@@ -21,11 +29,12 @@ public class FtpServerService : IFtpServerService
         Stream? requestStream = null;
         try
         {
+            _logger.LogInformation("UploadFile starts");
             FtpWebRequest? ftpWebRequest = FtpWebRequest.Create(_ftpUrl + path) as FtpWebRequest;
             ftpWebRequest!.Method = WebRequestMethods.Ftp.UploadFile;
             ftpWebRequest.Credentials = new NetworkCredential(_userName, _password);
             requestStream = ftpWebRequest.GetRequestStream();
-            
+            _logger.LogInformation("Start uploading file {FtpUrl}", _ftpUrl + path);
             int read;
             byte[] buffer = new byte[8092];
             while ((read = fileStream.Read(buffer, 0, buffer.Length)) != 0)
@@ -35,8 +44,10 @@ public class FtpServerService : IFtpServerService
 
             await requestStream.FlushAsync()!;
         }
-        catch
+        catch (global::System.Exception exception)
         {
+            _logger.LogError("Failed to upload file {FtpUrl} Exception Message: {Exception}", 
+                _ftpUrl + path, exception.Message);
             return false;
         }
         finally
@@ -51,6 +62,7 @@ public class FtpServerService : IFtpServerService
             }
         }
 
+        _logger.LogError("Successfully uploaded {FtpUrl}", _ftpUrl + path);
         return true;
     }
 
