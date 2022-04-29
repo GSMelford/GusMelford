@@ -92,7 +92,7 @@ public class ContentRepository : IContentRepository
     {
         var contents = _databaseManager.Context
             .Set<DAL.Applications.ContentCollector.Content>()
-            .Where(x => x.IsSaved == false);
+            .Where(x => x.IsSaved == false).ToList();
         
         foreach (var content in contents)
         {
