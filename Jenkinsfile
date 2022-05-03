@@ -34,8 +34,6 @@ pipeline {
             steps {
                 echo "=== stop the old docker-compose ==="
                 sh "docker-compose down"
-                echo "=== docker prune ==="
-                sh "docker system prune -a -f"
                 echo "=== docker pull ==="
                 sh "docker-compose pull"
             }
@@ -44,6 +42,8 @@ pipeline {
             steps {
                 echo "=== running docker-compose ==="
                 sh "docker-compose up -d"
+                echo "=== docker prune ==="
+                sh "docker system prune -a -f"
             }
         }
     }
