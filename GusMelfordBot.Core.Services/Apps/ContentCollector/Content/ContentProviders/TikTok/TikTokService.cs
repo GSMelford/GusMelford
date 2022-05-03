@@ -7,6 +7,7 @@ using GusMelfordBot.Core.Domain.Telegram;
 using GusMelfordBot.Core.Services.Apps.ContentCollector.ContentDownload.TikTok;
 using Microsoft.Extensions.Logging;
 using RestSharp;
+using Telegram.API.TelegramRequests.SendVideo;
 using Telegram.Dto.UpdateModule;
 
 namespace GusMelfordBot.Core.Services.Apps.ContentCollector.Content.ContentProviders.TikTok;
@@ -18,13 +19,16 @@ public class TikTokService : ITikTokService
     private readonly ITikTokRepository _tikTokRepository;
     private readonly TikTokDownloadManager _tikTokDownloadManager;
     private readonly IFtpServerService _ftpServerService;
+    private readonly IGusMelfordBotService _gusMelfordBotService;
     
     public TikTokService(
         IGusMelfordBotService gusMelfordBotService, 
         ITikTokRepository tikTokRepository, 
         ILogger<TikTokService> logger,
-        IRequestService requestService, IFtpServerService ftpServerService)
+        IRequestService requestService, 
+        IFtpServerService ftpServerService)
     {
+        _gusMelfordBotService = gusMelfordBotService;
         _tikTokRepository = tikTokRepository;
         _logger = logger;
         _ftpServerService = ftpServerService;
@@ -54,26 +58,38 @@ public class TikTokService : ITikTokService
             else
             {
                 content = await BuildContentIfNew(message, sentLink, refererLink);
-            
-                await _telegramHelper.EditMessageFromTelegram(
-                    TikTokServiceHelper.GetEditedMessage(
-                        content, 
-                        await _tikTokRepository.GetCountAsync(), 
-                        content.AccompanyingCommentary), 
-                    message.Chat.Id,
-                    newMessage?.MessageId ?? 0);
-
-                string userName = TikTokServiceHelper.GetUserName(content.RefererLink);
-                string videoId = TikTokServiceHelper.GetVideoId(content.RefererLink);
-                string videoName = $"{userName}-{videoId}";
+                string videoName = $"{TikTokServiceHelper.GetUserName(content.RefererLink)}" +
+                                   $"-{TikTokServiceHelper.GetVideoId(content.RefererLink)}";
                 
                 content.Name = videoName;
                 
                 byte[]? array = await _tikTokDownloadManager.DownloadTikTokVideo(content);
                 if (array is not null)
-                    content.IsSaved = await _ftpServerService.UploadFile(
-                        $"Contents/{videoName}.mp4", new MemoryStream(array));
-
+                {
+                    MemoryStream memoryStream = new MemoryStream(array);
+                    content.IsSaved = await _ftpServerService.UploadFile($"Contents/{videoName}.mp4", memoryStream);
+                    await _gusMelfordBotService.SendVideoAsync(new SendVideoParameters
+                    {
+                        Caption = TikTokServiceHelper.GetEditedMessage(
+                            content, 
+                            await _tikTokRepository.GetCountAsync(), 
+                            content.AccompanyingCommentary),
+                        Video = new VideoFile(memoryStream, videoName),
+                        ChatId = message.Chat.Id
+                    });
+                    await _telegramHelper.DeleteMessageFromTelegram(message.Chat.Id, newMessage?.MessageId ?? 0);
+                }
+                else
+                {
+                    await _telegramHelper.EditMessageFromTelegram(
+                        TikTokServiceHelper.GetEditedMessage(
+                            content, 
+                            await _tikTokRepository.GetCountAsync(), 
+                            content.AccompanyingCommentary), 
+                        message.Chat.Id,
+                        newMessage?.MessageId ?? 0);
+                }
+                
                 await _tikTokRepository.SaveContentAsync(content);
             }
         }

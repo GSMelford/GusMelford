@@ -7,6 +7,7 @@ let cursor = -1;
 let message;
 
 async function Init(){
+    fetch(baseUrl + "app/content/cache");
     document.addEventListener("keydown", keyDownHandler);
 
     let information = await executeRequest("system/info");
@@ -35,6 +36,9 @@ async function changeVideo(direction) {
     }
     degreeOfCoup = 360;
     
+    if(cursor !== 0){
+        await fetch(baseUrl + "app/content/setViewedVideo?contentId=" + contents[cursor]["id"]);
+    }
     
     updateCursor(direction);
     updateElementVideoInfo();
