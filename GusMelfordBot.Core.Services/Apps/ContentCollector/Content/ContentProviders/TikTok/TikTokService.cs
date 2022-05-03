@@ -66,15 +66,15 @@ public class TikTokService : ITikTokService
                 byte[]? array = await _tikTokDownloadManager.DownloadTikTokVideo(content);
                 if (array is not null)
                 {
-                    MemoryStream memoryStream = new MemoryStream(array);
-                    content.IsSaved = await _ftpServerService.UploadFile($"Contents/{videoName}.mp4", memoryStream);
+                    content.IsSaved = await _ftpServerService.UploadFile(
+                    $"Contents/{videoName}.mp4", new MemoryStream(array));
                     await _gusMelfordBotService.SendVideoAsync(new SendVideoParameters
                     {
                         Caption = TikTokServiceHelper.GetEditedMessage(
                             content, 
                             await _tikTokRepository.GetCountAsync(), 
                             content.AccompanyingCommentary),
-                        Video = new VideoFile(memoryStream, videoName),
+                        Video = new VideoFile(new MemoryStream(array), videoName),
                         ChatId = message.Chat.Id
                     });
                     await _telegramHelper.DeleteMessageFromTelegram(message.Chat.Id, newMessage?.MessageId ?? 0);
