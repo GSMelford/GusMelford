@@ -37,13 +37,13 @@ public class ContentCollectorService : IContentCollectorService
         _tikTokDownloaderService = tikTokDownloaderService;
     }
 
-    public async Task ProcessMessage(Message message)
+    public async void ProcessMessage(Message message)
     {
         string text = message.Text;
 
         if (text.Contains(nameof(ContentProvider.TikTok).ToLower()))
         {
-            await _tikTokService.ProcessMessage(message);
+            await _tikTokService.ProcessMessageAsync(message);
         }
     }
 
@@ -57,7 +57,7 @@ public class ContentCollectorService : IContentCollectorService
                 await Save(callbackQuery);
                 break;
             case "Retry":
-                await ProcessMessage(new Message
+                ProcessMessage(new Message
                 {
                     Text = callbackQuery.Data.Split(";")[2],
                     From = callbackQuery.FromUser,

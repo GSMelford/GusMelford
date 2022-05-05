@@ -34,7 +34,7 @@ public class TikTokService : ITikTokService
         _tikTokDownloaderService = tikTokDownloaderService;
     } 
     
-    public async Task ProcessMessage(Message message)
+    public async Task ProcessMessageAsync(Message message)
     {
         Message? newMessage = new Message();
         string? sentLink = string.Empty;

@@ -1,8 +1,6 @@
 using GusMelfordBot.Core.Domain.Apps;
 using GusMelfordBot.Core.Domain.Apps.ContentCollector;
 using GusMelfordBot.Core.Domain.Commands;
-using GusMelfordBot.Core.Extensions;
-using GusMelfordBot.DAL;
 using Telegram.Dto.UpdateModule;
 
 namespace GusMelfordBot.Core.Services.Apps;
@@ -32,7 +30,7 @@ public class ApplicationService : IApplicationService
         switch (applicationType)
         {
             case App.ContentCollector:
-                await _collectorService.ProcessMessage(message);
+                _collectorService.ProcessMessage(message);
                 break;
         }
 

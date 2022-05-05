@@ -4,5 +4,5 @@ namespace GusMelfordBot.Core.Domain.Apps.ContentCollector.Content.ContentProvide
 
 public interface ITikTokService
 {
-    Task ProcessMessage(Message message);
+    Task ProcessMessageAsync(Message message);
 }
