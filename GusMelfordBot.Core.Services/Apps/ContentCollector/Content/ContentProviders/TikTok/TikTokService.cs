@@ -161,6 +161,7 @@ public class TikTokService : ITikTokService
         RestResponse restResponse = await restClient.ExecuteAsync(restRequest);
 
         Uri? uri = restResponse.ResponseUri;
+        _logger.LogCritical(restResponse.Content);
         if (uri is null)
         {
             return string.Empty;
