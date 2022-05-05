@@ -50,6 +50,9 @@ public class TikTokService : ITikTokService
             
             if (content is not null)
             {
+                _logger.LogWarning("Content exists. {TikTok} {RefererLink}", 
+                    nameof(ContentProvider.TikTok), content.RefererLink);
+                
                 await _telegramHelper.EditMessageFromTelegram(
                     TikTokServiceHelper.GetEditedMessageAboutExist(message), 
                     message.Chat.Id,
@@ -91,6 +94,8 @@ public class TikTokService : ITikTokService
                 }
                 
                 await _tikTokRepository.SaveContentAsync(content);
+                _logger.LogInformation("Content saved successfully. {TikTok} {RefererLink}", 
+                    nameof(ContentProvider.TikTok), content.RefererLink);
             }
         }
         catch (global::System.Exception e)
