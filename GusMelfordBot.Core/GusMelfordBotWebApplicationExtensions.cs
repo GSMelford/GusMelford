@@ -4,6 +4,7 @@ using GusMelfordBot.Core.Domain.Apps.ContentCollector;
 using GusMelfordBot.Core.Domain.Apps.ContentCollector.Content;
 using GusMelfordBot.Core.Domain.Apps.ContentCollector.Content.ContentProviders.TikTok;
 using GusMelfordBot.Core.Domain.Apps.ContentCollector.ContentDownload;
+using GusMelfordBot.Core.Domain.Apps.ContentDownload.TikTok;
 using GusMelfordBot.Core.Domain.Commands;
 using GusMelfordBot.Core.Domain.Requests;
 using GusMelfordBot.Core.Domain.System;
@@ -15,6 +16,7 @@ using GusMelfordBot.Core.Services.Apps.ContentCollector;
 using GusMelfordBot.Core.Services.Apps.ContentCollector.Content;
 using GusMelfordBot.Core.Services.Apps.ContentCollector.Content.ContentProviders.TikTok;
 using GusMelfordBot.Core.Services.Apps.ContentCollector.ContentDownload;
+using GusMelfordBot.Core.Services.Apps.ContentCollector.ContentDownload.TikTok;
 using GusMelfordBot.Core.Services.Commands;
 using GusMelfordBot.Core.Services.GusMelfordBot;
 using GusMelfordBot.Core.Services.Requests;
@@ -80,6 +82,7 @@ public static class GusMelfordBotWebApplicationExtensions
         services.AddTransient<ICommandService, CommandService>();
         services.AddTransient<ISystemService, SystemService>();
         services.AddTransient<ISystemRepository, SystemRepository>();
+        services.AddTransient<ITikTokDownloaderService, TikTokDownloaderService>();
         services.AddTransient<IFtpServerService, FtpServerService>(
             provider => new FtpServerService(
                 commonSettings.FtpServerSettings.FtpUrl,

@@ -1,3 +1,4 @@
+using GusMelfordBot.Core.Domain.Apps.ContentDownload.TikTok;
 using GusMelfordBot.Core.Domain.Requests;
 using GusMelfordBot.Core.Extensions;
 using GusMelfordBot.Core.Services.Apps.ContentCollector.Content.ContentProviders.TikTok;
@@ -7,21 +8,20 @@ using Newtonsoft.Json.Linq;
 
 namespace GusMelfordBot.Core.Services.Apps.ContentCollector.ContentDownload.TikTok;
 
-public class TikTokDownloadManager
+public class TikTokDownloaderService : ITikTokDownloaderService
 {
-    private readonly ILogger<ContentDownloadService> _logger;
+    private readonly ILogger<TikTokDownloaderService> _logger;
     private readonly IRequestService _requestService;
         
-    public TikTokDownloadManager(
+    public TikTokDownloaderService(
         IRequestService requestService, 
-        ILogger<ContentDownloadService> logger)
+        ILogger<TikTokDownloaderService> logger)
     {
         _logger = logger;
         _requestService = requestService;
     }
         
-    public async Task<byte[]?> DownloadTikTokVideo
-        (DAL.Applications.ContentCollector.Content? content)
+    public async Task<byte[]?> DownloadTikTokVideo(DAL.Applications.ContentCollector.Content? content)
     {
         if (content is null)
         {
@@ -56,7 +56,7 @@ public class TikTokDownloadManager
         }
         catch
         {
-            _logger?.LogError("Video Download Error {RefererLink}", content.RefererLink);
+            _logger.LogError("Video Download Error {RefererLink}", content.RefererLink);
             return null;
         }
     }

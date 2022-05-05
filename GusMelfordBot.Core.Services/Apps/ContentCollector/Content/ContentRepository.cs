@@ -1,4 +1,5 @@
 using GusMelfordBot.Core.Domain.Apps.ContentCollector.Content;
+using GusMelfordBot.Core.Domain.Apps.ContentDownload.TikTok;
 using GusMelfordBot.Core.Domain.Requests;
 using GusMelfordBot.Core.Domain.System;
 using GusMelfordBot.Core.Services.Apps.ContentCollector.Content.ContentProviders.TikTok;
@@ -13,16 +14,16 @@ public class ContentRepository : IContentRepository
 {
     private readonly IDatabaseManager _databaseManager;
     private readonly IFtpServerService _ftpServerService;
-    private readonly IRequestService _requestService;
+    private readonly ITikTokDownloaderService _tikTokDownloaderService;
     
     public ContentRepository(
         IDatabaseManager databaseManager,
-        IFtpServerService ftpServerService, 
-        IRequestService requestService)
+        IFtpServerService ftpServerService,
+        ITikTokDownloaderService tikTokDownloaderService)
     {
         _databaseManager = databaseManager;
         _ftpServerService = ftpServerService;
-        _requestService = requestService;
+        _tikTokDownloaderService = tikTokDownloaderService;
     }
 
     public async Task<long?> GetChatId(Guid chatId)
@@ -100,9 +101,7 @@ public class ContentRepository : IContentRepository
             {
                 case nameof(ContentProvider.TikTok):
                 {
-                    TikTokDownloadManager tikTokDownloadManager =
-                        new TikTokDownloadManager(_requestService, null);
-                    byte[]? contentByte = await tikTokDownloadManager.DownloadTikTokVideo(content);
+                    byte[]? contentByte = await _tikTokDownloaderService.DownloadTikTokVideo(content);
                     if (contentByte != null)
                     {
                         MemoryStream memoryStream = new MemoryStream(contentByte);

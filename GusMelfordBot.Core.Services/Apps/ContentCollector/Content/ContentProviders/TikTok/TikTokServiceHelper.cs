@@ -71,4 +71,19 @@ public static class TikTokServiceHelper
             .Replace("/video/", " ")
             .Split(" ")[1];
     }
+    
+    public static string GetAccompanyingCommentaryIfExist(Message message)
+    {
+        string text = message.Text;
+        text = Regex.Replace(text, @"\s+", " ");
+        string[] words = text.Trim().Split(" ");
+
+        if (words.Length == 1)
+        {
+            return string.Empty;
+        }
+            
+        IEnumerable<string> wordsWithoutTikTokLink = words.Where(x => !x.Contains(TikTokServiceHelper.TikTok));
+        return $"{message.From.FirstName} {message.From.LastName}: {string.Join(" ", wordsWithoutTikTokLink)}";
+    }
 }

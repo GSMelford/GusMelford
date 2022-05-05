@@ -1,14 +1,12 @@
-using System.Text.RegularExpressions;
 using GusMelfordBot.Core.Domain.Apps.ContentCollector.Content;
 using GusMelfordBot.Core.Domain.Apps.ContentCollector.Content.ContentProviders.TikTok;
-using GusMelfordBot.Core.Domain.Requests;
+using GusMelfordBot.Core.Domain.Apps.ContentDownload.TikTok;
 using GusMelfordBot.Core.Domain.System;
 using GusMelfordBot.Core.Domain.Telegram;
-using GusMelfordBot.Core.Services.Apps.ContentCollector.ContentDownload.TikTok;
 using Microsoft.Extensions.Logging;
-using RestSharp;
 using Telegram.API.TelegramRequests.SendVideo;
 using Telegram.Dto.UpdateModule;
+using RestSharp;
 
 namespace GusMelfordBot.Core.Services.Apps.ContentCollector.Content.ContentProviders.TikTok;
 
@@ -17,7 +15,7 @@ public class TikTokService : ITikTokService
     private readonly ILogger<TikTokService> _logger;
     private readonly TelegramHelper _telegramHelper;
     private readonly ITikTokRepository _tikTokRepository;
-    private readonly TikTokDownloadManager _tikTokDownloadManager;
+    private readonly ITikTokDownloaderService _tikTokDownloaderService;
     private readonly IFtpServerService _ftpServerService;
     private readonly IGusMelfordBotService _gusMelfordBotService;
     
@@ -25,75 +23,39 @@ public class TikTokService : ITikTokService
         IGusMelfordBotService gusMelfordBotService, 
         ITikTokRepository tikTokRepository, 
         ILogger<TikTokService> logger,
-        IRequestService requestService, 
-        IFtpServerService ftpServerService)
+        IFtpServerService ftpServerService,
+        ITikTokDownloaderService tikTokDownloaderService)
     {
         _gusMelfordBotService = gusMelfordBotService;
         _tikTokRepository = tikTokRepository;
         _logger = logger;
         _ftpServerService = ftpServerService;
         _telegramHelper = new TelegramHelper(gusMelfordBotService);
-        _tikTokDownloadManager = new TikTokDownloadManager(requestService, null);
+        _tikTokDownloaderService = tikTokDownloaderService;
     } 
     
     public async Task ProcessMessage(Message message)
     {
-        Message? newMessage = await _telegramHelper
-            .SendMessageToTelegram(
-                TikTokServiceHelper.GetProcessMessage(message),
-                message.Chat.Id);
+        Message? newMessage = new Message();
+        string? sentLink = string.Empty;
         try
         {
-            string? sentLink = GetSendLink(message.Text);
-            string refererLink = await GetRefererLink(sentLink);
-            var content = await _tikTokRepository.GetContentAsync(refererLink);
+            newMessage = await _telegramHelper
+                .SendMessageToTelegram(TikTokServiceHelper.GetProcessMessage(message), message.Chat.Id);
             
-            if (content is not null)
+            sentLink = GetSendLink(message.Text);
+            string refererLink = await GetRefererLink(sentLink);
+            if (string.IsNullOrEmpty(refererLink))
             {
-                _logger.LogWarning("Content exists. {TikTok} {RefererLink}", 
-                    nameof(ContentProvider.TikTok), content.RefererLink);
-                
-                await _telegramHelper.EditMessageFromTelegram(
-                    TikTokServiceHelper.GetEditedMessageAboutExist(message), 
-                    message.Chat.Id,
-                    newMessage?.MessageId ?? 0);
+                throw new global::System.Exception("No referrer link");
             }
-            else
+            
+            if (await IsNewContent(refererLink, message, newMessage ?? new Message()))
             {
-                content = await BuildContentIfNew(message, sentLink, refererLink);
-                string videoName = $"{TikTokServiceHelper.GetUserName(content.RefererLink)}" +
-                                   $"-{TikTokServiceHelper.GetVideoId(content.RefererLink)}";
-                
-                content.Name = videoName;
-                
-                byte[]? array = await _tikTokDownloadManager.DownloadTikTokVideo(content);
-                if (array is not null)
-                {
-                    content.IsSaved = await _ftpServerService.UploadFile(
-                    $"Contents/{videoName}.mp4", new MemoryStream(array));
-                    await _gusMelfordBotService.SendVideoAsync(new SendVideoParameters
-                    {
-                        Caption = TikTokServiceHelper.GetEditedMessage(
-                            content, 
-                            await _tikTokRepository.GetCountAsync(), 
-                            content.AccompanyingCommentary),
-                        Video = new VideoFile(new MemoryStream(array), videoName),
-                        ChatId = message.Chat.Id
-                    });
-                    await _telegramHelper.DeleteMessageFromTelegram(message.Chat.Id, newMessage?.MessageId ?? 0);
-                }
-                else
-                {
-                    await _telegramHelper.EditMessageFromTelegram(
-                        TikTokServiceHelper.GetEditedMessage(
-                            content, 
-                            await _tikTokRepository.GetCountAsync(), 
-                            content.AccompanyingCommentary), 
-                        message.Chat.Id,
-                        newMessage?.MessageId ?? 0);
-                }
-                
+                var content = await BuildContent(message, sentLink, refererLink);
+                await TrySendVideoResult(content, message, newMessage ?? new Message());
                 await _tikTokRepository.SaveContentAsync(content);
+            
                 _logger.LogInformation("Content saved successfully. {TikTok} {RefererLink}", 
                     nameof(ContentProvider.TikTok), content.RefererLink);
             }
@@ -101,17 +63,76 @@ public class TikTokService : ITikTokService
         catch (global::System.Exception e)
         {
             _logger.LogError("We were unable to save tik tok video content.\n{Message}", e.Message);
-
-            await _telegramHelper.EditMessageFromTelegram(
-                TikTokServiceHelper.GetEditedMessageWhetException(message), 
-                message.Chat.Id,
-                newMessage?.MessageId ?? 0);
+            await EditErrorMessage(message, newMessage ?? new Message(), sentLink ?? string.Empty);
         }
 
         await _telegramHelper.DeleteMessageFromTelegram(message.Chat.Id, message.MessageId);
     }
 
-    private async Task<DAL.Applications.ContentCollector.Content> BuildContentIfNew(
+    private async Task EditErrorMessage(Message message, Message newMessage, string sentLink)
+    {
+        await _telegramHelper.DeleteMessageFromTelegram(message.Chat.Id, newMessage.MessageId);
+        await _telegramHelper.SendMessageToTelegram(
+            TikTokServiceHelper.GetEditedMessageWhetException(message), message.Chat.Id, sentLink);
+    }
+    
+    private async Task TrySendVideoResult(DAL.Applications.ContentCollector.Content content, Message message, Message newMessage)
+    {
+        string videoName = $"{TikTokServiceHelper.GetUserName(content.RefererLink)}-" +
+                           $"{TikTokServiceHelper.GetVideoId(content.RefererLink)}";
+            
+        content.Name = videoName;
+                
+        byte[]? array = await _tikTokDownloaderService.DownloadTikTokVideo(content);
+        if (array is not null)
+        {
+            content.IsSaved = await _ftpServerService.UploadFile(
+                $"Contents/{videoName}.mp4", new MemoryStream(array));
+            await _gusMelfordBotService.SendVideoAsync(new SendVideoParameters
+            {
+                Caption = TikTokServiceHelper.GetEditedMessage(
+                    content, 
+                    await _tikTokRepository.GetCountAsync(), 
+                    content.AccompanyingCommentary),
+                Video = new VideoFile(new MemoryStream(array), videoName),
+                ChatId = message.Chat.Id
+            });
+            await _telegramHelper.DeleteMessageFromTelegram(message.Chat.Id, newMessage.MessageId);
+        }
+        else
+        {
+            await _telegramHelper.EditMessageFromTelegram(
+                TikTokServiceHelper.GetEditedMessage(
+                    content, 
+                    await _tikTokRepository.GetCountAsync(), 
+                    content.AccompanyingCommentary), 
+                message.Chat.Id,
+                newMessage.MessageId);
+        }
+    }
+    
+    private async Task<bool> IsNewContent(string refererLink, Message message, Message newMessage)
+    {
+        var content = await _tikTokRepository.GetContentAsync(refererLink);
+
+        if (content is null)
+        {
+            return true;
+        }
+        
+        _logger.LogWarning("Content exists. {TikTok} {RefererLink}", 
+            nameof(ContentProvider.TikTok), content.RefererLink);
+                
+        await _telegramHelper.EditMessageFromTelegram(
+            TikTokServiceHelper.GetEditedMessageAboutExist(message), 
+            message.Chat.Id,
+            newMessage.MessageId);
+
+        return false;
+
+    }
+    
+    private async Task<DAL.Applications.ContentCollector.Content> BuildContent(
         Message message,
         string? sentLink,
         string refererLink)
@@ -120,7 +141,7 @@ public class TikTokService : ITikTokService
         {
             Chat = await _tikTokRepository.GetChatAsync(message.Chat.Id),
             User = await _tikTokRepository.GetUserAsync(message.From.Id),
-            AccompanyingCommentary = GetAccompanyingCommentaryIfExist(message),
+            AccompanyingCommentary = TikTokServiceHelper.GetAccompanyingCommentaryIfExist(message),
             SentLink = sentLink,
             RefererLink = refererLink,
             ContentProvider = nameof(ContentProvider.TikTok)
@@ -146,20 +167,5 @@ public class TikTokService : ITikTokService
         }
         
         return uri.Scheme + "://" + uri.Host + uri.AbsolutePath;
-    }
-
-    private static string GetAccompanyingCommentaryIfExist(Message message)
-    {
-        string text = message.Text;
-        text = Regex.Replace(text, @"\s+", " ");
-        string[] words = text.Trim().Split(" ");
-
-        if (words.Length == 1)
-        {
-            return string.Empty;
-        }
-            
-        IEnumerable<string> wordsWithoutTikTokLink = words.Where(x => !x.Contains(TikTokServiceHelper.TikTok));
-        return $"{message.From.FirstName} {message.From.LastName}: {string.Join(" ", wordsWithoutTikTokLink)}";
     }
 }
