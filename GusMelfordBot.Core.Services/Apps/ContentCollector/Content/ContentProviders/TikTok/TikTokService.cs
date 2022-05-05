@@ -154,17 +154,32 @@ public class TikTokService : ITikTokService
             .FirstOrDefault(x => x.Contains(TikTokServiceHelper.TikTok))?.Trim();
     }
 
-    private async Task<string> GetRefererLink(string? sentLink)
+    private static async Task<string> GetRefererLink(string? sentLink)
     {
-        RestClient restClient = new RestClient();
-        RestRequest restRequest = new RestRequest(sentLink);
-        RestResponse restResponse = await restClient.ExecuteAsync(restRequest);
+        const int maxRetry = 2;
+        int counter = 0;
 
-        Uri? uri = restResponse.ResponseUri;
-        _logger.LogCritical(restResponse.Content);
-        if (uri is null)
+        Uri? uri;
+        while (true)
         {
-            return string.Empty;
+            RestClient restClient = new RestClient();
+            RestRequest restRequest = new RestRequest(sentLink);
+            RestResponse restResponse = await restClient.ExecuteAsync(restRequest);
+
+            uri = restResponse.ResponseUri;
+            if (uri is null)
+            {
+                if (counter == maxRetry)
+                {
+                    return string.Empty;
+                }
+
+                counter++;
+            }
+            else
+            {
+                break;
+            }
         }
         
         return uri.Scheme + "://" + uri.Host + uri.AbsolutePath;

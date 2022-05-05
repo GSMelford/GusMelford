@@ -32,7 +32,7 @@ public class ApplicationService : IApplicationService
         switch (applicationType)
         {
             case App.ContentCollector:
-                _collectorService.ProcessMessage(message);
+                await _collectorService.ProcessMessage(message);
                 break;
         }
 
