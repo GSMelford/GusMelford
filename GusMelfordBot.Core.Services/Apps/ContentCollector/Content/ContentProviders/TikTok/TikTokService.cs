@@ -156,30 +156,16 @@ public class TikTokService : ITikTokService
 
     private static async Task<string> GetRefererLink(string? sentLink)
     {
-        const int maxRetry = 2;
-        int counter = 0;
-
-        Uri? uri;
-        while (true)
+        RestClient restClient = new RestClient();
+        RestRequest restRequest = new RestRequest(sentLink);
+        restRequest.AddHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) " +
+                                            "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/101.0.4951.54 Safari/537.36");
+        RestResponse restResponse = await restClient.ExecuteAsync(restRequest);
+        
+        Uri? uri = restResponse.ResponseUri;
+        if (uri is null)
         {
-            RestClient restClient = new RestClient();
-            RestRequest restRequest = new RestRequest(sentLink);
-            RestResponse restResponse = await restClient.ExecuteAsync(restRequest);
-
-            uri = restResponse.ResponseUri;
-            if (uri is null)
-            {
-                if (counter == maxRetry)
-                {
-                    return string.Empty;
-                }
-
-                counter++;
-            }
-            else
-            {
-                break;
-            }
+            return string.Empty;
         }
         
         return uri.Scheme + "://" + uri.Host + uri.AbsolutePath;
