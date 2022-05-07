@@ -4,6 +4,7 @@ using GusMelfordBot.Core.Domain.Apps.ContentCollector.Contents.ContentProviders.
 using GusMelfordBot.Core.Domain.Apps.ContentDownload.TikTok;
 using GusMelfordBot.Core.Domain.System;
 using GusMelfordBot.Core.Domain.Telegram;
+using GusMelfordBot.Core.Extensions;
 using GusMelfordBot.DAL.Applications.ContentCollector;
 using Microsoft.Extensions.Logging;
 using Telegram.API.TelegramRequests.SendVideo;
@@ -47,10 +48,6 @@ public class TikTokService : ITikTokService
             }
 
             Content content = await PreparingAndSaveContent(message, sentTikTokLink);
-            await _telegramHelper.DeleteMessageFromTelegram(message.Chat.Id, message.MessageId);
-            await _telegramHelper.SendMessageToTelegram(
-                $" 👍 Content has been saved!\n{sentTikTokLink}",
-                message.Chat.Id);
             
 #pragma warning disable CS4014
             PullAndUpdateContentAsync(content.Id, message.Chat.Id);
@@ -68,12 +65,12 @@ public class TikTokService : ITikTokService
     }
 
     public async Task<bool> PullAndUpdateContentAsync(Guid contentId, long chatId)
-    {//TODO Пересмотреть
+    {
         _logger.LogInformation("PullAndUpdateContent started. " +
                                "ContentId: {ContentId} ChatId: {ChatId}", contentId, chatId);
 
         Content? content = await _tikTokRepository.GetContentAsync(contentId);
-        
+
         if (content is null)
         {
             return false;
@@ -87,41 +84,47 @@ public class TikTokService : ITikTokService
         {
             return false;
         }
-        
-        if (!content.IsSaved)
-        {
-            content.Name = $"{GetUserName(content.RefererLink)}-{GetVideoId(content.RefererLink)}";
-            byte[]? array = await _tikTokDownloaderService.DownloadTikTokVideo(content);
 
-            if (!content.IsValid)
-            {
-                await _tikTokRepository.UpdateAndSaveContentAsync(content);
-                _logger.LogInformation("Content {ContentId} no longer exists", content.Id);
-                return true;
-            }
-            
-            if (array is not null)
-            {
-                content.IsSaved = await _ftpServerService.UploadFile(
-                    $"Contents/{content.Name}.mp4", new MemoryStream(array));
-                await _gusMelfordBotService.SendVideoAsync(new SendVideoParameters
-                {
-                    Caption = GetEditedMessage(content, content.AccompanyingCommentary),
-                    Video = new VideoFile(new MemoryStream(array), content.Name),
-                    ChatId = chatId
-                });
-                
-                _logger.LogInformation("Content is fully processed. " +
-                                       "Content: {RefererLink} ContentId: {ContentId}", content.RefererLink, content.Id);
-                await _tikTokRepository.UpdateAndSaveContentAsync(content);
-                return true;
-            }
-            
+        if (content.IsSaved)
+        {
+            return true;
+        }
+
+        content.Name = $"{GetUserName(content.RefererLink)}-{GetVideoId(content.RefererLink)}";
+        byte[]? array = await _tikTokDownloaderService.DownloadTikTokVideo(content);
+
+        if (!content.IsValid)
+        {
+            await _tikTokRepository.UpdateAndSaveContentAsync(content);
+            _logger.LogInformation("Content {ContentId} no longer exists", content.Id);
+            return true;
+        }
+
+        if (array is null)
+        {
             return false;
         }
+
+        content.IsSaved = await _ftpServerService.UploadFile(
+            $"Contents/{content.Name}.mp4", new MemoryStream(array));
+        Message? newMessage = _telegramHelper.GetMessageResponse(await (await _gusMelfordBotService.SendVideoAsync(
+            new SendVideoParameters
+            {
+                Caption = GetEditedMessage(content, content.AccompanyingCommentary),
+                Video = new VideoFile(new MemoryStream(array), content.Name),
+                ChatId = chatId
+            })).Content.ReadAsStringAsync());
+
+        _logger.LogInformation("Content is fully processed. " +
+                               "Content: {RefererLink} ContentId: {ContentId}", content.RefererLink, content.Id);
+
+        await _telegramHelper.DeleteMessageFromTelegram(content.Chat.ChatId, content.MessageId.ToInt());
+        content.MessageId = newMessage?.MessageId.ToString();
+        await _tikTokRepository.UpdateAndSaveContentAsync(content);
+
         return true;
     }
-    
+
     private async Task<Content> PreparingAndSaveContent(Message message, string? sentTikTokLink)
     {
         Content? content = _tikTokRepository.FirstOrDefault<Content>(x => x.SentLink == sentTikTokLink);
@@ -129,11 +132,19 @@ public class TikTokService : ITikTokService
         if (content is null)
         {
             content = await BuildContent(message, sentTikTokLink);
+            
+            Message? newMessage = await _telegramHelper.SendMessageToTelegram(
+                $" 👍 Content has been saved!\n{sentTikTokLink}",
+                message.Chat.Id);
+
+            content.MessageId = newMessage?.MessageId.ToString();
+            
             await _tikTokRepository.AddAndSaveContentAsync(content);
             _logger.LogInformation("Content is partially processed. " +
                                    "Content: {SentLink} ContentId: {ContentId}", content.SentLink,  content.Id);
         }
-
+        
+        await _telegramHelper.DeleteMessageFromTelegram(message.Chat.Id, message.MessageId);
         return content;
     }
 

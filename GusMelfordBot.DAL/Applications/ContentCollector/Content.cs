@@ -14,4 +14,5 @@ public class Content : DatabaseEntity
     public string Description { get; set; }
     public bool IsSaved { get; set; }
     public string Name { get; set; }
+    public string MessageId { get; set; }
 }

@@ -27,16 +27,18 @@ public class ContentRepository : IContentRepository
 
     public async Task<long?> GetChatId(Guid chatId)
     {
-        return (await _databaseManager.Context.Set<Chat>().FirstOrDefaultAsync(x => x.Id == chatId))?.ChatId;
+        return (await _databaseManager.Context
+            .Set<Chat>()
+            .FirstOrDefaultAsync(x => x.Id == chatId))?.ChatId;
     }
     
     public async Task<Content?> GetContent(Guid contentId)
     {
-        return (await _databaseManager.Context
+        return await _databaseManager.Context
             .Set<Content>()
             .Include(x=>x.Chat)
             .Include(x=>x.User)
-            .FirstOrDefaultAsync(x => x.Id == contentId));
+            .FirstOrDefaultAsync(x => x.Id == contentId);
     }
 
     public IEnumerable<Content> GetUnfinishedContents()
@@ -77,7 +79,7 @@ public class ContentRepository : IContentRepository
                     current.Where(x => x.ContentProvider.Equals(contentProvider)));
         }
 
-        foreach (var entity in query)
+        foreach (var entity in query.OrderBy(x=>x.Number))
         {
             yield return entity.ToDomain();
         }

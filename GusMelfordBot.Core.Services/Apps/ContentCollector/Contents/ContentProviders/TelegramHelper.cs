@@ -56,7 +56,7 @@ public class TelegramHelper
         return GetMessageResponse(await httpResponseMessage.Content.ReadAsStringAsync());
     }
 
-    private Message? GetMessageResponse(string response)
+    public Message? GetMessageResponse(string response)
     {
         try
         {

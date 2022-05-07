@@ -28,7 +28,7 @@ public class RefreshContent : IHostedService, IDisposable
     {
         _logger.LogInformation("RefreshContent Hosted Service running");
         
-        _timer = new Timer(Refresh, null, TimeSpan.Zero, TimeSpan.FromMinutes(15));
+        _timer = new Timer(Refresh, null, TimeSpan.Zero, TimeSpan.FromMinutes(30));
         
         return Task.CompletedTask;
     }
