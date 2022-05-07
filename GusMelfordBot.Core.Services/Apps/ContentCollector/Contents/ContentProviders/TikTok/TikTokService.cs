@@ -70,7 +70,8 @@ public class TikTokService : ITikTokService
             content.RefererLink = await GetRefererLink(content.SentLink);
             if (string.IsNullOrEmpty(content.RefererLink))
             {
-                throw new global::System.Exception($"Not available referer link from the link {content.SentLink}");
+                _logger.LogCritical("Not available referer link from the link {SentLink}", content.SentLink);
+                return;
             }
             
             await _tikTokRepository.UpdateAndSaveContentAsync(content);
