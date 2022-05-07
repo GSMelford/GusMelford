@@ -96,6 +96,7 @@ public class TikTokService : ITikTokService
             if (!content.IsValid)
             {
                 await _tikTokRepository.UpdateAndSaveContentAsync(content);
+                _logger.LogInformation("Content {ContentId} no longer exists", content.Id);
                 return true;
             }
             

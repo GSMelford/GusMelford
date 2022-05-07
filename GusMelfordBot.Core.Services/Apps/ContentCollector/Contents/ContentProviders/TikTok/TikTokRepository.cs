@@ -64,7 +64,7 @@ public class TikTokRepository : ITikTokRepository
         }
     }
     
-    public async Task AddAndSaveContentAsync(DAL.Applications.ContentCollector.Content content)
+    public async Task AddAndSaveContentAsync(Content content)
     {
         await _databaseManager.Context.AddAsync(content);
         await _databaseManager.Context.SaveChangesAsync();
