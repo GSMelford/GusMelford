@@ -37,13 +37,12 @@ public class TikTokDownloaderService : ITikTokDownloaderService
             _logger.LogInformation("Got the original link " +
                                    "{OriginalLink}. ContentId: {ContentId}", originalLink, content.Id);
             
-            content.Description = GetDescription(videoInformation);
-            
             if (string.IsNullOrEmpty(originalLink))
             {
                 return null;
             }
-                
+            
+            content.Description = GetDescription(videoInformation);
             Request request = new Request
             {
                 HttpMethod = HttpMethod.Get,
