@@ -6,7 +6,6 @@ using GusMelfordBot.Core.Domain.System;
 using GusMelfordBot.Core.Domain.Telegram;
 using GusMelfordBot.DAL.Applications.ContentCollector;
 using Microsoft.Extensions.Logging;
-using RestSharp;
 using Telegram.API.TelegramRequests.SendVideo;
 using Telegram.Dto.UpdateModule;
 using static GusMelfordBot.Core.Services.Apps.ContentCollector.Contents.ContentProviders.TikTok.TikTokServiceHelper;
@@ -46,9 +45,8 @@ public class TikTokService : ITikTokService
             {
                 return;
             }
-
-            ;
-            PullAndUpdateContent((await PreparingAndSaveContent(message, sentTikTokLink)).Id, message.Chat.Id);
+            
+            await PullAndUpdateContentAsync((await PreparingAndSaveContent(message, sentTikTokLink)).Id, message.Chat.Id);
             await _telegramHelper.DeleteMessageFromTelegram(message.Chat.Id, message.MessageId);
             await _telegramHelper.SendMessageToTelegram(
                 $" 👍 Content has been saved!\n{sentTikTokLink}",
@@ -64,11 +62,6 @@ public class TikTokService : ITikTokService
         }
     }
 
-    public async void PullAndUpdateContent(Guid contentId, long chatId)
-    {
-        await PullAndUpdateContentHandle(contentId, chatId);
-    }
-    
     public async Task PullAndUpdateContentAsync(Guid contentId, long chatId)
     {
         await PullAndUpdateContentHandle(contentId, chatId);
@@ -116,8 +109,6 @@ public class TikTokService : ITikTokService
             await _tikTokRepository.UpdateAndSaveContentAsync(content);
         }
     }
-
-    
     
     private async Task<Content> PreparingAndSaveContent(Message message, string? sentTikTokLink)
     {
