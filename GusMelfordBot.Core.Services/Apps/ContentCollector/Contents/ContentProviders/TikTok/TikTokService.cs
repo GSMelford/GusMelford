@@ -52,7 +52,10 @@ public class TikTokService : ITikTokService
                 $" 👍 Content has been saved!\n{sentTikTokLink}",
                 message.Chat.Id);
             
-            await PullAndUpdateContentAsync(content.Id, message.Chat.Id);
+#pragma warning disable CS4014
+            PullAndUpdateContentAsync(content.Id, message.Chat.Id);
+#pragma warning restore CS4014
+            
         }
         catch (global::System.Exception e)
         {
