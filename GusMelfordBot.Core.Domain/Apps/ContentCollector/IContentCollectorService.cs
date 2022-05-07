@@ -4,8 +4,7 @@ namespace GusMelfordBot.Core.Domain.Apps.ContentCollector;
 
 public interface IContentCollectorService
 {
-    void ProcessMessage(Message message);
-    Task<Message?> SendInformationPanelAsync(Guid contentId);
-    void DeleteInformationPanelAsync(Guid chatId, int messageId);
+    Task ProcessMessage(Message message);
     void ProcessCallbackQuery(CallbackQuery callbackQuery);
+    int Refresh(long chatId);
 }

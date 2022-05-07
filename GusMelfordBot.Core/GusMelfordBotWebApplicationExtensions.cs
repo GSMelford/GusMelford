@@ -1,8 +1,8 @@
 using GusMelfordBot.Core.Authentication;
 using GusMelfordBot.Core.Domain.Apps;
 using GusMelfordBot.Core.Domain.Apps.ContentCollector;
-using GusMelfordBot.Core.Domain.Apps.ContentCollector.Content;
-using GusMelfordBot.Core.Domain.Apps.ContentCollector.Content.ContentProviders.TikTok;
+using GusMelfordBot.Core.Domain.Apps.ContentCollector.Contents;
+using GusMelfordBot.Core.Domain.Apps.ContentCollector.Contents.ContentProviders.TikTok;
 using GusMelfordBot.Core.Domain.Apps.ContentCollector.ContentDownload;
 using GusMelfordBot.Core.Domain.Apps.ContentDownload.TikTok;
 using GusMelfordBot.Core.Domain.Commands;
@@ -13,8 +13,8 @@ using GusMelfordBot.Core.Domain.Update;
 using GusMelfordBot.Core.Services;
 using GusMelfordBot.Core.Services.Apps;
 using GusMelfordBot.Core.Services.Apps.ContentCollector;
-using GusMelfordBot.Core.Services.Apps.ContentCollector.Content;
-using GusMelfordBot.Core.Services.Apps.ContentCollector.Content.ContentProviders.TikTok;
+using GusMelfordBot.Core.Services.Apps.ContentCollector.Contents;
+using GusMelfordBot.Core.Services.Apps.ContentCollector.Contents.ContentProviders.TikTok;
 using GusMelfordBot.Core.Services.Apps.ContentCollector.ContentDownload;
 using GusMelfordBot.Core.Services.Apps.ContentCollector.ContentDownload.TikTok;
 using GusMelfordBot.Core.Services.Commands;
@@ -85,9 +85,9 @@ public static class GusMelfordBotWebApplicationExtensions
         services.AddTransient<ITikTokDownloaderService, TikTokDownloaderService>();
         services.AddTransient<IFtpServerService, FtpServerService>(
             provider => new FtpServerService(
-                commonSettings.FtpServerSettings.FtpUrl,
-                commonSettings.FtpServerSettings.UserName,
-                commonSettings.FtpServerSettings.Password,
+                commonSettings.FtpServerSettings?.FtpUrl ?? string.Empty,
+                commonSettings.FtpServerSettings?.UserName ?? string.Empty,
+                commonSettings.FtpServerSettings?.Password ?? string.Empty,
                 provider.GetRequiredService<ILogger<FtpServerService>>()));
         
         services.AddTransient<IDatabaseManager>(

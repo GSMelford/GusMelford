@@ -4,5 +4,5 @@ namespace GusMelfordBot.Core.Domain.Commands;
 
 public interface ICommandService
 {
-    Task ProcessCommand(Message message);
+    Task ProcessCommand(Message message, string applicationType);
 }

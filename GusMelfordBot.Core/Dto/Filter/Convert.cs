@@ -4,9 +4,9 @@ namespace GusMelfordBot.Core.Dto.Filter;
 
 public static class Convert
 {
-    public static Domain.Apps.ContentCollector.Content.Filter ToDomain(this FilterDto filterDto)
+    public static Domain.Apps.ContentCollector.Contents.Filter ToDomain(this FilterDto filterDto)
     {
-        return new Domain.Apps.ContentCollector.Content.Filter
+        return new Domain.Apps.ContentCollector.Contents.Filter
         {
             ChatId = filterDto.ChatId.ToGuid(),
             ContentProviders = filterDto.ContentProviders.ToList(),

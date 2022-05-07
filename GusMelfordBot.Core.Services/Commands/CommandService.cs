@@ -1,5 +1,7 @@
+using GusMelfordBot.Core.Domain.Apps.ContentCollector;
 using GusMelfordBot.Core.Domain.Commands;
 using GusMelfordBot.Core.Domain.Telegram;
+using GusMelfordBot.Core.Services.Apps;
 using Telegram.API.TelegramRequests.SendMessage;
 using Telegram.Dto.UpdateModule;
 
@@ -9,17 +11,20 @@ public class CommandService : ICommandService
 {
     private readonly IGusMelfordBotService _gusMelfordBotService;
     private readonly ICommandRepository _commandRepository;
+    private readonly IContentCollectorService _contentCollectorService;
     private const string COMMAND_BOT_NAME = "@GusMelfordBot";
 
     public CommandService(
         IGusMelfordBotService gusMelfordBotService, 
-        ICommandRepository commandRepository)
+        ICommandRepository commandRepository, 
+        IContentCollectorService contentCollectorService)
     {
         _gusMelfordBotService = gusMelfordBotService;
         _commandRepository = commandRepository;
+        _contentCollectorService = contentCollectorService;
     }
     
-    public async Task ProcessCommand(Message message)
+    public async Task ProcessCommand(Message message, string applicationType)
     {
         switch (message.Text.Replace(COMMAND_BOT_NAME, ""))
         {
@@ -41,6 +46,18 @@ public class CommandService : ICommandService
                         Text = "This conversation is already registered with this type. 😎",
                         ChatId = message.Chat.Id
                     });
+                }
+                break;
+            case Command.Refresh:
+                switch (applicationType)
+                {
+                    case App.ContentCollector:
+                        await _gusMelfordBotService.SendMessageAsync(new SendMessageParameters
+                        {
+                            Text = $"Updated {_contentCollectorService.Refresh(message.Chat.Id)} content",
+                            ChatId = message.Chat.Id
+                        });
+                        break;
                 }
                 break;
         }

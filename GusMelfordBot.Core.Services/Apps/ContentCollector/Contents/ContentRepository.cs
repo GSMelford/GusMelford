@@ -1,14 +1,13 @@
-using GusMelfordBot.Core.Domain.Apps.ContentCollector.Content;
+using GusMelfordBot.Core.Domain.Apps.ContentCollector.Contents;
 using GusMelfordBot.Core.Domain.Apps.ContentDownload.TikTok;
-using GusMelfordBot.Core.Domain.Requests;
 using GusMelfordBot.Core.Domain.System;
-using GusMelfordBot.Core.Services.Apps.ContentCollector.Content.ContentProviders.TikTok;
-using GusMelfordBot.Core.Services.Apps.ContentCollector.ContentDownload.TikTok;
+using GusMelfordBot.Core.Services.Apps.ContentCollector.Contents.ContentProviders.TikTok;
 using GusMelfordBot.DAL;
+using GusMelfordBot.DAL.Applications.ContentCollector;
 using GusMelfordBot.Database.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
-namespace GusMelfordBot.Core.Services.Apps.ContentCollector.Content;
+namespace GusMelfordBot.Core.Services.Apps.ContentCollector.Contents;
 
 public class ContentRepository : IContentRepository
 {
@@ -31,19 +30,27 @@ public class ContentRepository : IContentRepository
         return (await _databaseManager.Context.Set<Chat>().FirstOrDefaultAsync(x => x.Id == chatId))?.ChatId;
     }
     
-    public async Task<DAL.Applications.ContentCollector.Content?> GetContent(Guid contentId)
+    public async Task<Content?> GetContent(Guid contentId)
     {
         return (await _databaseManager.Context
-            .Set<DAL.Applications.ContentCollector.Content>()
+            .Set<Content>()
             .Include(x=>x.Chat)
             .Include(x=>x.User)
             .FirstOrDefaultAsync(x => x.Id == contentId));
     }
-    
+
+    public IEnumerable<Content> GetUnfinishedContents()
+    {
+        return _databaseManager.Context.Set<Content>()
+            .Include(x=>x.Chat)
+            .Include(x => x.User)
+            .Where(x => string.IsNullOrEmpty(x.RefererLink) || !x.IsSaved);
+    }
+
     public IEnumerable<ContentInfo> GetContentList(Filter filter)
     {
-        IQueryable<DAL.Applications.ContentCollector.Content> query = _databaseManager.Context
-            .Set<DAL.Applications.ContentCollector.Content>()
+        IQueryable<Content> query = _databaseManager.Context
+            .Set<Content>()
             .Include(x => x.User)
             .Include(x => x.Chat)
             .Where(x => 
@@ -77,7 +84,7 @@ public class ContentRepository : IContentRepository
     public async Task SetViewedVideo(Guid contentId)
     {
         var content = await _databaseManager.Context
-            .Set<DAL.Applications.ContentCollector.Content>()
+            .Set<Content>()
             .FirstOrDefaultAsync(x => x.Id == contentId);
         if (content is null)
         {
@@ -92,7 +99,7 @@ public class ContentRepository : IContentRepository
     public async Task Cache()
     {
         var contents = _databaseManager.Context
-            .Set<DAL.Applications.ContentCollector.Content>()
+            .Set<Content>()
             .Where(x => x.IsSaved == false).ToList();
         
         foreach (var content in contents)

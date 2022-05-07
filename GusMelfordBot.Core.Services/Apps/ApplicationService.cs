@@ -13,8 +13,8 @@ public class ApplicationService : IApplicationService
     
     public ApplicationService(
         IApplicationRepository applicationRepository,
-        IContentCollectorService collectorService,
-        ICommandService commandService)
+        ICommandService commandService,
+        IContentCollectorService collectorService)
     {
         _applicationRepository = applicationRepository;
         _collectorService = collectorService;
@@ -30,23 +30,12 @@ public class ApplicationService : IApplicationService
         switch (applicationType)
         {
             case App.ContentCollector:
-                _collectorService.ProcessMessage(message);
+                await _collectorService.ProcessMessage(message);
                 break;
         }
 
-        await _commandService.ProcessCommand(message);
+        await _commandService.ProcessCommand(message, applicationType);
     }
 
-    public async void ProcessCallbackQuery(CallbackQuery callbackQuery)
-    {
-        await _applicationRepository.RegisterNewUserIfNotExist(callbackQuery.FromUser);
-
-        string applicationType = callbackQuery.Data.Split(";")[0];
-        switch (applicationType)
-        {
-            case App.ContentCollector:
-                _collectorService.ProcessCallbackQuery(callbackQuery);
-                break;
-        }
-    }
+    public async void ProcessCallbackQuery(CallbackQuery callbackQuery) { }
 }

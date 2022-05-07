@@ -1,4 +1,4 @@
-namespace GusMelfordBot.Core.Domain.Apps.ContentCollector.Content;
+namespace GusMelfordBot.Core.Domain.Apps.ContentCollector.Contents;
 
 public class Filter
 {

@@ -1,4 +1,4 @@
-using GusMelfordBot.Core.Domain.Apps.ContentCollector.Content;
+using GusMelfordBot.Core.Domain.Apps.ContentCollector.Contents;
 using GusMelfordBot.Core.Domain.Apps.ContentCollector.ContentDownload;
 using GusMelfordBot.Core.Domain.Apps.ContentDownload.TikTok;
 using GusMelfordBot.Core.Domain.System;

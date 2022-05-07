@@ -1,4 +1,6 @@
-namespace GusMelfordBot.Core.Domain.Apps.ContentCollector.Content;
+using GusMelfordBot.DAL.Applications.ContentCollector;
+
+namespace GusMelfordBot.Core.Domain.Apps.ContentCollector.Contents;
 
 public interface IContentRepository
 {
@@ -7,4 +9,5 @@ public interface IContentRepository
     Task<DAL.Applications.ContentCollector.Content?> GetContent(Guid contentId);
     Task<long?> GetChatId(Guid chatId);
     Task Cache();
+    IEnumerable<Content> GetUnfinishedContents();
 }

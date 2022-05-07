@@ -1,7 +1,7 @@
 using GusMelfordBot.Core.Domain.Apps.ContentDownload.TikTok;
 using GusMelfordBot.Core.Domain.Requests;
 using GusMelfordBot.Core.Extensions;
-using GusMelfordBot.Core.Services.Apps.ContentCollector.Content.ContentProviders.TikTok;
+using GusMelfordBot.Core.Services.Apps.ContentCollector.Contents.ContentProviders.TikTok;
 using GusMelfordBot.Core.Services.Requests;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;

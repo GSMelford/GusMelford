@@ -16,20 +16,11 @@ async function Init(){
     let playerTitle = document.getElementById("player-title");
     playerTitle.innerText = information["systemName"] + " Player" + " v1.6";
 
-    contents = await executeRequest("app/content/info?chatId=7dfd19cb-33dc-4da6-b157-60177994b696");
+    contents = await executeRequest("app/content/info" + document.location.search);
     await changeVideo("next");
 }
 
 async function changeVideo(direction) {
-    try {
-        let request = baseUrl + "contentCollector/deleteInformationPanel" +
-            "?chatId=7dfd19cb-33dc-4da6-b157-60177994b696" +
-            "&messageId=" + message["messageId"];
-        await fetch(request);
-    }catch (e){
-        console.log("We can't delete old message")
-    }
-    
     let videoBlocks = document.getElementsByClassName("video-block");
     for (let i = 0; i < videoBlocks.length; i++) {
         videoBlocks[i].remove();
@@ -48,7 +39,6 @@ async function changeVideo(direction) {
     video.appendChild(source);
     videoContainer.appendChild(video);
     document.body.requestFullscreen().then(r => r);
-    message = await executeRequest("contentCollector/sendInformationPanel?contentId=" + contents[cursor]["id"]);
 }
 
 function updateCursor(direction){

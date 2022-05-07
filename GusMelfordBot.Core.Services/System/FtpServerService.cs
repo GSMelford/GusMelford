@@ -29,7 +29,6 @@ public class FtpServerService : IFtpServerService
         Stream? requestStream = null;
         try
         {
-            _logger.LogInformation("UploadFile starts {FtpUrl}", _ftpUrl + path);
             FtpWebRequest? ftpWebRequest = FtpWebRequest.Create(_ftpUrl + path) as FtpWebRequest;
             ftpWebRequest!.Method = WebRequestMethods.Ftp.UploadFile;
             ftpWebRequest.Credentials = new NetworkCredential(_userName, _password);
@@ -42,7 +41,7 @@ public class FtpServerService : IFtpServerService
                 await requestStream.WriteAsync(buffer, 0, read)!;
             }
 
-            await requestStream.FlushAsync()!;
+            await requestStream.FlushAsync();
         }
         catch (global::System.Exception exception)
         {

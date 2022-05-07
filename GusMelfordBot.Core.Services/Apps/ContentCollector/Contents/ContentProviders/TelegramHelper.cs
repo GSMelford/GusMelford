@@ -7,7 +7,7 @@ using Telegram.API.TelegramRequests.SendMessage;
 using Telegram.Dto.SendMessage.ReplyMarkup.InlineKeyboard;
 using Telegram.Dto.UpdateModule;
 
-namespace GusMelfordBot.Core.Services.Apps.ContentCollector.Content.ContentProviders;
+namespace GusMelfordBot.Core.Services.Apps.ContentCollector.Contents.ContentProviders;
 
 public class TelegramHelper
 {
@@ -20,33 +20,14 @@ public class TelegramHelper
     
     public async Task<Message?> SendMessageToTelegram(string text, long chatId, string? messageText = null)
     {
-        var parameters = new SendMessageParameters
-        {
-            Text = text,
-            ChatId = chatId,
-            DisableNotification = true,
-            DisableWebPagePreview = true
-        };
-
-        if (messageText is not null)
-        {
-            parameters.ReplyMarkup = new InlineKeyboardMarkup
+        HttpResponseMessage httpResponseMessage = await _gusMelfordBotService.SendMessageAsync(
+            new SendMessageParameters
             {
-                Buttons = new[]
-                {
-                    new InlineKeyboardButton[]
-                    {
-                        new()
-                        {
-                            Text = "To try one more time",
-                            CallbackData = $"ContentCollector;Retry;{messageText};"
-                        }
-                    }
-                }
-            };
-        }
-        
-        HttpResponseMessage httpResponseMessage = await _gusMelfordBotService.SendMessageAsync(parameters);
+                Text = text,
+                ChatId = chatId,
+                DisableNotification = true,
+                DisableWebPagePreview = true
+            });
         return GetMessageResponse(await httpResponseMessage.Content.ReadAsStringAsync());
     }
 

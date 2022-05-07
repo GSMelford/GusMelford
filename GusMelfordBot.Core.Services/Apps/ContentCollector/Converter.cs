@@ -1,4 +1,4 @@
-using GusMelfordBot.Core.Domain.Apps.ContentCollector.Content;
+using GusMelfordBot.Core.Domain.Apps.ContentCollector.Contents;
 
 namespace GusMelfordBot.Core.Services.Apps.ContentCollector;
 

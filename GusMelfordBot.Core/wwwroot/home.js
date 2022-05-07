@@ -9,7 +9,7 @@ async function load(){
     let botTitle = document.getElementById("bot-title");
     botTitle.innerText = botFullName;
 
-    let contentInfo = await executeRequest("app/content/info?chatId=7dfd19cb-33dc-4da6-b157-60177994b696");
+    let contentInfo = await executeRequest("app/content/info" + document.location.search);
     let playerButton = document.getElementById("player-button");
     playerButton.value = "View " + contentInfo.length + " contents";
 }
