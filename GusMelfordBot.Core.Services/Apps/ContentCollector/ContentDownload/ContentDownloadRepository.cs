@@ -1,4 +1,5 @@
 using GusMelfordBot.Core.Domain.Apps.ContentCollector.ContentDownload;
+using GusMelfordBot.DAL.Applications.ContentCollector;
 using GusMelfordBot.Database.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
@@ -13,18 +14,19 @@ public class ContentDownloadRepository : IContentDownloadRepository
         _databaseManager = databaseManager;
     }
 
-    public async Task<DAL.Applications.ContentCollector.Content?> GetContent(Guid contentId)
+    public async Task<Content?> GetContent(Guid contentId)
     {
         return await _databaseManager.Context
-            .Set<DAL.Applications.ContentCollector.Content>()
+            .Set<Content>()
             .FirstOrDefaultAsync(x => x.Id == contentId);
     }
 
     public async Task SetIsNotValid(Guid contentId)
     {
         var content = await _databaseManager.Context
-            .Set<DAL.Applications.ContentCollector.Content>()
+            .Set<Content>()
             .FirstOrDefaultAsync(x => x.Id == contentId);
+        
         if (content is null)
         {
             return;

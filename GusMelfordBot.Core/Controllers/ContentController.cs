@@ -29,9 +29,10 @@ public class ContentController : Controller
     }
     
     [HttpGet("setViewedVideo")]
-    public JsonResult GetContentInfoList([FromQuery] string contentId)
+    public async Task<IActionResult> GetContentInfoList([FromQuery] string contentId)
     {
-        return Json(_contentService.SetViewedVideo(contentId.ToGuid()));
+        await _contentService.SetViewedVideo(contentId.ToGuid());
+        return Ok();
     }
     
     [HttpGet("cache")]

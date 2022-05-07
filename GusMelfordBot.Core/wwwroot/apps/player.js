@@ -27,6 +27,10 @@ async function changeVideo(direction) {
     }
     degreeOfCoup = 360;
     
+    if(cursor !== -1){
+        await fetch(baseUrl + "app/content/setViewedVideo?contentId=" + contents[cursor]["id"])
+    }
+    
     updateCursor(direction);
     updateElementVideoInfo();
 
