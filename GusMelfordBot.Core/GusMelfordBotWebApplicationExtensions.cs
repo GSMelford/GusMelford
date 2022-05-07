@@ -19,6 +19,7 @@ using GusMelfordBot.Core.Services.Apps.ContentCollector.ContentDownload;
 using GusMelfordBot.Core.Services.Apps.ContentCollector.ContentDownload.TikTok;
 using GusMelfordBot.Core.Services.Commands;
 using GusMelfordBot.Core.Services.GusMelfordBot;
+using GusMelfordBot.Core.Services.Modules;
 using GusMelfordBot.Core.Services.Requests;
 using GusMelfordBot.Core.Services.System;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -90,6 +91,7 @@ public static class GusMelfordBotWebApplicationExtensions
                 commonSettings.FtpServerSettings?.Password ?? string.Empty,
                 provider.GetRequiredService<ILogger<FtpServerService>>()));
         
+        services.AddHostedService<RefreshContent>();
         services.AddTransient<IDatabaseManager>(
             provider => new DatabaseManager(commonSettings.DatabaseSettings, 
                 provider.GetRequiredService<ILogger<ApplicationContext>>()));
