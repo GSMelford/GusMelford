@@ -1,11 +1,12 @@
 using System.Text.RegularExpressions;
 using GusMelfordBot.Core.Domain.Apps.ContentDownload.TikTok;
 using GusMelfordBot.Core.Domain.Requests;
-using GusMelfordBot.Core.Extensions;
 using GusMelfordBot.Core.Services.Apps.ContentCollector.Contents.ContentProviders.TikTok;
 using GusMelfordBot.Core.Services.Requests;
+using GusMelfordBot.DAL.Applications.ContentCollector;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;
+using RestSharp;
 
 namespace GusMelfordBot.Core.Services.Apps.ContentCollector.ContentDownload.TikTok;
 
@@ -22,7 +23,7 @@ public class TikTokDownloaderService : ITikTokDownloaderService
         _requestService = requestService;
     }
         
-    public async Task<byte[]?> DownloadTikTokVideo(DAL.Applications.ContentCollector.Content? content)
+    public async Task<byte[]?> DownloadTikTokVideo(Content? content)
     {
         if (content is null)
         {
@@ -64,6 +65,24 @@ public class TikTokDownloaderService : ITikTokDownloaderService
         }
     }
         
+    public async Task<bool> TryGetAndSaveRefererLink(Content content)
+    {
+        if (string.IsNullOrEmpty(content.RefererLink))
+        {
+            content.RefererLink = await GetRefererLink(content.SentLink);
+            if (string.IsNullOrEmpty(content.RefererLink))
+            {
+                _logger.LogError("Not available referer link from the link " +
+                                    "{SentLink} ContentId: {ContentId}", content.SentLink, content.Id);
+                return false;
+            }
+            
+            _logger.LogInformation("ContentId: {ContentId} RefererLink: {RefererLink}", content.Id, content.RefererLink);
+        }
+
+        return true;
+    }
+    
     private static string? GetOriginalLink(JToken videoInformation)
     {
         return videoInformation["itemInfo"]?["itemStruct"]?["video"]?["downloadAddr"]?.ToString();
@@ -81,22 +100,41 @@ public class TikTokDownloaderService : ITikTokDownloaderService
         return string.Empty;
     }
         
-    private async Task<JToken> GetVideoInformation(DAL.Applications.ContentCollector.Content content)
+    private async Task<JToken> GetVideoInformation(Content content)
     {
-        Request request = new Request
+        string requestUrl = BuildVideoInformationUrl(content);
+        RestClient restClient = new RestClient();
+        RestRequest restRequest = new RestRequest(requestUrl) { Timeout = 60000 };
+        restRequest.AddHeader("User-Agent", Constants.UserAgent);
+        RestResponse restResponse = await restClient.ExecuteAsync(restRequest);
+
+        try
         {
-            HttpMethod = HttpMethod.Get,
-            RequestUri = BuildVideoInformationUrl(content),
-            Headers = new Dictionary<string, string>
-            {
-                {"User-Agent", Constants.UserAgent}
-            }
-        };
-        
-        return await (await _requestService.ExecuteAsync(request.ToHttpRequestMessage())).GetJTokenAsyncOrEmpty();
+            return JToken.Parse(restResponse.Content!);
+        }
+        catch
+        {
+            _logger.LogError("Failed Request {Request}  ContentId: {ContentId}", requestUrl, content.Id);
+            return new JObject();
+        }
     }
         
-    private string BuildVideoInformationUrl(DAL.Applications.ContentCollector.Content content)
+    private static async Task<string> GetRefererLink(string? sentLink)
+    {
+        RestClient restClient = new RestClient();
+        RestRequest restRequest = new RestRequest(sentLink) { Timeout = 60000 };
+        RestResponse restResponse = await restClient.ExecuteAsync(restRequest);
+        
+        Uri? uri = restResponse.ResponseUri;
+        if (uri is null)
+        {
+            return string.Empty;
+        }
+        
+        return uri.Scheme + "://" + uri.Host + uri.AbsolutePath;
+    }
+    
+    private string BuildVideoInformationUrl(Content content)
     {
         return $"https://www.tiktok.com/node/share/video/{TikTokServiceHelper.GetUserName(content.RefererLink)}" +
                $"/{TikTokServiceHelper.GetVideoId(content.RefererLink)}";

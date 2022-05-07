@@ -54,7 +54,7 @@ public class CommandService : ICommandService
                     case App.ContentCollector:
                         await _gusMelfordBotService.SendMessageAsync(new SendMessageParameters
                         {
-                            Text = $"Updated {_contentCollectorService.Refresh(message.Chat.Id)} content",
+                            Text = $"Updated {await _contentCollectorService.Refresh(message.Chat.Id)} content",
                             ChatId = message.Chat.Id
                         });
                         break;

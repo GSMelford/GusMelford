@@ -31,7 +31,7 @@ public class ContentCollectorService : IContentCollectorService
         throw new NotImplementedException();
     }
 
-    public int Refresh(long chatId)
+    public Task<int> Refresh(long chatId)
     {
         return _contentService.Refresh(chatId);
     }

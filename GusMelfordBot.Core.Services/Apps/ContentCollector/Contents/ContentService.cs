@@ -37,7 +37,7 @@ public class ContentService : IContentService
         await _contentRepository.Cache();
     }
     
-    public int Refresh(long chatId)
+    public async Task<int> Refresh(long chatId)
     {
         List<Content> contents = _contentRepository.GetUnfinishedContents().ToList();
         foreach (var content in contents)
@@ -45,7 +45,8 @@ public class ContentService : IContentService
             switch (content.ContentProvider)
             {
                 case nameof(ContentProvider.TikTok):
-                    _tikTokService.PullAndUpdateContent(content.Id, chatId);
+                    await _tikTokService.PullAndUpdateContentAsync(content.Id, chatId);
+                    await Task.Delay(2000);
                     break;
             }
         }

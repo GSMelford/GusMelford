@@ -42,6 +42,11 @@ public class ContentDownloadService : IContentDownloadService
                 MemoryStream? memoryStream = await _ftpServerService.DownloadFile($"Contents/{content.Name}.mp4");
                 if (memoryStream is not null)
                     return memoryStream;
+
+                if (!await _tikTokDownloaderService.TryGetAndSaveRefererLink(content))
+                {
+                    return null;
+                }
                 
                 byte[]? bytes = await _tikTokDownloaderService.DownloadTikTokVideo(content);
                 if (bytes is null)

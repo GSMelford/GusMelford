@@ -6,5 +6,5 @@ public interface IContentCollectorService
 {
     Task ProcessMessage(Message message);
     void ProcessCallbackQuery(CallbackQuery callbackQuery);
-    int Refresh(long chatId);
+    Task<int> Refresh(long chatId);
 }

@@ -5,5 +5,5 @@ public interface IContentService
     List<ContentInfoDomain> BuildContentInfoList(Filter filter);
     Task SetViewedVideo(Guid contentId);
     Task Cache();
-    int Refresh(long chatId);
+    Task<int> Refresh(long chatId);
 }

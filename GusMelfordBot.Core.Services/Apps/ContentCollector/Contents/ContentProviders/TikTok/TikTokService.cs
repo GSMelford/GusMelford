@@ -21,10 +21,10 @@ public class TikTokService : ITikTokService
     private readonly ITikTokDownloaderService _tikTokDownloaderService;
     private readonly IFtpServerService _ftpServerService;
     private readonly IGusMelfordBotService _gusMelfordBotService;
-    
+
     public TikTokService(
-        IGusMelfordBotService gusMelfordBotService, 
-        ITikTokRepository tikTokRepository, 
+        IGusMelfordBotService gusMelfordBotService,
+        ITikTokRepository tikTokRepository,
         ILogger<TikTokService> logger,
         IFtpServerService ftpServerService,
         ITikTokDownloaderService tikTokDownloaderService)
@@ -35,8 +35,8 @@ public class TikTokService : ITikTokService
         _ftpServerService = ftpServerService;
         _telegramHelper = new TelegramHelper(gusMelfordBotService);
         _tikTokDownloaderService = tikTokDownloaderService;
-    } 
-    
+    }
+
     public async Task ProcessMessageAsync(Message message)
     {
         try
@@ -59,12 +59,22 @@ public class TikTokService : ITikTokService
             _logger.LogError("Error processing content. " +
                              "ContentProvider: {ContentProvider}. " +
                              "Processing message text: {Text}. " +
-                             "Error message: {ErrorMessage}", 
+                             "Error message: {ErrorMessage}",
                 nameof(ContentProvider.TikTok), message.Text, e.Message);
         }
     }
 
     public async void PullAndUpdateContent(Guid contentId, long chatId)
+    {
+        await PullAndUpdateContentHandle(contentId, chatId);
+    }
+    
+    public async Task PullAndUpdateContentAsync(Guid contentId, long chatId)
+    {
+        await PullAndUpdateContentHandle(contentId, chatId);
+    }
+
+    private async Task PullAndUpdateContentHandle(Guid contentId, long chatId)
     {
         _logger.LogInformation("PullAndUpdateContent started. " +
                                "ContentId: {ContentId} ChatId: {ChatId}", contentId, chatId);
@@ -75,20 +85,15 @@ public class TikTokService : ITikTokService
             return;
         }
 
-        if (string.IsNullOrEmpty(content.RefererLink))
+        if (await _tikTokDownloaderService.TryGetAndSaveRefererLink(content))
         {
-            content.RefererLink = await GetRefererLink(content.SentLink);
-            if (string.IsNullOrEmpty(content.RefererLink))
-            {
-                _logger.LogCritical("Not available referer link from the link " +
-                                    "{SentLink} ContentId: {ContentId}", content.SentLink, content.Id);
-                return;
-            }
-            
-            _logger.LogInformation("ContentId: {ContentId} RefererLink: {RefererLink}", content.Id, content.RefererLink);
             await _tikTokRepository.UpdateAndSaveContentAsync(content);
         }
-
+        else
+        {
+            return;
+        }
+        
         if (!content.IsSaved)
         {
             content.Name = $"{GetUserName(content.RefererLink)}-{GetVideoId(content.RefererLink)}";
@@ -111,6 +116,8 @@ public class TikTokService : ITikTokService
             await _tikTokRepository.UpdateAndSaveContentAsync(content);
         }
     }
+
+    
     
     private async Task<Content> PreparingAndSaveContent(Message message, string? sentTikTokLink)
     {
@@ -154,20 +161,5 @@ public class TikTokService : ITikTokService
         }
         
         return temp;
-    }
-
-    private static async Task<string> GetRefererLink(string? sentLink)
-    {
-        RestClient restClient = new RestClient();
-        RestRequest restRequest = new RestRequest(sentLink) { Timeout = 60000 };
-        RestResponse restResponse = await restClient.ExecuteAsync(restRequest);
-        
-        Uri? uri = restResponse.ResponseUri;
-        if (uri is null)
-        {
-            return string.Empty;
-        }
-        
-        return uri.Scheme + "://" + uri.Host + uri.AbsolutePath;
     }
 }
