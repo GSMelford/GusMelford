@@ -80,10 +80,12 @@ public class TikTokService : ITikTokService
             content.RefererLink = await GetRefererLink(content.SentLink);
             if (string.IsNullOrEmpty(content.RefererLink))
             {
-                _logger.LogCritical("Not available referer link from the link {SentLink}", content.SentLink);
+                _logger.LogCritical("Not available referer link from the link " +
+                                    "{SentLink} ContentId: {ContentId}", content.SentLink, content.Id);
                 return;
             }
             
+            _logger.LogInformation("ContentId: {ContentId} RefererLink: {RefererLink}", content.Id, content.RefererLink);
             await _tikTokRepository.UpdateAndSaveContentAsync(content);
         }
 
@@ -102,7 +104,8 @@ public class TikTokService : ITikTokService
                     ChatId = chatId
                 });
                 
-                _logger.LogInformation("Content is fully processed. Content: {RefererLink}", content.RefererLink);
+                _logger.LogInformation("Content is fully processed. " +
+                                       "Content: {RefererLink} ContentId: {ContentId}", content.RefererLink, content.Id);
             }
 
             await _tikTokRepository.UpdateAndSaveContentAsync(content);
@@ -117,7 +120,8 @@ public class TikTokService : ITikTokService
         {
             content = await BuildContent(message, sentTikTokLink);
             await _tikTokRepository.AddAndSaveContentAsync(content);
-            _logger.LogInformation("Content is partially processed. Content: {SentLink}", content.SentLink);
+            _logger.LogInformation("Content is partially processed. " +
+                                   "Content: {SentLink} ContentId: {ContentId}", content.SentLink,  content.Id);
         }
 
         return content;

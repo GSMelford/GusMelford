@@ -16,7 +16,7 @@ async function Init(){
     let playerTitle = document.getElementById("player-title");
     playerTitle.innerText = information["systemName"] + " Player" + " v1.6";
 
-    contents = await executeRequest("app/content/info" + document.location.search);
+    contents = await executeRequest("app/content/info?chatId=5b0eb694-7435-447c-9008-f8b8bff6684d");
     await changeVideo("next");
 }
 
