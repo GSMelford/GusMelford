@@ -16,14 +16,13 @@ public static class TikTokServiceHelper
     };
     
     public static string GetEditedMessage(
-        Content? tikTokContent, 
-        int count, 
+        Content? tikTokContent,
         string accompanyingCommentary)
     {
-        string text = $"{GetRandomEmoji()} Content № {count}\n" +
-                      $"🤖 {tikTokContent.Id}\n" +
-                      $"👉 {tikTokContent.User.FirstName} {tikTokContent.User.LastName}\n" +
-                      $"{tikTokContent.RefererLink}";
+        string text = $"{GetRandomEmoji()} Content № {tikTokContent?.Number}\n" +
+                      $"🤖 {tikTokContent?.Id}\n" +
+                      $"👉 {tikTokContent?.User?.FirstName} {tikTokContent?.User?.LastName}\n" +
+                      $"{tikTokContent?.RefererLink}";
 
         if (!string.IsNullOrEmpty(accompanyingCommentary))
         {

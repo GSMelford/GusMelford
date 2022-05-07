@@ -34,22 +34,25 @@ public class TikTokRepository : ITikTokRepository
             .FirstOrDefaultAsync(x => x.TelegramUserId == telegramUserId);
     }
 
-    public async Task<DAL.Applications.ContentCollector.Content?> GetContentAsync(string refererLink)
+    public async Task<Content?> GetContentAsync(string refererLink)
     {
         return await _databaseManager.Context
-            .Set<DAL.Applications.ContentCollector.Content>()
+            .Set<Content>()
             .FirstOrDefaultAsync(x => x.RefererLink == refererLink);
     }
 
     public async Task<int> GetCountAsync()
     {
-        return await _databaseManager.Context.Set<DAL.Applications.ContentCollector.Content>().CountAsync();
+        return await _databaseManager.Context.Set<Content>().CountAsync();
     }
 
     public async Task UpdateAndSaveContentAsync(Content? content)
     {
-        _databaseManager.Context.Update(content);
-        await _databaseManager.Context.SaveChangesAsync();
+        if (content is not null)
+        {
+            _databaseManager.Context.Update(content);
+            await _databaseManager.Context.SaveChangesAsync();
+        }
     }
     
     public async Task AddAndSaveContentAsync(DAL.Applications.ContentCollector.Content content)

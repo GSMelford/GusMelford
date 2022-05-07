@@ -97,7 +97,7 @@ public class TikTokService : ITikTokService
                     $"Contents/{content.Name}.mp4", new MemoryStream(array));
                 await _gusMelfordBotService.SendVideoAsync(new SendVideoParameters
                 {
-                    Caption = GetEditedMessage(content, await _tikTokRepository.GetCountAsync(), content.AccompanyingCommentary),
+                    Caption = GetEditedMessage(content, content.AccompanyingCommentary),
                     Video = new VideoFile(new MemoryStream(array), content.Name),
                     ChatId = chatId
                 });
@@ -131,7 +131,8 @@ public class TikTokService : ITikTokService
             User = await _tikTokRepository.GetUserAsync(message.From.Id),
             AccompanyingCommentary = message.Text.Replace(sentTikTokLink ?? string.Empty, "").Trim(),
             SentLink = sentTikTokLink,
-            ContentProvider = nameof(ContentProvider.TikTok)
+            ContentProvider = nameof(ContentProvider.TikTok),
+            Number = await _tikTokRepository.GetCountAsync() + 1
         };
     }
 
@@ -154,7 +155,7 @@ public class TikTokService : ITikTokService
     private static async Task<string> GetRefererLink(string? sentLink)
     {
         RestClient restClient = new RestClient();
-        RestRequest restRequest = new RestRequest(sentLink) { Timeout = 10000 };
+        RestRequest restRequest = new RestRequest(sentLink) { Timeout = 60000 };
         RestResponse restResponse = await restClient.ExecuteAsync(restRequest);
         
         Uri? uri = restResponse.ResponseUri;
