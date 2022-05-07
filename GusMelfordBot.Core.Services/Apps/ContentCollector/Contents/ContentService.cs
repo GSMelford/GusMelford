@@ -45,7 +45,7 @@ public class ContentService : IContentService
             switch (content.ContentProvider)
             {
                 case nameof(ContentProvider.TikTok):
-                    _tikTokService.PullAndUpdateContent(content, chatId);
+                    _tikTokService.PullAndUpdateContent(content.Id, chatId);
                     break;
             }
         }

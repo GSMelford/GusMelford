@@ -1,5 +1,6 @@
 using GusMelfordBot.Core.Domain.Apps.ContentCollector.Contents.ContentProviders.TikTok;
 using GusMelfordBot.DAL;
+using GusMelfordBot.DAL.Applications.ContentCollector;
 using GusMelfordBot.Database.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
@@ -45,7 +46,7 @@ public class TikTokRepository : ITikTokRepository
         return await _databaseManager.Context.Set<DAL.Applications.ContentCollector.Content>().CountAsync();
     }
 
-    public async Task UpdateAndSaveContentAsync(DAL.Applications.ContentCollector.Content content)
+    public async Task UpdateAndSaveContentAsync(Content? content)
     {
         _databaseManager.Context.Update(content);
         await _databaseManager.Context.SaveChangesAsync();

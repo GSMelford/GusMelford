@@ -42,4 +42,11 @@ public sealed class ApplicationContext : DbContext
             $"Username={_databaseSettings.Username};" +
             $"Password={_databaseSettings.Password}");
     }
+    
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<Content>()
+            .Property(x => x.Number)
+            .ValueGeneratedOnAdd();
+    }
 }

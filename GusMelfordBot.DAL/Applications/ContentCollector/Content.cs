@@ -2,6 +2,7 @@ namespace GusMelfordBot.DAL.Applications.ContentCollector;
 
 public class Content : DatabaseEntity
 {
+    public int Number { get; set; }
     public Chat Chat { get; set; }
     public User User { get; set; }
     public string ContentProvider { get; set; }

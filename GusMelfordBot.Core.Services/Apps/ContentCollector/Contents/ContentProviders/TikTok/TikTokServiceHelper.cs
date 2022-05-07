@@ -1,4 +1,5 @@
 using System.Text.RegularExpressions;
+using GusMelfordBot.DAL.Applications.ContentCollector;
 using Telegram.Dto.UpdateModule;
 
 namespace GusMelfordBot.Core.Services.Apps.ContentCollector.Contents.ContentProviders.TikTok;
@@ -15,7 +16,7 @@ public static class TikTokServiceHelper
     };
     
     public static string GetEditedMessage(
-        DAL.Applications.ContentCollector.Content tikTokContent, 
+        Content? tikTokContent, 
         int count, 
         string accompanyingCommentary)
     {

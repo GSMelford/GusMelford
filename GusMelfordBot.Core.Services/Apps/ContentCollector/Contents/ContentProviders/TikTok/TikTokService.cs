@@ -46,8 +46,9 @@ public class TikTokService : ITikTokService
             {
                 return;
             }
-            
-            PullAndUpdateContent(await PreparingAndSaveContent(message, sentTikTokLink), message.Chat.Id);
+
+            ;
+            PullAndUpdateContent((await PreparingAndSaveContent(message, sentTikTokLink)).Id, message.Chat.Id);
             await _telegramHelper.DeleteMessageFromTelegram(message.Chat.Id, message.MessageId);
             await _telegramHelper.SendMessageToTelegram(
                 $" 👍 Content has been saved!\n{sentTikTokLink}",
@@ -63,8 +64,17 @@ public class TikTokService : ITikTokService
         }
     }
 
-    public async void PullAndUpdateContent(Content content, long chatId)
+    public async void PullAndUpdateContent(Guid contentId, long chatId)
     {
+        _logger.LogInformation("PullAndUpdateContent started. " +
+                               "ContentId: {ContentId} ChatId: {ChatId}", contentId, chatId);
+        
+        Content? content = _tikTokRepository.FirstOrDefault<Content>(x => x.Id == contentId);
+        if (content is null)
+        {
+            return;
+        }
+
         if (string.IsNullOrEmpty(content.RefererLink))
         {
             content.RefererLink = await GetRefererLink(content.SentLink);
@@ -144,7 +154,7 @@ public class TikTokService : ITikTokService
     private static async Task<string> GetRefererLink(string? sentLink)
     {
         RestClient restClient = new RestClient();
-        RestRequest restRequest = new RestRequest(sentLink) { Timeout = -1 };
+        RestRequest restRequest = new RestRequest(sentLink) { Timeout = 10000 };
         RestResponse restResponse = await restClient.ExecuteAsync(restRequest);
         
         Uri? uri = restResponse.ResponseUri;

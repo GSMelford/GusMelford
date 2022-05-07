@@ -33,7 +33,9 @@ public class TikTokDownloaderService : ITikTokDownloaderService
         {
             JToken videoInformation = await GetVideoInformation(content);
             string? originalLink = GetOriginalLink(videoInformation);
-
+            _logger.LogInformation("Got the original link " +
+                                   "{OriginalLink}. ContentId: {ContentId}", originalLink, content.Id);
+            
             content.Description = GetDescription(videoInformation);
             
             if (string.IsNullOrEmpty(originalLink))
