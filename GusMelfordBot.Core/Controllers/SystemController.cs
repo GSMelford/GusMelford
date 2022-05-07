@@ -12,8 +12,7 @@ public class SystemController : Controller
     private readonly ISystemService _systemService;
     private readonly CommonSettings _commonSettings;
     
-    public SystemController(
-        ISystemService systemService, CommonSettings commonSettings)
+    public SystemController(ISystemService systemService, CommonSettings commonSettings)
     {
         _systemService = systemService;
         _commonSettings = commonSettings;
