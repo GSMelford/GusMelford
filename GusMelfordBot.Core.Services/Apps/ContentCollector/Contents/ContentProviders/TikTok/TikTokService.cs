@@ -45,12 +45,14 @@ public class TikTokService : ITikTokService
             {
                 return;
             }
-            
-            await PullAndUpdateContentAsync((await PreparingAndSaveContent(message, sentTikTokLink)).Id, message.Chat.Id);
+
+            Content content = await PreparingAndSaveContent(message, sentTikTokLink);
             await _telegramHelper.DeleteMessageFromTelegram(message.Chat.Id, message.MessageId);
             await _telegramHelper.SendMessageToTelegram(
                 $" 👍 Content has been saved!\n{sentTikTokLink}",
                 message.Chat.Id);
+            
+            await PullAndUpdateContentAsync(content.Id, message.Chat.Id);
         }
         catch (global::System.Exception e)
         {
@@ -62,12 +64,7 @@ public class TikTokService : ITikTokService
         }
     }
 
-    public async Task PullAndUpdateContentAsync(Guid contentId, long chatId)
-    {
-        await PullAndUpdateContentHandle(contentId, chatId);
-    }
-
-    private async Task PullAndUpdateContentHandle(Guid contentId, long chatId)
+    public async Task<bool> PullAndUpdateContentAsync(Guid contentId, long chatId)
     {
         _logger.LogInformation("PullAndUpdateContent started. " +
                                "ContentId: {ContentId} ChatId: {ChatId}", contentId, chatId);
@@ -75,7 +72,7 @@ public class TikTokService : ITikTokService
         Content? content = _tikTokRepository.FirstOrDefault<Content>(x => x.Id == contentId);
         if (content is null)
         {
-            return;
+            return false;
         }
 
         if (await _tikTokDownloaderService.TryGetAndSaveRefererLink(content))
@@ -84,7 +81,7 @@ public class TikTokService : ITikTokService
         }
         else
         {
-            return;
+            return false;
         }
         
         if (!content.IsSaved)
@@ -104,10 +101,12 @@ public class TikTokService : ITikTokService
                 
                 _logger.LogInformation("Content is fully processed. " +
                                        "Content: {RefererLink} ContentId: {ContentId}", content.RefererLink, content.Id);
+                await _tikTokRepository.UpdateAndSaveContentAsync(content);
+                return true;
             }
-
-            await _tikTokRepository.UpdateAndSaveContentAsync(content);
+            return false;
         }
+        return true;
     }
     
     private async Task<Content> PreparingAndSaveContent(Message message, string? sentTikTokLink)

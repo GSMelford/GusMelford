@@ -8,7 +8,7 @@ namespace GusMelfordBot.Core.Services.Modules;
 
 public class RefreshContent : IHostedService, IDisposable
 {
-    private int _executionCount = 0;
+    private int _executionCount;
     private readonly ILogger<RefreshContent> _logger;
     private Timer _timer = null!;
     private readonly IContentRepository _contentRepository;
@@ -28,7 +28,7 @@ public class RefreshContent : IHostedService, IDisposable
     {
         _logger.LogInformation("RefreshContent Hosted Service running");
         
-        _timer = new Timer(Refresh, null, TimeSpan.Zero, TimeSpan.FromMinutes(5));
+        _timer = new Timer(Refresh, null, TimeSpan.Zero, TimeSpan.FromMinutes(15));
         
         return Task.CompletedTask;
     }
@@ -37,19 +37,28 @@ public class RefreshContent : IHostedService, IDisposable
     {
         var count = Interlocked.Increment(ref _executionCount);
 
-        _logger.LogInformation("Timed Hosted Service is working. Count: {Count}", count);
+        _logger.LogInformation("RefreshContent Hosted Service is working. Count: {Count}", count);
         
         List<Content> contents = _contentRepository.GetUnfinishedContents().ToList();
+        int counter = 0;
         foreach (var content in contents)
         {
             switch (content.ContentProvider)
             {
                 case nameof(ContentProvider.TikTok):
-                    await _tikTokService.PullAndUpdateContentAsync(content.Id, content.Chat.ChatId);
+                    bool isUpdated = await _tikTokService.PullAndUpdateContentAsync(content.Id, content.Chat.ChatId);
+                    if (isUpdated)
+                    {
+                        counter++;
+                    }
+                    
                     await Task.Delay(2000);
                     break;
             }
         }
+        
+        _logger.LogInformation("RefreshContent Hosted updated. " +
+                               "For update: {Count For update}, updated {Updated Count}", contents.Count, counter);
     }
     
     public Task StopAsync(CancellationToken cancellationToken)

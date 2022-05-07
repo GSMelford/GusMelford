@@ -3,6 +3,7 @@ using GusMelfordBot.Core.Domain.Apps.ContentCollector.ContentDownload;
 using GusMelfordBot.Core.Domain.Apps.ContentDownload.TikTok;
 using GusMelfordBot.Core.Domain.System;
 using GusMelfordBot.Core.Exception;
+using GusMelfordBot.DAL.Applications.ContentCollector;
 using Microsoft.Extensions.Logging;
 
 namespace GusMelfordBot.Core.Services.Apps.ContentCollector.ContentDownload;
@@ -29,7 +30,7 @@ public class ContentDownloadService : IContentDownloadService
     public async Task<MemoryStream?> GetFileStreamContent(Guid contentId)
     {
         _logger.LogInformation("Content Request id {Id}", contentId);
-        DAL.Applications.ContentCollector.Content? content = await _contentDownloadRepository.GetContent(contentId);
+        Content? content = await _contentDownloadRepository.GetContent(contentId);
 
         if (content is null)
         {
