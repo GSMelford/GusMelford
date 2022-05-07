@@ -58,7 +58,7 @@ public class RefreshContent : IHostedService, IDisposable
         }
         
         _logger.LogInformation("RefreshContent Hosted updated. " +
-                               "For update: {Count For update}, updated {Updated Count}", contents.Count, counter);
+                               "For update: {CountForUpdate}, updated {UpdatedCount}", contents.Count, counter);
     }
     
     public Task StopAsync(CancellationToken cancellationToken)
