@@ -34,6 +34,15 @@ public class TikTokRepository : ITikTokRepository
             .FirstOrDefaultAsync(x => x.TelegramUserId == telegramUserId);
     }
 
+    public async Task<Content?> GetContentAsync(Guid contentId)
+    {
+        return await _databaseManager.Context
+            .Set<Content>()
+            .Include(x=>x.User)
+            .Include(x=>x.Chat)
+            .FirstOrDefaultAsync(x => x.Id == contentId);
+    }
+
     public async Task<Content?> GetContentAsync(string refererLink)
     {
         return await _databaseManager.Context

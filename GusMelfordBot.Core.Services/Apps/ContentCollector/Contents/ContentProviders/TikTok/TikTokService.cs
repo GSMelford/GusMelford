@@ -68,11 +68,12 @@ public class TikTokService : ITikTokService
     }
 
     public async Task<bool> PullAndUpdateContentAsync(Guid contentId, long chatId)
-    {
+    {//TODO Пересмотреть
         _logger.LogInformation("PullAndUpdateContent started. " +
                                "ContentId: {ContentId} ChatId: {ChatId}", contentId, chatId);
+
+        Content? content = await _tikTokRepository.GetContentAsync(contentId);
         
-        Content? content = _tikTokRepository.FirstOrDefault<Content>(x => x.Id == contentId);
         if (content is null)
         {
             return false;
@@ -91,6 +92,13 @@ public class TikTokService : ITikTokService
         {
             content.Name = $"{GetUserName(content.RefererLink)}-{GetVideoId(content.RefererLink)}";
             byte[]? array = await _tikTokDownloaderService.DownloadTikTokVideo(content);
+
+            if (!content.IsValid)
+            {
+                await _tikTokRepository.UpdateAndSaveContentAsync(content);
+                return true;
+            }
+            
             if (array is not null)
             {
                 content.IsSaved = await _ftpServerService.UploadFile(
@@ -107,6 +115,7 @@ public class TikTokService : ITikTokService
                 await _tikTokRepository.UpdateAndSaveContentAsync(content);
                 return true;
             }
+            
             return false;
         }
         return true;

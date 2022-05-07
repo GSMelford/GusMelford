@@ -44,6 +44,7 @@ public class ContentRepository : IContentRepository
         return _databaseManager.Context.Set<Content>()
             .Include(x=>x.Chat)
             .Include(x => x.User)
+            .Include(x=>x.IsValid)
             .Where(x => string.IsNullOrEmpty(x.RefererLink) || !x.IsSaved);
     }
 
