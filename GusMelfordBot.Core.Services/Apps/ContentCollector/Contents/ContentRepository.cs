@@ -47,7 +47,7 @@ public class ContentRepository : IContentRepository
             .Where(x => string.IsNullOrEmpty(x.RefererLink) || !x.IsSaved);
     }
 
-    public IEnumerable<ContentInfo> GetContentList(Filter filter)
+    public IEnumerable<ContentInfoDomain> GetContentList(Filter filter)
     {
         IQueryable<Content> query = _databaseManager.Context
             .Set<Content>()

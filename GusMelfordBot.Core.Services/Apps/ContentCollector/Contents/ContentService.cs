@@ -21,7 +21,7 @@ public class ContentService : IContentService
         _tikTokService = tikTokService;
     }
 
-    public List<ContentInfo> BuildContentInfoList(Filter filter)
+    public List<ContentInfoDomain> BuildContentInfoList(Filter filter)
     {
         _logger.LogInformation("Request for content. Chat Id: {ChatId}", filter.ChatId);
         return _contentRepository.GetContentList(filter).ToList();

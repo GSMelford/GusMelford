@@ -1,3 +1,4 @@
+using System.Text.RegularExpressions;
 using GusMelfordBot.Core.Domain.Apps.ContentDownload.TikTok;
 using GusMelfordBot.Core.Domain.Requests;
 using GusMelfordBot.Core.Extensions;
@@ -66,9 +67,16 @@ public class TikTokDownloaderService : ITikTokDownloaderService
         return videoInformation["itemInfo"]?["itemStruct"]?["video"]?["downloadAddr"]?.ToString();
     }
         
-    private static string? GetDescription(JToken videoInformation)
+    private static string GetDescription(JToken videoInformation)
     {
-        return videoInformation["seoProps"]?["metaParams"]?["description"]?.ToString();
+        string? description = videoInformation["seoProps"]?["metaParams"]?["description"]?.ToString();
+        if (!string.IsNullOrEmpty(description))
+        {
+            return new Regex("\\S* Likes, \\S* Comments. TikTok video from \\D*: \"(\\D*)\"")
+                .Match(description).Groups[1].Value;
+        }
+        
+        return string.Empty;
     }
         
     private async Task<JToken> GetVideoInformation(DAL.Applications.ContentCollector.Content content)

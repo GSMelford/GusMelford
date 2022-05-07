@@ -116,6 +116,8 @@ function updateElementVideoInfo(){
     let content = contents[cursor];
     div.appendChild(createP(content["id"]));
     div.appendChild(createP(content["senderName"]));
+    div.appendChild(createP(content["description"]));
+    div.appendChild(createA(content["refererLink"]));
     updatePAccompanyingCommentary(createP(content["accompanyingCommentary"]), divAccompanyingCommentary);
     
     let infoContainer = document.getElementById("info");
@@ -126,6 +128,13 @@ function createP(innerText){
     let p = document.createElement("p");
     p.innerText = innerText;
     return p;
+}
+
+function createA(innerText){
+    let a = document.createElement("a");
+    a.innerText = innerText;
+    a.href = innerText;
+    return a;
 }
 
 function updatePAccompanyingCommentary(p, divAccompanyingCommentary){
