@@ -34,8 +34,23 @@ public class ApplicationService : IApplicationService
                 break;
         }
 
-        await _commandService.ProcessCommand(message, applicationType);
+        if (!string.IsNullOrEmpty(applicationType))
+        {
+            await _commandService.ProcessCommand(message, applicationType);
+        }
+        
     }
 
-    public async void ProcessCallbackQuery(CallbackQuery callbackQuery) { }
+    public async void ProcessCallbackQuery(CallbackQuery callbackQuery)
+    {
+        await _applicationRepository.RegisterNewUserIfNotExist(callbackQuery.FromUser);
+
+        string applicationType = callbackQuery.Data.Split(";")[0];
+        switch (applicationType)
+        {
+            case App.ContentCollector:
+                _collectorService.ProcessCallbackQuery(callbackQuery);
+                break;
+        }
+    }
 }

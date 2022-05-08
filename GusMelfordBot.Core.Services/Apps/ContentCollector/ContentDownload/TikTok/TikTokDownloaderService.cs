@@ -33,10 +33,17 @@ public class TikTokDownloaderService : ITikTokDownloaderService
         try
         {
             JToken videoInformation = await GetVideoInformation(content);
+            if (videoInformation["statusCode"]?.ToString() == "10204")
+            {
+                content.IsValid = false;
+                return null;
+            }
+            
             string? originalLink = GetOriginalLink(videoInformation);
             if (string.IsNullOrEmpty(originalLink))
             {
-                content.IsValid = false;
+                _logger.LogWarning("The original link is not available at the moment." +
+                                   " Request token {Token}", videoInformation);
                 return null;
             }
             
