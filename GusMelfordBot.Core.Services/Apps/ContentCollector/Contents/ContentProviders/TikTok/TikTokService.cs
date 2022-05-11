@@ -41,7 +41,7 @@ public class TikTokService : ITikTokService
     {
         try
         {
-            string? sentTikTokLink = GetSentLink(message.Text);
+            string sentTikTokLink = GetSentLink(message.Text);
             if (string.IsNullOrEmpty(sentTikTokLink))
             {
                 return;
@@ -76,13 +76,9 @@ public class TikTokService : ITikTokService
             return false;
         }
 
-        if (await _tikTokDownloaderService.TryGetAndSaveRefererLink(content))
+        if (await ManageRefererLink(content))
         {
-            await _tikTokRepository.UpdateAndSaveContentAsync(content);
-        }
-        else
-        {
-            return false;
+            return true;
         }
 
         if (content.IsSaved)
@@ -105,6 +101,33 @@ public class TikTokService : ITikTokService
             return false;
         }
 
+        content = await SendAndSaveContent(content, array, chatId);
+        await _tikTokRepository.UpdateAndSaveContentAsync(content);
+        return true;
+    }
+
+    private async Task<bool> ManageRefererLink(Content content)
+    {
+        if (await _tikTokDownloaderService.TryGetAndSaveRefererLink(content))
+        {
+            Content? foundContent = await _tikTokRepository.GetContentAsync(content.RefererLink);
+            if (foundContent is not null)
+            {
+                await _telegramHelper.EditMessageFromTelegram(
+                    $"This content №{foundContent.Number} has already been posted by " +
+                    $"{foundContent.User.FirstName} {foundContent.User.LastName}\n" +
+                    $"{foundContent.RefererLink}", content.Chat.ChatId, content.MessageId.ToInt());
+                content.IsValid = false;
+            }
+            await _tikTokRepository.UpdateAndSaveContentAsync(content);
+            return true;
+        }
+        
+        return false;
+    }
+    
+    private async Task<Content> SendAndSaveContent(Content content, byte[] array, long chatId)
+    {
         content.IsSaved = await _ftpServerService.UploadFile(
             $"Contents/{content.Name}.mp4", new MemoryStream(array));
         Message? newMessage = _telegramHelper.GetMessageResponse(await (await _gusMelfordBotService.SendVideoAsync(
@@ -120,11 +143,9 @@ public class TikTokService : ITikTokService
 
         await _telegramHelper.DeleteMessageFromTelegram(content.Chat.ChatId, content.MessageId.ToInt());
         content.MessageId = newMessage?.MessageId.ToString();
-        await _tikTokRepository.UpdateAndSaveContentAsync(content);
-
-        return true;
+        return content;
     }
-
+    
     private async Task<Content> PreparingAndSaveContent(Message message, string? sentTikTokLink)
     {
         Content? content = _tikTokRepository.FirstOrDefault<Content>(x => x.SentLink == sentTikTokLink);
@@ -161,19 +182,17 @@ public class TikTokService : ITikTokService
         };
     }
 
-    private static string? GetSentLink(string messageText)
+    private static string GetSentLink(string messageText)
     {
-        string? temp = new Regex(@"https://\w*.tiktok.com/\S{9}/")
+        string? uri = new Regex(@"https://\w*.tiktok.com/\S*")
             .Matches(messageText)
             .FirstOrDefault()?.Value;
 
-        if (string.IsNullOrEmpty(temp))
+        if (string.IsNullOrEmpty(uri))
         {
-            temp = new Regex(@"https://\w*.tiktok.com/\S*")
-                .Matches(messageText)
-                .FirstOrDefault()?.Value;
+            throw new global::System.Exception($"There is no link in this post. {nameof(ContentProvider.TikTok)}");
         }
-        
-        return temp;
+
+        return uri.Replace(new Uri(uri).Query, "");
     }
 }
