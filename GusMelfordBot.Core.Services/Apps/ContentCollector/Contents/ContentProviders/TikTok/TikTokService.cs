@@ -41,7 +41,7 @@ public class TikTokService : ITikTokService
     {
         try
         {
-            string sentTikTokLink = GetSentLink(message.Text);
+            string? sentTikTokLink = GetSentLink(message.Text);
             if (string.IsNullOrEmpty(sentTikTokLink))
             {
                 return;
@@ -186,17 +186,10 @@ public class TikTokService : ITikTokService
         };
     }
 
-    private static string GetSentLink(string messageText)
+    private static string? GetSentLink(string messageText)
     {
-        string? uri = new Regex(@"https://\w*.tiktok.com/\S*")
+        return new Regex(@"https://\w*.tiktok.com/\S*")
             .Matches(messageText)
             .FirstOrDefault()?.Value;
-
-        if (string.IsNullOrEmpty(uri))
-        {
-            throw new global::System.Exception($"There is no link in this post. {nameof(ContentProvider.TikTok)}");
-        }
-
-        return uri.Replace(new Uri(uri).Query, "");
     }
 }
