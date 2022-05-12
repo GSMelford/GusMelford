@@ -76,7 +76,12 @@ public class TikTokService : ITikTokService
             return false;
         }
 
-        if (await ManageRefererLink(content))
+        if (!await _tikTokDownloaderService.TryGetAndSaveRefererLink(content))
+        {
+            return false;
+        }
+        
+        if (await CheckDuplicate(content))
         {
             return true;
         }
@@ -86,16 +91,15 @@ public class TikTokService : ITikTokService
             return true;
         }
 
-        content.Name = $"{GetUserName(content.RefererLink)}-{GetVideoId(content.RefererLink)}";
-        byte[]? array = await _tikTokDownloaderService.DownloadTikTokVideo(content);
-
         if (!content.IsValid)
         {
             await _tikTokRepository.UpdateAndSaveContentAsync(content);
             _logger.LogInformation("Content {ContentId} no longer exists", content.Id);
             return true;
         }
-
+        
+        content.Name = $"{GetUserName(content.RefererLink)}-{GetVideoId(content.RefererLink)}";
+        byte[]? array = await _tikTokDownloaderService.DownloadTikTokVideo(content);
         if (array is null)
         {
             return false;
@@ -106,7 +110,7 @@ public class TikTokService : ITikTokService
         return true;
     }
 
-    private async Task<bool> ManageRefererLink(Content content)
+    private async Task<bool> CheckDuplicate(Content content)
     {
         if (await _tikTokDownloaderService.TryGetAndSaveRefererLink(content))
         {
@@ -118,9 +122,9 @@ public class TikTokService : ITikTokService
                     $"{foundContent.User.FirstName} {foundContent.User.LastName}\n" +
                     $"{foundContent.RefererLink}", content.Chat.ChatId, content.MessageId.ToInt());
                 content.IsValid = false;
+                await _tikTokRepository.UpdateAndSaveContentAsync(content);
+                return true;
             }
-            await _tikTokRepository.UpdateAndSaveContentAsync(content);
-            return true;
         }
         
         return false;
