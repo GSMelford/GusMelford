@@ -17,6 +17,7 @@ public class LongPoolingUpdateService : IHostedService, IDisposable
     private const int TIMEOUT = 3000;
     private int _updateId;
     private Timer _timer = null!;
+    private bool _isRun;
     
     public LongPoolingUpdateService(
         ILogger<LongPoolingUpdateService> logger, 
@@ -32,15 +33,21 @@ public class LongPoolingUpdateService : IHostedService, IDisposable
     {
         _logger.LogInformation("LongPoolingUpdateService started");
         
-        _timer = new Timer(CheckUpdates, null, TimeSpan.Zero, TimeSpan.FromMinutes(1));
+        _timer = new Timer(CheckUpdates, _isRun, TimeSpan.Zero, TimeSpan.FromSeconds(25));
         
         return Task.CompletedTask;
     }
 
     private void CheckUpdates(object? state)
     {
+        if ((bool)state!)
+        {
+            return;
+        }
+        
         try
         {
+            _isRun = true;
             List<Update> updates = _gusMelfordBotService.GetUpdates(new GetUpdatesParameters
             {
                 Limit = LIMIT,
@@ -55,10 +62,15 @@ public class LongPoolingUpdateService : IHostedService, IDisposable
 
             foreach (string json in updates.Select(JsonConvert.SerializeObject))
             {
-                _updateService.ProcessUpdate(json);
+                bool result = _updateService.ProcessUpdate(json).Result;
+                if (!result)
+                {
+                    _logger.LogWarning("Content not saved. Error in ProcessUpdate {Json}", json);
+                }
             }
 
             _updateId = updates[^1].UpdateId + 1;
+            _isRun = false;
         }
         catch (global::System.Exception e)
         {

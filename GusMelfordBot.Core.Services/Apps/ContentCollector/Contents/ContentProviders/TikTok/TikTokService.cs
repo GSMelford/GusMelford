@@ -94,6 +94,9 @@ public class TikTokService : ITikTokService
             return true;
         }
 
+        content.Name = $"{GetUserName(content.RefererLink)}-{GetVideoId(content.RefererLink)}";
+        byte[]? array = await _tikTokDownloaderService.DownloadTikTokVideo(content);
+        
         if (!content.IsValid)
         {
             await _tikTokRepository.UpdateAndSaveContentAsync(content);
@@ -101,13 +104,11 @@ public class TikTokService : ITikTokService
             return true;
         }
         
-        content.Name = $"{GetUserName(content.RefererLink)}-{GetVideoId(content.RefererLink)}";
-        byte[]? array = await _tikTokDownloaderService.DownloadTikTokVideo(content);
         if (array is null)
         {
             return false;
         }
-
+        
         content = await SendAndSaveContent(content, array, chatId);
         await _tikTokRepository.UpdateAndSaveContentAsync(content);
         return true;

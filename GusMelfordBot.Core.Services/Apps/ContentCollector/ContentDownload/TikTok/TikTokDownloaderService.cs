@@ -33,10 +33,14 @@ public class TikTokDownloaderService : ITikTokDownloaderService
         try
         {
             JToken videoInformation = await GetVideoInformation(content);
-            if (videoInformation["statusCode"]?.ToString() == "10204")
+            if (int.TryParse(videoInformation["statusCode"]?.ToString(), out int code))
             {
-                content.IsValid = false;
-                return null;
+                if (code is > 10000 and < 11000)
+                {
+                    content.IsValid = false;
+                    _logger.LogInformation("When receiving a link to content, received a code {Code}", code);
+                    return null; 
+                }
             }
             
             string? originalLink = GetOriginalLink(videoInformation);

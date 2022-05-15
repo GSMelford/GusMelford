@@ -49,6 +49,7 @@ public class GusMelfordBotWebApplication
         app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
         logger.Information("GusMelfordBot WebApplication launched. Time: {Time}", DateTime.UtcNow);
         
+        Task.Run(() => Console.WriteLine("Hello Task!"));
         app.Run();
     }
     
