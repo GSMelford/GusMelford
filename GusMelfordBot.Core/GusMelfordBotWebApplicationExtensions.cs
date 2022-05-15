@@ -4,6 +4,7 @@ using GusMelfordBot.Core.Domain.Apps.ContentCollector;
 using GusMelfordBot.Core.Domain.Apps.ContentCollector.Contents;
 using GusMelfordBot.Core.Domain.Apps.ContentCollector.Contents.ContentProviders.TikTok;
 using GusMelfordBot.Core.Domain.Apps.ContentCollector.ContentDownload;
+using GusMelfordBot.Core.Domain.Apps.ContentCollector.Contents.ContentProviders.Telegram;
 using GusMelfordBot.Core.Domain.Apps.ContentDownload.TikTok;
 using GusMelfordBot.Core.Domain.Commands;
 using GusMelfordBot.Core.Domain.Requests;
@@ -17,6 +18,7 @@ using GusMelfordBot.Core.Services.Apps.ContentCollector.Contents;
 using GusMelfordBot.Core.Services.Apps.ContentCollector.Contents.ContentProviders.TikTok;
 using GusMelfordBot.Core.Services.Apps.ContentCollector.ContentDownload;
 using GusMelfordBot.Core.Services.Apps.ContentCollector.ContentDownload.TikTok;
+using GusMelfordBot.Core.Services.Apps.ContentCollector.Contents.ContentProviders.Telegram;
 using GusMelfordBot.Core.Services.Commands;
 using GusMelfordBot.Core.Services.GusMelfordBot;
 using GusMelfordBot.Core.Services.Modules;
@@ -91,10 +93,12 @@ public static class GusMelfordBotWebApplicationExtensions
                 commonSettings.FtpServerSettings?.Password ?? string.Empty,
                 provider.GetRequiredService<ILogger<FtpServerService>>()));
         
-        services.AddHostedService<RefreshContent>();
+        services.AddHostedService<RefreshContentService>();
+        services.AddHostedService<LongPoolingUpdateService>();
         services.AddTransient<IDatabaseManager>(
             provider => new DatabaseManager(commonSettings.DatabaseSettings, 
                 provider.GetRequiredService<ILogger<ApplicationContext>>()));
+        services.AddTransient<ITelegramService, TelegramService>();
     }
     
     public static Logger AddGraylog(this WebApplicationBuilder builder)

@@ -5,5 +5,5 @@ namespace GusMelfordBot.Core.Domain.Apps.ContentCollector.Contents.ContentProvid
 public interface ITikTokService
 {
     Task ProcessMessageAsync(Message message);
-    Task<bool> PullAndUpdateContentAsync(Guid contentId, long chatId);
+    Task<bool> PullAndUpdateContentAsync(Guid contentId, long chatId, bool retry = false);
 }

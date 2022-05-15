@@ -6,16 +6,16 @@ using Microsoft.Extensions.Logging;
 
 namespace GusMelfordBot.Core.Services.Modules;
 
-public class RefreshContent : IHostedService, IDisposable
+public class RefreshContentService : IHostedService, IDisposable
 {
     private int _executionCount;
-    private readonly ILogger<RefreshContent> _logger;
+    private readonly ILogger<RefreshContentService> _logger;
     private Timer _timer = null!;
     private readonly IContentRepository _contentRepository;
     private readonly ITikTokService _tikTokService;
     
-    public RefreshContent(
-        ILogger<RefreshContent> logger, 
+    public RefreshContentService(
+        ILogger<RefreshContentService> logger, 
         IContentRepository contentRepository, 
         ITikTokService tikTokService)
     {
@@ -46,7 +46,7 @@ public class RefreshContent : IHostedService, IDisposable
             switch (content.ContentProvider)
             {
                 case nameof(ContentProvider.TikTok):
-                    bool isUpdated = await _tikTokService.PullAndUpdateContentAsync(content.Id, content.Chat.ChatId);
+                    bool isUpdated = await _tikTokService.PullAndUpdateContentAsync(content.Id, content.Chat.ChatId, true);
                     if (isUpdated)
                     {
                         counter++;

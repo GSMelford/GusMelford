@@ -22,7 +22,7 @@ services:
       - $PORT:80
     environment:
       - CommonSettings__Name=GusMelfordBot
-      - CommonSettings__Version=1.6.3
+      - CommonSettings__Version=1.6.4
       - CommonSettings__TelegramBotSettings__Token=$GUSMELFORDBOT_TELEGRAM_TOKEN
       - CommonSettings__DatabaseSettings__Host=$GUSMELFORDBOT_HOST
       - CommonSettings__DatabaseSettings__Port=5432
@@ -35,13 +35,6 @@ services:
       - CommonSettings__FtpServerSettings__FtpUrl=$FTP_URL
       - CommonSettings__FtpServerSettings__UserName=$FTP_USER
       - CommonSettings__FtpServerSettings__Password=$FTP_PASSWORD
-
-  gusmelfordbot.core.addon:
-    image: gsmelford/gusmelfordbot.core.addon:latest
-    restart: always
-    environment:
-      - Token=$GUSMELFORDBOT_TELEGRAM_TOKEN
-      - UpdateUrl=http://$GUSMELFORDBOT_HOST:$PORT/update
 
 volumes:
   gusmelforddb:

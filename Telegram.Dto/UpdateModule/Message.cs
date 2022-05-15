@@ -36,5 +36,8 @@ namespace Telegram.Dto.UpdateModule
         public List<MessageEntity> Entities { get; set; }
         public List<PhotoSize> PhotoSizes { get; set; }
         public List<PhotoSize> NewChatPhoto { get; set; }
+        
+        [JsonProperty("photo")]
+        public List<Photo> Photos { get; set; }
     }
 }

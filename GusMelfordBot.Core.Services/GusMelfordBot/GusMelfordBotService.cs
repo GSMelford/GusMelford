@@ -1,8 +1,12 @@
 using System.Net;
 using Bot.Api.BotRequests.Interfaces;
 using GusMelfordBot.Core.Domain.Telegram;
+using GusMelfordBot.Core.Extensions;
 using Microsoft.Extensions.Logging;
+using Telegram.API.TelegramRequests.GetUpdates;
 using Telegram.Bot.Client;
+using Telegram.Dto.Response;
+using Telegram.Dto.UpdateModule;
 
 namespace GusMelfordBot.Core.Services.GusMelfordBot;
 
@@ -39,6 +43,23 @@ public class GusMelfordBotService : IGusMelfordBotService
         return await Retry(parameters, x => _telegramBot.EditMessageAsync(x));
     }
 
+    public Task<List<Update>> GetUpdates(IParameters getUpdatesParameters)
+    {
+        return _telegramBot.GetUpdates(getUpdatesParameters);
+    }
+
+    public async Task<FileResponse?> GetFile(IParameters parameters)
+    {
+        HttpResponseMessage httpResponseMessage = await _telegramBot.GetFileAsync(parameters);
+        return (await httpResponseMessage.Content.ReadAsStringAsync()).ToObject<FileResponse>();
+    }
+    
+    public async Task<byte[]> GetFileBytes(string telegramFilePath)
+    {
+        HttpResponseMessage httpResponseMessage = await _telegramBot.GetFileBytes(telegramFilePath);
+        return await httpResponseMessage.Content.ReadAsByteArrayAsync();
+    }
+    
     private async Task<HttpResponseMessage> Retry(
         IParameters parameters,
         Func<IParameters, Task<HttpResponseMessage>> telegramMethod)

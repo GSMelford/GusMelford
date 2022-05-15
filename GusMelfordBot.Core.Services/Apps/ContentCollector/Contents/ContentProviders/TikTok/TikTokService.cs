@@ -64,7 +64,7 @@ public class TikTokService : ITikTokService
         }
     }
 
-    public async Task<bool> PullAndUpdateContentAsync(Guid contentId, long chatId)
+    public async Task<bool> PullAndUpdateContentAsync(Guid contentId, long chatId, bool retry = false)
     {
         _logger.LogInformation("PullAndUpdateContent started. " +
                                "ContentId: {ContentId} ChatId: {ChatId}", contentId, chatId);
@@ -80,10 +80,13 @@ public class TikTokService : ITikTokService
         {
             return false;
         }
-        
-        if (await CheckDuplicate(content))
+
+        if (!retry)
         {
-            return true;
+            if (await CheckDuplicate(content))
+            {
+                return true;
+            }
         }
 
         if (content.IsSaved)
@@ -117,10 +120,10 @@ public class TikTokService : ITikTokService
             Content? foundContent = await _tikTokRepository.GetContentAsync(content.RefererLink);
             if (foundContent is not null)
             {
-                await _telegramHelper.EditMessageFromTelegram(
-                    $"This content №{foundContent.Number} has already been posted by " +
+                await _telegramHelper.SendMessageToTelegram(
+                    $"😎 This content №{foundContent.Number} has already been posted by " +
                     $"{foundContent.User.FirstName} {foundContent.User.LastName}\n" +
-                    $"{foundContent.RefererLink}", content.Chat.ChatId, content.MessageId.ToInt());
+                    $"{foundContent.RefererLink}", content.Chat.ChatId);
                 content.IsValid = false;
                 await _tikTokRepository.UpdateAndSaveContentAsync(content);
                 return true;
@@ -134,19 +137,24 @@ public class TikTokService : ITikTokService
     {
         content.IsSaved = await _ftpServerService.UploadFile(
             $"Contents/{content.Name}.mp4", new MemoryStream(array));
-        Message? newMessage = _telegramHelper.GetMessageResponse(await (await _gusMelfordBotService.SendVideoAsync(
-            new SendVideoParameters
-            {
-                Caption = GetEditedMessage(content, content.AccompanyingCommentary),
-                Video = new VideoFile(new MemoryStream(array), content.Name),
-                ChatId = chatId
-            })).Content.ReadAsStringAsync());
 
-        _logger.LogInformation("Content is fully processed. " +
-                               "Content: {RefererLink} ContentId: {ContentId}", content.RefererLink, content.Id);
+        if (content.IsSaved)
+        {
+            Message? newMessage = _telegramHelper.GetMessageResponse(await (await _gusMelfordBotService.SendVideoAsync(
+                new SendVideoParameters
+                {
+                    Caption = GetEditedMessage(content, content.AccompanyingCommentary),
+                    Video = new VideoFile(new MemoryStream(array), content.Name),
+                    ChatId = chatId
+                })).Content.ReadAsStringAsync());
 
-        await _telegramHelper.DeleteMessageFromTelegram(content.Chat.ChatId, content.MessageId.ToInt());
-        content.MessageId = newMessage?.MessageId.ToString();
+            _logger.LogInformation("Content is fully processed. " +
+                                   "Content: {RefererLink} ContentId: {ContentId}", content.RefererLink, content.Id);
+
+            await _telegramHelper.DeleteMessageFromTelegram(content.Chat.ChatId, content.MessageId.ToInt());
+            content.MessageId = newMessage?.MessageId.ToString();
+        }
+        
         return content;
     }
     

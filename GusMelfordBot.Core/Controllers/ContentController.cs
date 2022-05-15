@@ -29,7 +29,7 @@ public class ContentController : Controller
     }
     
     [HttpGet("setViewedVideo")]
-    public async Task<IActionResult> GetContentInfoList([FromQuery] string contentId)
+    public async Task<IActionResult> SetViewedVideo([FromQuery] string contentId)
     {
         await _contentService.SetViewedVideo(contentId.ToGuid());
         return Ok();

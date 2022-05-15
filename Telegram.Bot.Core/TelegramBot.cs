@@ -8,6 +8,8 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Telegram.API.TelegramRequests.DeleteMessage;
 using Telegram.API.TelegramRequests.EditMessage;
+using Telegram.API.TelegramRequests.GetFile;
+using Telegram.API.TelegramRequests.GetFileBytes;
 using Telegram.API.TelegramRequests.GetUpdates;
 using Telegram.API.TelegramRequests.SendMessage;
 using Telegram.API.TelegramRequests.SendVideo;
@@ -21,7 +23,7 @@ namespace Telegram.Bot.Client
         private readonly HttpClient _httpClient;
         private const string API_URL = "https://api.telegram.org/";
         private readonly string _botToken;
-        private string BaseUrl => $"{API_URL}bot{_botToken}/";
+        private string BotTokenPath => $"bot{_botToken}/";
 
         private readonly ILogger _logger;
         private readonly UpdateListener _updateListener;
@@ -44,22 +46,32 @@ namespace Telegram.Bot.Client
 
         public async Task<HttpResponseMessage> SendMessageAsync(IParameters parameters)
         {
-            return await DoRequestAsync(_httpClient, new SendMessageRequest(BaseUrl, parameters));
+            return await DoRequestAsync(_httpClient, new SendMessageRequest(API_URL + BotTokenPath, parameters));
         }
 
         public async Task<HttpResponseMessage> SendVideoAsync(IParameters parameters)
         {
-            return await DoRequestAsync(_httpClient, new SendVideoRequest(BaseUrl, parameters));
+            return await DoRequestAsync(_httpClient, new SendVideoRequest(API_URL + BotTokenPath, parameters));
         }
 
         public async Task<HttpResponseMessage> DeleteMessageAsync(IParameters parameters)
         {
-            return await DoRequestAsync(_httpClient, new DeleteMessageRequest(BaseUrl, parameters));
+            return await DoRequestAsync(_httpClient, new DeleteMessageRequest(API_URL + BotTokenPath, parameters));
         }
         
         public async Task<HttpResponseMessage> EditMessageAsync(IParameters parameters)
         {
-            return await DoRequestAsync(_httpClient, new EditMessageRequest(BaseUrl, parameters));
+            return await DoRequestAsync(_httpClient, new EditMessageRequest(API_URL + BotTokenPath, parameters));
+        }
+
+        public async Task<HttpResponseMessage> GetFileAsync(IParameters parameters)
+        {
+            return await DoRequestAsync(_httpClient, new GetFileRequest(API_URL + BotTokenPath, parameters));
+        }
+
+        public async Task<HttpResponseMessage> GetFileBytes(string telegramFilePath)
+        {
+            return await DoRequestAsync(_httpClient, new GetFileBytesRequest($"{API_URL}file/{BotTokenPath}", telegramFilePath));
         }
         
         public async void StartListenUpdateAsync(CancellationToken cancellationToken = default)
@@ -70,15 +82,15 @@ namespace Telegram.Bot.Client
         public async Task<List<Update>> GetUpdates(IParameters parameters)
         {
             HttpResponseMessage httpResponseMessage =
-                await DoRequestAsync(_httpClient, new GetUpdatesRequest(BaseUrl, parameters));
+                await DoRequestAsync(_httpClient, new GetUpdatesRequest(API_URL + BotTokenPath, parameters));
 
             string responseContent = 
                 Regex.Unescape(httpResponseMessage.Content.ReadAsStringAsync().Result);
             
-            Response response = 
-                JsonConvert.DeserializeObject<Response>(responseContent);
+            UpdateResponse updateResponse = 
+                JsonConvert.DeserializeObject<UpdateResponse>(responseContent);
 
-            return response?.Result ?? new List<Update>();
+            return updateResponse?.Result ?? new List<Update>();
         }
 
         private async Task<HttpResponseMessage> DoRequestAsync(HttpClient httpClient, IExecutable request)

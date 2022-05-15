@@ -13,5 +13,6 @@ namespace Telegram.Bot.Client
         Task<HttpResponseMessage> DeleteMessageAsync(IParameters parameters);
         Task<HttpResponseMessage> EditMessageAsync(IParameters parameters);
         Task<List<Update>> GetUpdates(IParameters parameters);
+        Task<HttpResponseMessage> GetFileBytes(string telegramFilePath);
     }
 }

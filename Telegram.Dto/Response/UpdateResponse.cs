@@ -4,7 +4,7 @@ using Telegram.Dto.UpdateModule;
 namespace Telegram.Dto.Response
 {
     using Newtonsoft.Json;
-    public class Response
+    public class UpdateResponse
     {
         [JsonProperty("ok")] 
         public string Ok { get; set; }
