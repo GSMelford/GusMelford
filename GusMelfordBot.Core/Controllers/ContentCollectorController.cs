@@ -16,8 +16,7 @@ public class ContentCollectorController : Controller
     }
     
     [HttpGet("sendInformationPanel")]
-    public async Task<JsonResult> SendInformationPanel(
-        [FromQuery] string contentId)
+    public async Task<JsonResult> SendInformationPanel([FromQuery] string contentId)
     {
         return Json(await _contentCollectorService.SendInformationPanelAsync(contentId.ToGuid()));
     }

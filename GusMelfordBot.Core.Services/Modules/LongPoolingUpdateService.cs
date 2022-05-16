@@ -20,13 +20,13 @@ public class LongPoolingUpdateService : IHostedService, IDisposable
     private bool _isRun;
     
     public LongPoolingUpdateService(
-        ILogger<LongPoolingUpdateService> logger, 
-        IUpdateService updateService, 
-        IGusMelfordBotService gusMelfordBotService)
+        ILogger<LongPoolingUpdateService> logger,
+        IGusMelfordBotService gusMelfordBotService, 
+        IUpdateService updateService)
     {
         _logger = logger;
-        _updateService = updateService;
         _gusMelfordBotService = gusMelfordBotService;
+        _updateService = updateService;
     }
     
     public Task StartAsync(CancellationToken cancellationToken)
