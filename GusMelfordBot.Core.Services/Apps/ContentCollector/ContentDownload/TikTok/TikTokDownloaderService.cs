@@ -52,6 +52,7 @@ public class TikTokDownloaderService : ITikTokDownloaderService
             }
             
             content.Description = GetDescription(videoInformation);
+            
             Request request = new Request
             {
                 HttpMethod = HttpMethod.Get,
