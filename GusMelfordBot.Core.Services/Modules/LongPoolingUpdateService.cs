@@ -33,7 +33,7 @@ public class LongPoolingUpdateService : IHostedService, IDisposable
     {
         _logger.LogInformation("LongPoolingUpdateService started");
         
-        _timer = new Timer(CheckUpdates, _isRun, TimeSpan.Zero, TimeSpan.FromSeconds(25));
+        //_timer = new Timer(CheckUpdates, _isRun, TimeSpan.Zero, TimeSpan.FromSeconds(25));
         
         return Task.CompletedTask;
     }
