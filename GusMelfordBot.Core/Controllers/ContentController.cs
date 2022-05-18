@@ -1,5 +1,6 @@
 using GusMelfordBot.Core.Domain.Apps.ContentCollector.Contents;
 using GusMelfordBot.Core.Domain.Apps.ContentCollector.ContentDownload;
+using GusMelfordBot.Core.Domain.System;
 using GusMelfordBot.Core.Dto.Filter;
 using GusMelfordBot.Core.Extensions;
 using Microsoft.AspNetCore.Mvc;
@@ -12,14 +13,17 @@ public class ContentController : Controller
 {
     private readonly IContentService _contentService;
     private readonly IContentDownloadService _contentDownloadService;
+    private readonly IDataLakeService _dataLakeService;
     private const string CONTENT_TYPE = "video/mp4";
     
     public ContentController(
         IContentService contentService, 
-        IContentDownloadService contentDownloadService)
+        IContentDownloadService contentDownloadService, 
+        IDataLakeService dataLakeService)
     {
         _contentService = contentService;
         _contentDownloadService = contentDownloadService;
+        _dataLakeService = dataLakeService;
     }
     
     [HttpGet("info")]
@@ -32,13 +36,6 @@ public class ContentController : Controller
     public async Task<IActionResult> SetViewedVideo([FromQuery] string contentId)
     {
         await _contentService.SetViewedVideo(contentId.ToGuid());
-        return Ok();
-    }
-    
-    [HttpGet("cache")]
-    public async Task<IActionResult> CacheContent()
-    {
-        await _contentService.Cache();
         return Ok();
     }
     
@@ -60,5 +57,12 @@ public class ContentController : Controller
         HttpContext.Response.Headers.Add("Expires", "0");
         
         return fileStreamResult;
+    }
+    
+    [HttpGet("archive")]
+    public FileResult Archive()
+    {
+        string zipName = $"{DateTime.UtcNow:dd.MM.yyyy.hh.mm.ss}.zip";
+        return File( _dataLakeService.Archive("contents", zipName), "application/zip", zipName);
     }
 }

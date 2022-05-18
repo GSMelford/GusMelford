@@ -1,6 +1,6 @@
 using GusMelfordBot.Core.Middlewares;
 using GusMelfordBot.Core.Settings;
-using ILogger = Serilog.ILogger;
+using Serilog;
 
 namespace GusMelfordBot.Core;
 
@@ -10,11 +10,11 @@ public class GusMelfordBotWebApplication
     {
         WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
         
-        CommonSettings commonSettings = new CommonSettings();
-        builder.Configuration.Bind(nameof(CommonSettings), commonSettings);
-        builder.Services.AddServices(commonSettings);
-        ILogger logger = builder.AddGraylog();
+        AppSettings appSettings = new AppSettings();
+        builder.Configuration.Bind(nameof(AppSettings), appSettings);
+        builder.Services.AddServices(appSettings);
         
+        Log.Logger = builder.AddGraylog(appSettings);
         AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
         
         WebApplication app = builder.Build();
@@ -45,9 +45,9 @@ public class GusMelfordBotWebApplication
         {
             endpoints.MapGet("/", SetStartPage);
         });
-
+        
         app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
-        logger.Information("GusMelfordBot WebApplication launched. Time: {Time}", DateTime.UtcNow);
+        app.Logger.LogInformation("GusMelfordBot WebApplication launched. Time: {Time}", DateTime.UtcNow);
         
         Task.Run(() => Console.WriteLine("Hello Task!"));
         app.Run();

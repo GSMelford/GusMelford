@@ -1,7 +1,6 @@
 using GusMelfordBot.Core.Domain.Apps.ContentCollector.Contents;
 using GusMelfordBot.Core.Domain.Apps.ContentDownload.TikTok;
 using GusMelfordBot.Core.Domain.System;
-using GusMelfordBot.Core.Services.Apps.ContentCollector.Contents.ContentProviders.TikTok;
 using GusMelfordBot.DAL;
 using GusMelfordBot.DAL.Applications.ContentCollector;
 using GusMelfordBot.Database.Interfaces;
@@ -98,39 +97,5 @@ public class ContentRepository : IContentRepository
         content.IsViewed = true;
         _databaseManager.Context.Update(content);
         await _databaseManager.Context.SaveChangesAsync();
-    }
-
-    public async Task Cache()
-    {
-        var contents = _databaseManager.Context
-            .Set<Content>()
-            .Where(x => x.IsSaved == false).ToList();
-        
-        foreach (var content in contents)
-        {
-            switch (content.ContentProvider)
-            {
-                case nameof(ContentProvider.TikTok):
-                {
-                    byte[]? contentByte = await _tikTokDownloaderService.DownloadTikTokVideo(content);
-                    if (contentByte != null)
-                    {
-                        MemoryStream memoryStream = new MemoryStream(contentByte);
-                        string userName = TikTokServiceHelper.GetUserName(content.RefererLink);
-                        string videoId = TikTokServiceHelper.GetVideoId(content.RefererLink);
-                        string videoName = $"{userName}-{videoId}";
-                
-                        content.Name = videoName;
-                        
-                        content.IsSaved = await _ftpServerService
-                            .UploadFile($"Contents/{content.Name}.mp4", memoryStream);
-                        await Task.Delay(1000);
-                    }
-                    break;
-                }
-            }
-
-            await _databaseManager.Context.SaveChangesAsync();
-        }
     }
 }

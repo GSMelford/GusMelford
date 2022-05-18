@@ -12,6 +12,7 @@ services:
       - PGDATA=/var/lib/postgresql/data/pgdata
     volumes:
       - gusmelforddb:/var/lib/postgresql/data
+      - datalake:/datalake
 
   gusmelfordbot.core:
     image: $DOCKER_REPO/$CONTAINER_NAME:$DOCKER_CONTAINER_TAG
@@ -21,20 +22,25 @@ services:
     ports:
       - $PORT:80
     environment:
-      - CommonSettings__Name=GusMelfordBot
-      - CommonSettings__Version=1.6.4
-      - CommonSettings__TelegramBotSettings__Token=$GUSMELFORDBOT_TELEGRAM_TOKEN
-      - CommonSettings__DatabaseSettings__Host=$GUSMELFORDBOT_HOST
-      - CommonSettings__DatabaseSettings__Port=5432
-      - CommonSettings__DatabaseSettings__Database=dev.gusmelfordbot.db
-      - CommonSettings__DatabaseSettings__Username=$POSTGRES_USER
-      - CommonSettings__DatabaseSettings__Password=$POSTGRES_PASSWORD
-      - CommonSettings__GrayLogSettings__Host=$GUSMELFORDBOT_HOST
-      - CommonSettings__GrayLogSettings__Port=12201
-      - CommonSettings__GrayLogSettings__TransportType=Udp
-      - CommonSettings__FtpServerSettings__FtpUrl=$FTP_URL
-      - CommonSettings__FtpServerSettings__UserName=$FTP_USER
-      - CommonSettings__FtpServerSettings__Password=$FTP_PASSWORD
+      - AppSettings:Name=GusMelfordBot
+      - AppSettings:Version=1.6.5
+      - AppSettings:TelegramBotSettings:Token=$GUSMELFORDBOT_TELEGRAM_TOKEN
+      - AppSettings:DatabaseSettings:Host=$GUSMELFORDBOT_HOST
+      - AppSettings:DatabaseSettings:Port=5432
+      - AppSettings:DatabaseSettings:Database=dev.gusmelfordbot.db
+      - AppSettings:DatabaseSettings:Username=$POSTGRES_USER
+      - AppSettings:DatabaseSettings:Password=$POSTGRES_PASSWORD
+      - AppSettings:GrayLogSettings:Host=$GUSMELFORDBOT_HOST
+      - AppSettings:GrayLogSettings:Port=12201
+      - AppSettings:GrayLogSettings:TransportType=Udp
+      - AppSettings:FtpServerSettings:FtpUrl=$FTP_URL
+      - AppSettings:FtpServerSettings:UserName=$FTP_USER
+      - AppSettings:FtpServerSettings:Password=$FTP_PASSWORD
+      - Serilog:WriteTo:0:Args:HostnameOrAddress=$GUSMELFORDBOT_HOST
+      - Serilog:WriteTo:0:Args:Port=12201
+      - Serilog:WriteTo:0:Args:TransportType=Udp
+      - Serilog:Properties:Application=GusMelfordBot
 
 volumes:
   gusmelforddb:
+  datalake:

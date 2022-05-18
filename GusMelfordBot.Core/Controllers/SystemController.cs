@@ -10,18 +10,20 @@ namespace GusMelfordBot.Core.Controllers;
 public class SystemController : Controller
 {
     private readonly ISystemService _systemService;
-    private readonly CommonSettings _commonSettings;
+    private readonly AppSettings _appSettings;
     
-    public SystemController(ISystemService systemService, CommonSettings commonSettings)
+    public SystemController(
+        ISystemService systemService, 
+        AppSettings appSettings)
     {
         _systemService = systemService;
-        _commonSettings = commonSettings;
+        _appSettings = appSettings;
     }
 
     [HttpGet("info")]
     public JsonResult GetSystemInfo()
     {
-        return Json(_systemService.BuildSystemInfo(_commonSettings.Name, _commonSettings.Version).ToDto());
+        return Json(_systemService.BuildSystemInfo(_appSettings.Name, _appSettings.Version).ToDto());
     }
     
     [HttpPost("login")]

@@ -32,11 +32,6 @@ public class ContentService : IContentService
         await _contentRepository.SetViewedVideo(contentId);
     }
 
-    public async Task Cache()
-    {
-        await _contentRepository.Cache();
-    }
-    
     public async Task<int> Refresh(long chatId)
     {
         List<Content> contents = _contentRepository.GetUnfinishedContents().ToList();

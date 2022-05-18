@@ -19,22 +19,24 @@ public class TikTokService : ITikTokService
     private readonly TelegramHelper _telegramHelper;
     private readonly ITikTokRepository _tikTokRepository;
     private readonly ITikTokDownloaderService _tikTokDownloaderService;
-    private readonly IFtpServerService _ftpServerService;
     private readonly IGusMelfordBotService _gusMelfordBotService;
+    private readonly IDataLakeService _dataLakeService;
+
+    private const string ContentsFolder = "contents";
 
     public TikTokService(
         IGusMelfordBotService gusMelfordBotService,
         ITikTokRepository tikTokRepository,
         ILogger<TikTokService> logger,
-        IFtpServerService ftpServerService,
-        ITikTokDownloaderService tikTokDownloaderService)
+        ITikTokDownloaderService tikTokDownloaderService,
+        IDataLakeService dataLakeService)
     {
         _gusMelfordBotService = gusMelfordBotService;
         _tikTokRepository = tikTokRepository;
         _logger = logger;
-        _ftpServerService = ftpServerService;
         _telegramHelper = new TelegramHelper(gusMelfordBotService);
         _tikTokDownloaderService = tikTokDownloaderService;
+        _dataLakeService = dataLakeService;
     }
 
     public async Task ProcessMessageAsync(Message message)
@@ -136,9 +138,7 @@ public class TikTokService : ITikTokService
     
     private async Task<Content> SendAndSaveContent(Content content, byte[] array, long chatId)
     {
-        content.IsSaved = await _ftpServerService.UploadFile(
-            $"Contents/{content.Name}.mp4", new MemoryStream(array));
-
+        content.IsSaved = await _dataLakeService.Write($"{Path.Combine(ContentsFolder, $"{content.Name}.mp4")}", array);
         if (content.IsSaved)
         {
             Message? newMessage = _telegramHelper.GetMessageResponse(await (await _gusMelfordBotService.SendVideoAsync(

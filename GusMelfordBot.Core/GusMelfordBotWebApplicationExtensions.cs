@@ -1,3 +1,4 @@
+using Gelf.Extensions.Logging;
 using GusMelfordBot.Core.Authentication;
 using GusMelfordBot.Core.Domain.Apps;
 using GusMelfordBot.Core.Domain.Apps.ContentCollector;
@@ -11,6 +12,7 @@ using GusMelfordBot.Core.Domain.Requests;
 using GusMelfordBot.Core.Domain.System;
 using GusMelfordBot.Core.Domain.Telegram;
 using GusMelfordBot.Core.Domain.Update;
+using GusMelfordBot.Core.Extensions;
 using GusMelfordBot.Core.Services;
 using GusMelfordBot.Core.Services.Apps;
 using GusMelfordBot.Core.Services.Apps.ContentCollector;
@@ -27,6 +29,8 @@ using GusMelfordBot.Core.Services.System;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.IdentityModel.Tokens;
+using Serilog.Sinks.Graylog;
+using Serilog.Sinks.Graylog.Core.Transport;
 
 namespace GusMelfordBot.Core;
 
@@ -38,9 +42,9 @@ using Serilog.Core;
 
 public static class GusMelfordBotWebApplicationExtensions
 {
-    public static void AddServices(this IServiceCollection services, CommonSettings commonSettings)
+    public static void AddServices(this IServiceCollection services, AppSettings appSettings)
     {
-        services.AddSingleton(commonSettings);
+        services.AddSingleton(appSettings);
         services.AddControllers();
         services.AddHealthChecks();
         services.AddCors();
@@ -71,7 +75,7 @@ public static class GusMelfordBotWebApplicationExtensions
         
         services.AddTransient<IGusMelfordBotService, GusMelfordBotService>(
             provider => new GusMelfordBotService(
-                commonSettings.TelegramBotSettings?.Token, 
+                appSettings.TelegramBotSettings?.Token, 
                 new NullLogger<GusMelfordBotService>(), 
                 provider.GetRequiredService<HttpClient>()));
         
@@ -88,23 +92,25 @@ public static class GusMelfordBotWebApplicationExtensions
         services.AddTransient<ITikTokDownloaderService, TikTokDownloaderService>();
         services.AddTransient<IFtpServerService, FtpServerService>(
             provider => new FtpServerService(
-                commonSettings.FtpServerSettings?.FtpUrl ?? string.Empty,
-                commonSettings.FtpServerSettings?.UserName ?? string.Empty,
-                commonSettings.FtpServerSettings?.Password ?? string.Empty,
+                appSettings.FtpServerSettings?.FtpUrl ?? string.Empty,
+                appSettings.FtpServerSettings?.UserName ?? string.Empty,
+                appSettings.FtpServerSettings?.Password ?? string.Empty,
                 provider.GetRequiredService<ILogger<FtpServerService>>()));
         
         services.AddHostedService<RefreshContentService>();
         services.AddHostedService<LongPoolingUpdateService>();
         services.AddTransient<IDatabaseManager>(
-            provider => new DatabaseManager(commonSettings.DatabaseSettings, 
+            provider => new DatabaseManager(appSettings.DatabaseSettings, 
                 provider.GetRequiredService<ILogger<ApplicationContext>>()));
         services.AddTransient<ITelegramService, TelegramService>();
+        services.AddTransient<IDataLakeService, DataLakeService>();
     }
     
-    public static Logger AddGraylog(this WebApplicationBuilder builder)
-    {
+    public static Logger AddGraylog(this WebApplicationBuilder builder, AppSettings appSettings)
+    {  
         var logger = new LoggerConfiguration()
             .ReadFrom.Configuration(builder.Configuration)
+            .Enrich.FromLogContext()
             .CreateLogger();
 
         builder.Logging.ClearProviders();

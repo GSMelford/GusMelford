@@ -12,19 +12,19 @@ public class ContentDownloadService : IContentDownloadService
 {
     private readonly ILogger<ContentDownloadService> _logger;
     private readonly IContentDownloadRepository _contentDownloadRepository;
-    private readonly IFtpServerService _ftpServerService;
     private readonly ITikTokDownloaderService _tikTokDownloaderService;
+    private readonly IDataLakeService _dataLakeService;
 
     public ContentDownloadService(
         ILogger<ContentDownloadService> logger, 
         IContentDownloadRepository contentDownloadRepository,
-        IFtpServerService ftpServerService,
-        ITikTokDownloaderService tikTokDownloaderService)
+        ITikTokDownloaderService tikTokDownloaderService, 
+        IDataLakeService dataLakeService)
     {
         _logger = logger;
         _contentDownloadRepository = contentDownloadRepository;
-        _ftpServerService = ftpServerService;
         _tikTokDownloaderService = tikTokDownloaderService;
+        _dataLakeService = dataLakeService;
     }
 
     public async Task<MemoryStream?> GetFileStreamContent(Guid contentId)
@@ -40,18 +40,20 @@ public class ContentDownloadService : IContentDownloadService
         switch (content.ContentProvider)
         {
             case nameof(ContentProvider.TikTok):
-                MemoryStream? memoryStream = await _ftpServerService.DownloadFile($"Contents/{content.Name}.mp4");
-                if (memoryStream is not null)
-                    return memoryStream;
-
-                if (!await _tikTokDownloaderService.TryGetAndSaveRefererLink(content))
+                byte[]? bytes = await _dataLakeService.Read($"contents/{content.Name}.mp4");
+                if (bytes is null)
                 {
-                    return null;
+                    if (!await _tikTokDownloaderService.TryGetAndSaveRefererLink(content))
+                    {
+                        return null;
+                    }
+                    
+                    bytes = await _tikTokDownloaderService.DownloadTikTokVideo(content);
+                    
+                    if (bytes is null)
+                        await _contentDownloadRepository.SetIsNotValid(contentId);
                 }
                 
-                byte[]? bytes = await _tikTokDownloaderService.DownloadTikTokVideo(content);
-                if (bytes is null)
-                    await _contentDownloadRepository.SetIsNotValid(contentId);
                 return bytes is not null ? new MemoryStream(bytes) : null;
         }
 

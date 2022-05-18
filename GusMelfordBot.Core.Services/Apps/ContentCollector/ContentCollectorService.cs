@@ -19,24 +19,23 @@ public class ContentCollectorService : IContentCollectorService
     private readonly ITikTokService _tikTokService;
     private readonly IContentRepository _contentRepository;
     private readonly IGusMelfordBotService _gusMelfordBotService;
-    private readonly IFtpServerService _ftpServerService;
     private readonly ITikTokDownloaderService _tikTokDownloaderService;
     private readonly IContentService _contentService;
+    private readonly IDataLakeService _dataLakeService;
     
     public ContentCollectorService(
         ITikTokService tikTokService,
         IContentRepository contentRepository,
         IGusMelfordBotService gusMelfordBotService,
-        IFtpServerService ftpServerService,
         ITikTokDownloaderService tikTokDownloaderService, 
-        IContentService contentService)
+        IContentService contentService, IDataLakeService dataLakeService)
     {
         _tikTokService = tikTokService;
         _contentRepository = contentRepository;
         _gusMelfordBotService = gusMelfordBotService;
-        _ftpServerService = ftpServerService;
         _tikTokDownloaderService = tikTokDownloaderService;
         _contentService = contentService;
+        _dataLakeService = dataLakeService;
     }
 
     public async Task ProcessMessage(Message message)
@@ -68,11 +67,11 @@ public class ContentCollectorService : IContentCollectorService
         switch (content?.ContentProvider)
         {
             case nameof(ContentProvider.TikTok):
-                MemoryStream? memoryStream = await _ftpServerService.DownloadFile($"Contents/{content.Name}.mp4");
-                if (memoryStream is null)
+                byte[]? bytes = await _dataLakeService.Read($"contents/{content.Name}.mp4");
+                if (bytes is null)
                 {
-                    byte[]? contentByte = await _tikTokDownloaderService.DownloadTikTokVideo(content);
-                    if (contentByte is null)
+                    bytes = await _tikTokDownloaderService.DownloadTikTokVideo(content);
+                    if (bytes is null)
                     {
                         await _gusMelfordBotService.SendMessageAsync(new SendMessageParameters
                         {
@@ -83,13 +82,11 @@ public class ContentCollectorService : IContentCollectorService
                         });
                         return;
                     }
-
-                    memoryStream = new MemoryStream(contentByte);
                 }
-                    
+                
                 await _gusMelfordBotService.SendVideoAsync(new SendVideoParameters
                 {
-                    Video = new VideoFile(memoryStream, content.Name),
+                    Video = new VideoFile(new MemoryStream(bytes), content.Name),
                     Caption = content.RefererLink,
                     ChatId = callbackQuery.FromUser.Id
                 });
