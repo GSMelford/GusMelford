@@ -67,7 +67,7 @@ public class ContentCollectorService : IContentCollectorService
         switch (content?.ContentProvider)
         {
             case nameof(ContentProvider.TikTok):
-                byte[]? bytes = await _dataLakeService.Read($"contents/{content.Name}.mp4");
+                byte[]? bytes = null;//await _dataLakeService.Read($"contents/{content.Name}.mp4");
                 if (bytes is null)
                 {
                     bytes = await _tikTokDownloaderService.DownloadTikTokVideo(content);

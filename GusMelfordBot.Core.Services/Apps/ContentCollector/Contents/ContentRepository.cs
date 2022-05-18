@@ -55,9 +55,8 @@ public class ContentRepository : IContentRepository
             .Set<Content>()
             .Include(x => x.User)
             .Include(x => x.Chat)
-            .Where(x => 
-                x.IsSaved == true 
-                && x.IsViewed == filter.IsNotViewed 
+            .Where(x =>
+                x.IsViewed == filter.IsNotViewed 
                 && x.Chat.Id == filter.ChatId
                 && x.IsValid == true);
 

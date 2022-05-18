@@ -138,8 +138,8 @@ public class TikTokService : ITikTokService
     
     private async Task<Content> SendAndSaveContent(Content content, byte[] array, long chatId)
     {
-        content.IsSaved = await _dataLakeService.Write($"{Path.Combine(ContentsFolder, $"{content.Name}.mp4")}", array);
-        if (content.IsSaved)
+        //content.IsSaved = await _dataLakeService.Write($"{Path.Combine(ContentsFolder, $"{content.Name}.mp4")}", array);
+        if (true)
         {
             Message? newMessage = _telegramHelper.GetMessageResponse(await (await _gusMelfordBotService.SendVideoAsync(
                 new SendVideoParameters

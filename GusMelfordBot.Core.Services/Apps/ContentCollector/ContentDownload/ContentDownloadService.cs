@@ -40,7 +40,7 @@ public class ContentDownloadService : IContentDownloadService
         switch (content.ContentProvider)
         {
             case nameof(ContentProvider.TikTok):
-                byte[]? bytes = await _dataLakeService.Read($"contents/{content.Name}.mp4");
+                byte[]? bytes = null;//await _dataLakeService.Read($"contents/{content.Name}.mp4");
                 if (bytes is null)
                 {
                     if (!await _tikTokDownloaderService.TryGetAndSaveRefererLink(content))
