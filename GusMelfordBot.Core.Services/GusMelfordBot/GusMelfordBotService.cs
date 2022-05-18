@@ -64,17 +64,26 @@ public class GusMelfordBotService : IGusMelfordBotService
         IParameters parameters,
         Func<IParameters, Task<HttpResponseMessage>> telegramMethod)
     {
-        while (true)
+        try
         {
-            HttpResponseMessage httpResponseMessage = await telegramMethod(parameters);
-            if (!httpResponseMessage.IsSuccessStatusCode && httpResponseMessage.StatusCode != HttpStatusCode.BadRequest)
+            while (true)
             {
-                await Task.Delay(RETRY_MILLISECONDS);
-            }
-            else
-            {
-                return httpResponseMessage;
+                HttpResponseMessage httpResponseMessage = await telegramMethod(parameters);
+                if (!httpResponseMessage.IsSuccessStatusCode && httpResponseMessage.StatusCode != HttpStatusCode.BadRequest)
+                {
+                    await Task.Delay(RETRY_MILLISECONDS);
+                }
+                else
+                {
+                    return httpResponseMessage;
+                }
             }
         }
+        catch
+        {
+            //ignored
+        }
+
+        return new HttpResponseMessage();
     }
 }

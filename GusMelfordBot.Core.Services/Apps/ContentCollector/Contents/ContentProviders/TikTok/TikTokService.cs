@@ -152,7 +152,7 @@ public class TikTokService : ITikTokService
             _logger.LogInformation("Content is fully processed. " +
                                    "Content: {RefererLink} ContentId: {ContentId}", content.RefererLink, content.Id);
 
-            await _telegramHelper.DeleteMessageFromTelegram(content.Chat.ChatId, content.MessageId.ToInt());
+            await _telegramHelper.DeleteMessageFromTelegram(content.Chat.ChatId, content.MessageId?.ToInt() ?? 0);
             content.MessageId = newMessage?.MessageId.ToString();
         }
         
