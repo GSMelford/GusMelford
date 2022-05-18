@@ -33,11 +33,6 @@ services:
       - AppSettings:FtpServerSettings:FtpUrl=$FTP_URL
       - AppSettings:FtpServerSettings:UserName=$FTP_USER
       - AppSettings:FtpServerSettings:Password=$FTP_PASSWORD
-      - Serilog:WriteTo:0:Name=GrayLog
-      - Serilog:WriteTo:0:Args:HostnameOrAddress=$GUSMELFORDLOG_HOST
-      - Serilog:WriteTo:0:Args:Port=12201
-      - Serilog:WriteTo:0:Args:TransportType=Udp
-      - Serilog:Properties:Application=GusMelfordBot
 
 volumes:
   gusmelforddb:
