@@ -18,7 +18,13 @@ public class DataLakeService : IDataLakeService
     {
         try
         {
-            await File.WriteAllBytesAsync(Path.Combine(DATA_LAKE_PATH, path), bytes);
+            path = Path.Combine(DATA_LAKE_PATH, path);
+            if (!Directory.Exists(path))
+            {
+                Directory.CreateDirectory(path);
+            }
+            
+            await File.WriteAllBytesAsync(path, bytes);
             _logger.LogInformation("File saved by DateLake {Path} Size: {Size}", path, bytes.Length);
             return true;
         }
