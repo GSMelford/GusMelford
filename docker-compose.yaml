@@ -30,12 +30,10 @@ services:
       - AppSettings:DatabaseSettings:Database=dev.gusmelfordbot.db
       - AppSettings:DatabaseSettings:Username=$POSTGRES_USER
       - AppSettings:DatabaseSettings:Password=$POSTGRES_PASSWORD
-      - AppSettings:GrayLogSettings:Host=$GUSMELFORDBOT_HOST
-      - AppSettings:GrayLogSettings:Port=12201
-      - AppSettings:GrayLogSettings:TransportType=Udp
       - AppSettings:FtpServerSettings:FtpUrl=$FTP_URL
       - AppSettings:FtpServerSettings:UserName=$FTP_USER
       - AppSettings:FtpServerSettings:Password=$FTP_PASSWORD
+      - Serilog:WriteTo:0:Name=GrayLog
       - Serilog:WriteTo:0:Args:HostnameOrAddress=$GUSMELFORDBOT_HOST
       - Serilog:WriteTo:0:Args:Port=12201
       - Serilog:WriteTo:0:Args:TransportType=Udp
