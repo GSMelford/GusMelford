@@ -7,6 +7,7 @@ using GusMelfordBot.Core.Domain.Telegram;
 using GusMelfordBot.Core.Extensions;
 using GusMelfordBot.DAL.Applications.ContentCollector;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json.Linq;
 using Telegram.API.TelegramRequests.SendVideo;
 using Telegram.Dto.UpdateModule;
 using static GusMelfordBot.Core.Services.Apps.ContentCollector.Contents.ContentProviders.TikTok.TikTokServiceHelper;
@@ -20,23 +21,23 @@ public class TikTokService : ITikTokService
     private readonly ITikTokRepository _tikTokRepository;
     private readonly ITikTokDownloaderService _tikTokDownloaderService;
     private readonly IGusMelfordBotService _gusMelfordBotService;
-    private readonly IDataLakeService _dataLakeService;
+    private readonly IFtpServerService _ftpServerService;
 
-    private const string ContentsFolder = "contents";
+    private const string CONTENTS_FOLDER = "contents";
 
     public TikTokService(
         IGusMelfordBotService gusMelfordBotService,
         ITikTokRepository tikTokRepository,
         ILogger<TikTokService> logger,
         ITikTokDownloaderService tikTokDownloaderService,
-        IDataLakeService dataLakeService)
+        IFtpServerService ftpServerService)
     {
         _gusMelfordBotService = gusMelfordBotService;
         _tikTokRepository = tikTokRepository;
         _logger = logger;
         _telegramHelper = new TelegramHelper(gusMelfordBotService);
         _tikTokDownloaderService = tikTokDownloaderService;
-        _dataLakeService = dataLakeService;
+        _ftpServerService = ftpServerService;
     }
 
     public async Task ProcessMessageAsync(Message message)
@@ -72,40 +73,36 @@ public class TikTokService : ITikTokService
                                "ContentId: {ContentId} ChatId: {ChatId}", contentId, chatId);
 
         Content? content = await _tikTokRepository.GetContentAsync(contentId);
-
-        if (content is null)
+        if (content is null || !await _tikTokDownloaderService.TryGetAndSaveRefererLink(content))
         {
             return false;
         }
 
-        if (!await _tikTokDownloaderService.TryGetAndSaveRefererLink(content))
-        {
-            return false;
-        }
-
-        if (!retry)
-        {
-            if (await CheckDuplicate(content))
-            {
-                return true;
-            }
-        }
-
-        if (content.IsSaved)
+        if (!retry && await CheckDuplicate(content) || content.IsSaved)
         {
             return true;
         }
 
-        content.Name = $"{GetUserName(content.RefererLink)}-{GetVideoId(content.RefererLink)}";
-        byte[]? array = await _tikTokDownloaderService.DownloadTikTokVideo(content);
-        
-        if (!content.IsValid)
+        JToken videoInformation = await _tikTokDownloaderService.GetVideoInformation(content);
+        if (!CheckIfVideoExists(videoInformation))
         {
-            await _tikTokRepository.UpdateAndSaveContentAsync(content);
+            content.IsValid = false;
             _logger.LogInformation("Content {ContentId} no longer exists", content.Id);
             return true;
         }
         
+        string? originalLink = GetOriginalLink(videoInformation);
+        if (string.IsNullOrEmpty(originalLink))
+        {
+            _logger.LogWarning("The original link is not available at the moment." +
+                               " Request token {Token}", videoInformation);
+            return false;
+        }
+            
+        content.Description = GetDescription(videoInformation);
+        content.Name = $"{GetUserName(content.RefererLink)}-{GetVideoId(content.RefererLink)}";
+        
+        byte[]? array = await _tikTokDownloaderService.TryDownloadTikTokVideo(originalLink, content.RefererLink);
         if (array is null)
         {
             return false;
@@ -116,21 +113,49 @@ public class TikTokService : ITikTokService
         return true;
     }
 
+    private bool CheckIfVideoExists(JToken videoInformation)
+    {
+        if (int.TryParse(videoInformation["statusCode"]?.ToString(), out int code))
+        {
+            if (code is > 10000 and < 11000)
+            {
+                _logger.LogInformation("When receiving a link to content, received a code {Code}", code);
+                return false; 
+            }
+        }
+
+        return true;
+    }
+    
+    private static string? GetOriginalLink(JToken videoInformation)
+    {
+        return videoInformation["itemInfo"]?["itemStruct"]?["video"]?["downloadAddr"]?.ToString();
+    }
+        
+    private static string GetDescription(JToken videoInformation)
+    {
+        string? description = videoInformation["seoProps"]?["metaParams"]?["description"]?.ToString();
+        if (!string.IsNullOrEmpty(description))
+        {
+            return new Regex("\\S* Likes, \\S* Comments. TikTok video from \\D*: \"(\\D*)\"")
+                .Match(description).Groups[1].Value;
+        }
+        
+        return string.Empty;
+    }
+    
     private async Task<bool> CheckDuplicate(Content content)
     {
-        if (await _tikTokDownloaderService.TryGetAndSaveRefererLink(content))
+        Content? foundContent = await _tikTokRepository.GetContentAsync(content.RefererLink);
+        if (foundContent is not null)
         {
-            Content? foundContent = await _tikTokRepository.GetContentAsync(content.RefererLink);
-            if (foundContent is not null)
-            {
-                await _telegramHelper.SendMessageToTelegram(
-                    $"😎 This content №{foundContent.Number} has already been posted by " +
-                    $"{foundContent.User.FirstName} {foundContent.User.LastName}\n" +
-                    $"{foundContent.RefererLink}", content.Chat.ChatId);
-                content.IsValid = false;
-                await _tikTokRepository.UpdateAndSaveContentAsync(content);
-                return true;
-            }
+            await _telegramHelper.SendMessageToTelegram(
+                $"😎 This content №{foundContent.Number} has already been posted by " +
+                $"{foundContent.User.FirstName} {foundContent.User.LastName}\n" +
+                $"{foundContent.RefererLink}", content.Chat.ChatId);
+            content.IsValid = false;
+            await _tikTokRepository.UpdateAndSaveContentAsync(content);
+            return true;
         }
         
         return false;
@@ -138,8 +163,9 @@ public class TikTokService : ITikTokService
     
     private async Task<Content> SendAndSaveContent(Content content, byte[] array, long chatId)
     {
-        content.IsSaved = true;// await _dataLakeService.Write($"{Path.Combine(ContentsFolder, $"{content.Name}.mp4")}", array);
-        if (true)
+        content.IsSaved = await _ftpServerService.UploadFile(
+            $"{Path.Combine(CONTENTS_FOLDER, $"{content.Name}.mp4")}", new MemoryStream(array));
+        if (content.IsSaved)
         {
             Message? newMessage = _telegramHelper.GetMessageResponse(await (await _gusMelfordBotService.SendVideoAsync(
                 new SendVideoParameters

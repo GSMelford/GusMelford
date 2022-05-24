@@ -23,7 +23,7 @@ services:
       - $PORT:80
     environment:
       - AppSettings:Name=GusMelfordBot
-      - AppSettings:Version=1.6.5
+      - AppSettings:Version=1.6.6
       - AppSettings:TelegramBotSettings:Token=$GUSMELFORDBOT_TELEGRAM_TOKEN
       - AppSettings:DatabaseSettings:Host=$GUSMELFORDBOT_HOST
       - AppSettings:DatabaseSettings:Port=5432

@@ -1,7 +1,6 @@
 using GusMelfordBot.Core.Domain.Apps.ContentCollector;
 using GusMelfordBot.Core.Domain.Apps.ContentCollector.Contents;
 using GusMelfordBot.Core.Domain.Apps.ContentCollector.Contents.ContentProviders.TikTok;
-using GusMelfordBot.Core.Domain.Apps.ContentDownload.TikTok;
 using GusMelfordBot.Core.Domain.System;
 using GusMelfordBot.Core.Domain.Telegram;
 using GusMelfordBot.Core.Extensions;
@@ -19,23 +18,21 @@ public class ContentCollectorService : IContentCollectorService
     private readonly ITikTokService _tikTokService;
     private readonly IContentRepository _contentRepository;
     private readonly IGusMelfordBotService _gusMelfordBotService;
-    private readonly ITikTokDownloaderService _tikTokDownloaderService;
     private readonly IContentService _contentService;
-    private readonly IDataLakeService _dataLakeService;
+    private readonly IFtpServerService _ftpServerService;
     
     public ContentCollectorService(
         ITikTokService tikTokService,
         IContentRepository contentRepository,
         IGusMelfordBotService gusMelfordBotService,
-        ITikTokDownloaderService tikTokDownloaderService, 
-        IContentService contentService, IDataLakeService dataLakeService)
+        IContentService contentService, 
+        IFtpServerService ftpServerService)
     {
         _tikTokService = tikTokService;
         _contentRepository = contentRepository;
         _gusMelfordBotService = gusMelfordBotService;
-        _tikTokDownloaderService = tikTokDownloaderService;
         _contentService = contentService;
-        _dataLakeService = dataLakeService;
+        _ftpServerService = ftpServerService;
     }
 
     public async Task ProcessMessage(Message message)
@@ -67,26 +64,23 @@ public class ContentCollectorService : IContentCollectorService
         switch (content?.ContentProvider)
         {
             case nameof(ContentProvider.TikTok):
-                byte[]? bytes = null;//await _dataLakeService.Read($"contents/{content.Name}.mp4");
-                if (bytes is null)
+                MemoryStream? memoryStream = await _ftpServerService.DownloadFile($"contents/{content.Name}.mp4");
+                
+                if (memoryStream is null)
                 {
-                    bytes = await _tikTokDownloaderService.DownloadTikTokVideo(content);
-                    if (bytes is null)
+                    await _gusMelfordBotService.SendMessageAsync(new SendMessageParameters
                     {
-                        await _gusMelfordBotService.SendMessageAsync(new SendMessageParameters
-                        {
-                            Text =
-                                "I'm sorry, for some reason I can't send you a video( Keep at least the link:\n" +
-                                $"{content.RefererLink ?? "Something is wrong with the link..."}",
-                            ChatId = callbackQuery.FromUser.Id
-                        });
-                        return;
-                    }
+                        Text =
+                            "I'm sorry, for some reason I can't send you a video( Keep at least the link:\n" +
+                            $"{content.RefererLink ?? "Something is wrong with the link..."}",
+                        ChatId = callbackQuery.FromUser.Id
+                    });
+                    return;
                 }
                 
                 await _gusMelfordBotService.SendVideoAsync(new SendVideoParameters
                 {
-                    Video = new VideoFile(new MemoryStream(bytes), content.Name),
+                    Video = new VideoFile(memoryStream, content.Name),
                     Caption = content.RefererLink,
                     ChatId = callbackQuery.FromUser.Id
                 });

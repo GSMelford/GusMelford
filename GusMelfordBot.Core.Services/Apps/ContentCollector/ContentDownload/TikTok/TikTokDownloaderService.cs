@@ -1,4 +1,3 @@
-using System.Text.RegularExpressions;
 using GusMelfordBot.Core.Domain.Apps.ContentDownload.TikTok;
 using GusMelfordBot.Core.Domain.Requests;
 using GusMelfordBot.Core.Services.Apps.ContentCollector.Contents.ContentProviders.TikTok;
@@ -22,58 +21,32 @@ public class TikTokDownloaderService : ITikTokDownloaderService
         _logger = logger;
         _requestService = requestService;
     }
-        
-    public async Task<byte[]?> DownloadTikTokVideo(Content? content)
+
+    public async Task<byte[]?> TryDownloadTikTokVideo(string originalLink, string refererLink)
     {
-        if (content is null)
-        {
-            return null;
-        }
-        
         try
         {
-            JToken videoInformation = await GetVideoInformation(content);
-            if (int.TryParse(videoInformation["statusCode"]?.ToString(), out int code))
-            {
-                if (code is > 10000 and < 11000)
+            HttpResponseMessage httpResponseMessage = await _requestService.ExecuteAsync(
+                new Request
                 {
-                    content.IsValid = false;
-                    _logger.LogInformation("When receiving a link to content, received a code {Code}", code);
-                    return null; 
-                }
-            }
+                    HttpMethod = HttpMethod.Get,
+                    RequestUri = originalLink,
+                    Headers = new Dictionary<string, string>
+                    {
+                        {"User-Agent", Constants.UserAgent},
+                        {"Referer", refererLink},
+                    }
+                }.ToHttpRequestMessage());
             
-            string? originalLink = GetOriginalLink(videoInformation);
-            if (string.IsNullOrEmpty(originalLink))
-            {
-                _logger.LogWarning("The original link is not available at the moment." +
-                                   " Request token {Token}", videoInformation);
-                return null;
-            }
-            
-            content.Description = GetDescription(videoInformation);
-            
-            Request request = new Request
-            {
-                HttpMethod = HttpMethod.Get,
-                RequestUri = originalLink,
-                Headers = new Dictionary<string, string>
-                {
-                    {"User-Agent", Constants.UserAgent},
-                    {"Referer", content.RefererLink},
-                }
-            };
-            
-            HttpResponseMessage httpResponseMessage = await _requestService.ExecuteAsync(request.ToHttpRequestMessage());
             return await httpResponseMessage.Content.ReadAsByteArrayAsync();
         }
         catch
         {
-            _logger.LogError("Video Download Error {RefererLink}", content.RefererLink);
+            _logger.LogError("Video Download Error {RefererLink}", refererLink);
             return null;
         }
     }
-        
+
     public async Task<bool> TryGetAndSaveRefererLink(Content content)
     {
         if (string.IsNullOrEmpty(content.RefererLink))
@@ -91,25 +64,8 @@ public class TikTokDownloaderService : ITikTokDownloaderService
 
         return true;
     }
-    
-    private static string? GetOriginalLink(JToken videoInformation)
-    {
-        return videoInformation["itemInfo"]?["itemStruct"]?["video"]?["downloadAddr"]?.ToString();
-    }
-        
-    private static string GetDescription(JToken videoInformation)
-    {
-        string? description = videoInformation["seoProps"]?["metaParams"]?["description"]?.ToString();
-        if (!string.IsNullOrEmpty(description))
-        {
-            return new Regex("\\S* Likes, \\S* Comments. TikTok video from \\D*: \"(\\D*)\"")
-                .Match(description).Groups[1].Value;
-        }
-        
-        return string.Empty;
-    }
-        
-    private async Task<JToken> GetVideoInformation(Content content)
+
+    public async Task<JToken> GetVideoInformation(Content content)
     {
         string requestUrl = BuildVideoInformationUrl(content);
         RestClient restClient = new RestClient();
