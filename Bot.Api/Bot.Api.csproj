@@ -13,4 +13,8 @@
         <PackageTags>Bot.Api, Api, Telegram, Bot</PackageTags>
     </PropertyGroup>
 
+    <ItemGroup>
+      <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+    </ItemGroup>
+
 </Project>
