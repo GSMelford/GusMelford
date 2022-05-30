@@ -51,7 +51,9 @@ async function changeVideo(direction) {
     video.appendChild(source);
     videoContainer.appendChild(video);
     document.body.requestFullscreen().then(r => r);
-    message = await executeRequest("contentCollector/sendInformationPanel?contentId=" + contents[cursor]["id"]);
+    if(document.location.search !== "?test=1" || document.location.search !== "test=1"){
+        message = await executeRequest("contentCollector/sendInformationPanel?contentId=" + contents[cursor]["id"]);
+    }
 }
 
 function updateCursor(direction){
