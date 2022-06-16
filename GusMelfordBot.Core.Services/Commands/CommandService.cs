@@ -26,7 +26,7 @@ public class CommandService : ICommandService
     
     public async Task ProcessCommand(Message message, string applicationType)
     {
-        switch (message.Text.Replace(COMMAND_BOT_NAME, ""))
+        switch (message.Text?.Replace(COMMAND_BOT_NAME, ""))
         {
             case Command.RegisterContentCollectorGroup:
                 if (await _commandRepository.RegisterContentCollectorGroup(message.Chat))
