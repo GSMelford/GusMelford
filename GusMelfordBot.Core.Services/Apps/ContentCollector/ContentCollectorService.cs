@@ -39,6 +39,11 @@ public class ContentCollectorService : IContentCollectorService
     {
         string text = message.Text;
 
+        if (string.IsNullOrEmpty(text))
+        {
+            return;
+        }
+
         if (text.Contains(nameof(ContentProvider.TikTok).ToLower()))
         {
             await _tikTokService.ProcessMessageAsync(message);

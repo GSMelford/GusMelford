@@ -21,7 +21,7 @@ public class UpdateService : IUpdateService
     public async Task<bool> ProcessUpdate(string json)
     {
         var updateEntity = JsonConvert.DeserializeObject<Telegram.Dto.UpdateModule.Update>(json);
-        _logger.LogInformation("Update text: {Text}", updateEntity.Message?.Text);
+        _logger.LogInformation("Update text: {Text}", updateEntity?.Message?.Text);
 
         try
         {
