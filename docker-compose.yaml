@@ -12,7 +12,6 @@ services:
       - PGDATA=/var/lib/postgresql/data/pgdata
     volumes:
       - gusmelforddb:/var/lib/postgresql/data
-      - /home/pi/Test:/datalake
 
   gusmelfordbot.core:
     image: $DOCKER_REPO/$CONTAINER_NAME:$DOCKER_CONTAINER_TAG
@@ -40,8 +39,8 @@ services:
           - 5672:5672
           - 15672:15672
       volumes:
-          - ~/.docker-conf/rabbitmq/data/:/var/lib/rabbitmq/
-          - ~/.docker-conf/rabbitmq/log/:/var/log/rabbitmq
+          - rabbitmqdata:/var/lib/rabbitmq/
+          - rabbitmqdata:/var/log/rabbitmq
       networks:
           - rabbitmq_go_net
 
@@ -51,3 +50,4 @@ networks:
 
 volumes:
   gusmelforddb:
+  rabbitmqdata:
