@@ -7,9 +7,17 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <Folder Include="Controllers" />
       <Folder Include="Dto" />
-      <Folder Include="Services" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\GusMelfordBot.Domain\GusMelfordBot.Domain.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="SimpleKafka" Version="0.1.3" />
+      <PackageReference Include="TBot.Client" Version="0.2.5" />
+      <PackageReference Include="TBot.Telegram.Dto" Version="0.1.3" />
     </ItemGroup>
 
 </Project>
