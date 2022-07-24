@@ -1,6 +1,10 @@
-﻿using GusMelfordBot.Api.Settings;
+﻿using Confluent.Kafka;
+using GusMelfordBot.Api.KafkaEventHandlers.Events;
+using GusMelfordBot.Api.KafkaEventHandlers.Handlers;
+using GusMelfordBot.Api.Settings;
 using GusMelfordBot.Infrastructure;
 using GusMelfordBot.Infrastructure.Interfaces;
+using SimpleKafka.Interfaces;
 
 namespace GusMelfordBot.Api;
 
@@ -29,5 +33,17 @@ public static class WebApplicationExtensions
     {
         IDatabaseContext databaseContext = app.Services.GetRequiredService<IDatabaseContext>();
         databaseContext.InitializeDatabase(databaseSettings);
+    }
+
+    public static void SubscribeOnEvents(this WebApplication app, AppSettings appSettings)
+    {
+        IKafkaConsumerFactory kafkaConsumerFactory = app.Services.GetRequiredService<IKafkaConsumerFactory>();
+        kafkaConsumerFactory.Subscribe<TelegramMessageReceivedEvent, TelegramMessageReceivedHandler>(BuildConsumerConfig(appSettings));
+        kafkaConsumerFactory.Subscribe<ContentProcessedEvent, ContentProcessedHandler>(BuildConsumerConfig(appSettings));
+    }
+
+    private static ConsumerConfig BuildConsumerConfig(AppSettings appSettings)
+    {
+        return new ConsumerConfig { BootstrapServers = appSettings.KafkaSettings.BootstrapServers };
     }
 }

@@ -1,8 +1,8 @@
-﻿using TBot.Telegram.Dto.UpdateModule;
+﻿using GusMelfordBot.Domain.Telegram.Models;
 
 namespace GusMelfordBot.Domain.Telegram;
 
 public interface IUpdateService
 {
-    Task ProcessUpdate(Update message);
+    Task ProcessUpdate(UpdateDomain updateDomain);
 }

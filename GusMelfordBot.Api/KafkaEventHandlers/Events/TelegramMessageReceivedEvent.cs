@@ -1,9 +1,9 @@
-﻿using SimpleKafka.Models;
-using TBot.Telegram.Dto.UpdateModule;
+﻿using GusMelfordBot.Domain.Telegram.Models;
+using SimpleKafka.Models;
 
 namespace GusMelfordBot.Api.KafkaEventHandlers.Events;
 
 public class TelegramMessageReceivedEvent : BaseEvent
 {
-    public Message? Message { get; set; }
+    public MessageDomain? Message { get; set; }
 }

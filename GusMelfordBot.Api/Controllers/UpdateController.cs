@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using GusMelfordBot.Api.Dto.Telegram;
 using GusMelfordBot.Domain.Telegram;
 using Microsoft.AspNetCore.Mvc;
 using TBot.Telegram.Dto.UpdateModule;
@@ -21,16 +22,20 @@ public class UpdateController : Controller
     }
 
     [HttpPost]
-    public IActionResult Update([Required, FromBody]Update update)
+    public async Task<IActionResult> Update([Required, FromBody] Update update)
     {
-        _logger.LogInformation("Update. Body: {@UpdateText}", update);
-        try {
-            _updateService.ProcessUpdate(update);
+        _logger.LogInformation("Update from telegram: {Update}", update);
+        
+        try 
+        {
+            await _updateService.ProcessUpdate(update.ToDomain());
         }
-        catch (Exception e) {
+        catch (Exception e)
+        {
             _logger.LogError(e, "ProcessUpdate error. UpdateId: {UpdateId}", update.UpdateId);
             return BadRequest();
         }
+        
         return Ok();
     }
 }
