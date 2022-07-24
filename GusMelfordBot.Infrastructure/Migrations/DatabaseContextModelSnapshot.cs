@@ -45,11 +45,12 @@ namespace GusMelfordBot.Infrastructure.Migrations
 
             modelBuilder.Entity("GusMelfordBot.Infrastructure.Models.Content", b =>
                 {
-                    b.Property<long>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
+                        .HasColumnType("uuid");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+                    b.Property<string>("AccompanyingCommentary")
+                        .HasColumnType("text");
 
                     b.Property<Guid>("ChatId")
                         .HasColumnType("uuid");
@@ -57,10 +58,7 @@ namespace GusMelfordBot.Infrastructure.Migrations
                     b.Property<DateTime>("CreatedOn")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<bool>("IsSaved")
-                        .HasColumnType("boolean");
-
-                    b.Property<bool>("IsValid")
+                    b.Property<bool?>("IsValid")
                         .HasColumnType("boolean");
 
                     b.Property<bool>("IsViewed")
@@ -72,17 +70,24 @@ namespace GusMelfordBot.Infrastructure.Migrations
                     b.Property<DateTime>("ModifiedOn")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<long>("Number")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Number"));
+
                     b.Property<string>("OriginalLink")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("Path")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("Provider")
                         .IsRequired()
                         .HasColumnType("text");
+
+                    b.Property<Guid>("SameContentId")
+                        .HasColumnType("uuid");
 
                     b.Property<Guid>("UserId")
                         .HasColumnType("uuid");
@@ -129,8 +134,8 @@ namespace GusMelfordBot.Infrastructure.Migrations
                     b.Property<long>("ChatId")
                         .HasColumnType("bigint");
 
-                    b.Property<long?>("ContentId")
-                        .HasColumnType("bigint");
+                    b.Property<Guid?>("ContentId")
+                        .HasColumnType("uuid");
 
                     b.Property<DateTime>("CreatedOn")
                         .HasColumnType("timestamp with time zone");
@@ -166,7 +171,6 @@ namespace GusMelfordBot.Infrastructure.Migrations
                         .HasColumnType("uuid");
 
                     b.Property<string>("Username")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.HasKey("Id");
@@ -185,25 +189,30 @@ namespace GusMelfordBot.Infrastructure.Migrations
                     b.Property<DateTime>("CreatedOn")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.Property<string>("FirstName")
                         .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("LastName")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<DateTime>("ModifiedOn")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Password")
-                        .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<Guid>("RoleId")
+                    b.Property<Guid?>("RoleId")
                         .HasColumnType("uuid");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("Email")
+                        .IsUnique();
 
                     b.HasIndex("RoleId");
 
@@ -259,9 +268,7 @@ namespace GusMelfordBot.Infrastructure.Migrations
                 {
                     b.HasOne("GusMelfordBot.Infrastructure.Models.Role", "Role")
                         .WithMany("Users")
-                        .HasForeignKey("RoleId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("RoleId");
 
                     b.Navigation("Role");
                 });

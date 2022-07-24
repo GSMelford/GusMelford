@@ -35,6 +35,7 @@ public class DatabaseContext : DbContext, IDatabaseContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        modelBuilder.Entity<User>().HasIndex(u => u.Email).IsUnique();
     }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -44,16 +45,9 @@ public class DatabaseContext : DbContext, IDatabaseContext
 
     public new void Update<TEntity>(TEntity entity)
     {
-        switch (entity)
+        if (entity is BaseEntity baseEntity)
         {
-            case BaseEntity<Guid> baseEntityByGuid:
-                baseEntityByGuid.ModifiedOn = DateTime.UtcNow;
-                base.Update(baseEntityByGuid);
-                break;
-            case BaseEntity<long> baseEntityByLong:
-                baseEntityByLong.ModifiedOn = DateTime.UtcNow;
-                base.Update(baseEntityByLong);
-                break;
+            baseEntity.ModifiedOn = DateTime.UtcNow;
         }
     }
 
