@@ -8,10 +8,12 @@
 
     <ItemGroup>
       <Folder Include="Dto" />
+      <Folder Include="KafkaEventHandlers\Handlers" />
     </ItemGroup>
 
     <ItemGroup>
       <ProjectReference Include="..\GusMelfordBot.Domain\GusMelfordBot.Domain.csproj" />
+      <ProjectReference Include="..\GusMelfordBot.Infrastructure\GusMelfordBot.Infrastructure.csproj" />
     </ItemGroup>
 
     <ItemGroup>
