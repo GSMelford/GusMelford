@@ -1,8 +1,8 @@
-﻿using ContentCollector.Utilities;
+﻿using ContentCollector.MircoService.Domain.ContentProviders;
 
-namespace ContentCollector.Services;
+namespace ContentCollector.Services.ContentProviders;
 
-public class ContentProviderService
+public class ContentProviderService : IContentProviderService
 {
     public ContentProvider Define(string message)
     {
