@@ -6,6 +6,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GusMelfordBot.Infrastructur
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GusMelfordBot.Domain", "GusMelfordBot.Domain\GusMelfordBot.Domain.csproj", "{5B186686-8A92-47F8-B96C-BCBF663DDEE0}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Applications", "Applications", "{BEE7298B-24F2-4141-A120-D50B55284C24}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ContentCollector", "ContentCollector\ContentCollector.csproj", "{FAF77666-B14F-4AE4-A3C3-E2D80AABCEF4}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -24,7 +28,12 @@ Global
 		{5B186686-8A92-47F8-B96C-BCBF663DDEE0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5B186686-8A92-47F8-B96C-BCBF663DDEE0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5B186686-8A92-47F8-B96C-BCBF663DDEE0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FAF77666-B14F-4AE4-A3C3-E2D80AABCEF4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FAF77666-B14F-4AE4-A3C3-E2D80AABCEF4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FAF77666-B14F-4AE4-A3C3-E2D80AABCEF4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FAF77666-B14F-4AE4-A3C3-E2D80AABCEF4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
+		{FAF77666-B14F-4AE4-A3C3-E2D80AABCEF4} = {BEE7298B-24F2-4141-A120-D50B55284C24}
 	EndGlobalSection
 EndGlobal
