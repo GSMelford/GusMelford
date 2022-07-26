@@ -2,5 +2,5 @@
 
 public class KafkaSettings
 {
-    public string BootstrapServers { get; set; }
+    public string BootstrapServers { get; set; } = "localhost";
 }

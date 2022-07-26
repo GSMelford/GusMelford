@@ -18,7 +18,7 @@ public static class Convertor
             message.Text, 
             message.Caption,
             message.From?.ToDomain(),
-            message.Chat?.ToDomain());
+            message.Chat.ToDomain());
     }
 
     private static UserDomain ToDomain(this User user)

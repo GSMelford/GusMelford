@@ -48,8 +48,6 @@ public class AuthRepository : IAuthRepository
         
         if (telegramUser is null)
         {
-            
-
             telegramUser = new TelegramUser
             {
                 User = user,

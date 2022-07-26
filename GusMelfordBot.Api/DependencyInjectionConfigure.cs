@@ -9,6 +9,7 @@ using GusMelfordBot.Infrastructure.Interfaces;
 using GusMelfordBot.Infrastructure.Repositories.Application;
 using GusMelfordBot.Infrastructure.Repositories.Auth;
 using SimpleKafka;
+using TBot.Client;
 
 namespace GusMelfordBot.Api;
 
@@ -16,6 +17,7 @@ public static class DependencyInjectionConfigure
 {
     public static void ConfigureServices(this IServiceCollection serviceCollection, AppSettings appSettings)
     {
+        serviceCollection.AddTBotClient(appSettings.TelegramBotSettings.Token);
         serviceCollection.AddTransient<IDatabaseContext, DatabaseContext>(_ => new DatabaseContext(appSettings.DatabaseSettings));
         serviceCollection.AddTransient<IUpdateService, UpdateService>();
         serviceCollection.AddTransient<IAuthRepository, AuthRepository>();

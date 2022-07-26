@@ -1,5 +1,6 @@
 ﻿using GusMelfordBot.Api.KafkaEventHandlers.Events;
 using GusMelfordBot.Domain.Application;
+using GusMelfordBot.Domain.Application.ContentCollector;
 using SimpleKafka.Interfaces;
 
 namespace GusMelfordBot.Api.KafkaEventHandlers.Handlers;
@@ -8,11 +9,16 @@ public class TelegramMessageReceivedHandler : IEventHandler<TelegramMessageRecei
 {
     private readonly IKafkaProducer<string> _kafkaProducer;
     private readonly IApplicationRepository _applicationRepository;
+    private readonly IContentCollectorRepository _contentCollectorRepository;
 
-    public TelegramMessageReceivedHandler(IKafkaProducer<string> kafkaProducer, IApplicationRepository applicationRepository)
+    public TelegramMessageReceivedHandler(
+        IKafkaProducer<string> kafkaProducer,
+        IApplicationRepository applicationRepository,
+        IContentCollectorRepository contentCollectorRepository)
     {
         _kafkaProducer = kafkaProducer;
         _applicationRepository = applicationRepository;
+        _contentCollectorRepository = contentCollectorRepository;
     }
 
     public async Task Handle(TelegramMessageReceivedEvent @event)
@@ -23,15 +29,32 @@ public class TelegramMessageReceivedHandler : IEventHandler<TelegramMessageRecei
             switch (await _applicationRepository.GetApplicationService(chatId.Value))
             {
                 case ApplicationService.ContentCollector:
-                    await _kafkaProducer.ProduceAsync(new ContentCollectorMessageEvent
-                    {
-                        Id = @event.Id,
-                        MessageText = @event.Message?.Text ?? throw new Exception()
-                    });
+                    await HandleContentCollector(@event);
                     break;
                 case ApplicationService.Unknown:
                     break;
             }
         }
+    }
+
+    private async Task HandleContentCollector(TelegramMessageReceivedEvent @event)
+    {
+        string? messageText = @event.Message?.Text;
+        if (string.IsNullOrEmpty(messageText)) {
+            return;
+        }
+                    
+        await _contentCollectorRepository.Create(
+            @event.Id,
+            @event.Message?.Chat?.Id,
+            @event.Message?.From?.Id,
+            messageText,
+            @event.Message?.Chat?.Id);
+
+        await _kafkaProducer.ProduceAsync(new ContentCollectorMessageEvent
+        {
+            Id = @event.Id,
+            MessageText = messageText
+        });
     }
 }

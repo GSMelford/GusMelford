@@ -2,7 +2,7 @@
 using GusMelfordBot.Api.Dto.Telegram;
 using GusMelfordBot.Domain.Telegram;
 using Microsoft.AspNetCore.Mvc;
-using TBot.Telegram.Dto.UpdateModule;
+using TBot.Telegram.Dto;
 
 namespace GusMelfordBot.Api.Controllers;
 
@@ -24,7 +24,7 @@ public class UpdateController : Controller
     [HttpPost]
     public async Task<IActionResult> Update([Required, FromBody] Update update)
     {
-        _logger.LogInformation("Update from telegram: {Update}", update);
+        _logger.LogInformation("Update from telegram: {@Update}", update);
         
         try 
         {
@@ -32,7 +32,7 @@ public class UpdateController : Controller
         }
         catch (Exception e)
         {
-            _logger.LogError(e, "ProcessUpdate error. UpdateId: {UpdateId}", update.UpdateId);
+            _logger.LogError(e, "Update from telegram error. UpdateId: {UpdateId}", update.UpdateId);
             return BadRequest();
         }
         
