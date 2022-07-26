@@ -1,9 +1,9 @@
-﻿using ContentCollector.MircoService.Domain.ContentProviders.TikTok;
+﻿using ContentCollector.Domain.ContentProviders;
 
 namespace ContentCollector.Services.ContentProviders.TikTok.TikTokContentHandlers.Abstractions;
 
 public interface IHandler
 {
     IHandler SetNext(IHandler handler);
-    Task<ProcessedContent?> Handle(ProcessedContent processedContent);
+    Task<ProcessedTikTokContent?> Handle(ProcessedTikTokContent processedTikTokContent);
 }

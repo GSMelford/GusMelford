@@ -12,8 +12,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ContentCollector.MicroServi
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ContentCollector", "ContentCollector", "{8034EF3D-64C6-426A-B8A4-9456D9C4FE0D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ContentCollector.MircoService.Domain", "ContentCollector.MircoService.Domain\ContentCollector.MircoService.Domain.csproj", "{80F1CE8B-50FC-4708-82AF-F0E366F9F2E1}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GusMelfordBot.Extensions", "GusMelfordBot.Extensions\GusMelfordBot.Extensions.csproj", "{988F5C1A-3979-4986-80B5-4A2B46C73B3D}"
 EndProject
 Global
@@ -38,10 +36,6 @@ Global
 		{FAF77666-B14F-4AE4-A3C3-E2D80AABCEF4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FAF77666-B14F-4AE4-A3C3-E2D80AABCEF4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FAF77666-B14F-4AE4-A3C3-E2D80AABCEF4}.Release|Any CPU.Build.0 = Release|Any CPU
-		{80F1CE8B-50FC-4708-82AF-F0E366F9F2E1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{80F1CE8B-50FC-4708-82AF-F0E366F9F2E1}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{80F1CE8B-50FC-4708-82AF-F0E366F9F2E1}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{80F1CE8B-50FC-4708-82AF-F0E366F9F2E1}.Release|Any CPU.Build.0 = Release|Any CPU
 		{988F5C1A-3979-4986-80B5-4A2B46C73B3D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{988F5C1A-3979-4986-80B5-4A2B46C73B3D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{988F5C1A-3979-4986-80B5-4A2B46C73B3D}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -50,6 +44,5 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{8034EF3D-64C6-426A-B8A4-9456D9C4FE0D} = {BEE7298B-24F2-4141-A120-D50B55284C24}
 		{FAF77666-B14F-4AE4-A3C3-E2D80AABCEF4} = {8034EF3D-64C6-426A-B8A4-9456D9C4FE0D}
-		{80F1CE8B-50FC-4708-82AF-F0E366F9F2E1} = {8034EF3D-64C6-426A-B8A4-9456D9C4FE0D}
 	EndGlobalSection
 EndGlobal

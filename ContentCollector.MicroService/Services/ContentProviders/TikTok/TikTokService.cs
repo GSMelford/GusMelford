@@ -1,5 +1,6 @@
-﻿using ContentCollector.MircoService.Domain.ContentProviders.TikTok;
-using ContentCollector.MircoService.Domain.System;
+﻿using ContentCollector.Domain.ContentProviders;
+using ContentCollector.Domain.ContentProviders.TikTok;
+using ContentCollector.Domain.System;
 using ContentCollector.Services.ContentProviders.TikTok.TikTokContentHandlers;
 using ContentCollector.Services.ContentProviders.TikTok.TikTokContentHandlers.Abstractions;
 using GusMelfordBot.Extensions;
@@ -18,13 +19,13 @@ public class TikTokService : ITikTokService
         _ftpServerService = ftpServerService;
     }
 
-    public async Task Process(ProcessedContent? processedContent)
+    public async Task Process(ProcessedTikTokContent? processedContent)
     {
         if (processedContent is null) {
             return;
         }
 
-        var handler = new RefererLinkHandler();
+        AbstractTikTokContentHandler handler = new RefererLinkHandler();
         handler
             .SetNext(new VideoInformationHandler())
             .SetNext(new ValidVideoHandler())

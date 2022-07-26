@@ -2,6 +2,6 @@
 
 public class AppSettings
 {
-    public KafkaSettings KafkaSettings { get; set; }
-    public FtpSettings FtpSettings { get; set; }
+    public KafkaSettings KafkaSettings { get; set; } = null!;
+    public FtpSettings FtpSettings { get; set; } = null!;
 }

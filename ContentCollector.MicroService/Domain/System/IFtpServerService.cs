@@ -1,4 +1,4 @@
-﻿namespace ContentCollector.MircoService.Domain.System;
+﻿namespace ContentCollector.Domain.System;
 
 public interface IFtpServerService
 {

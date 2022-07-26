@@ -1,4 +1,4 @@
-﻿using ContentCollector.MircoService.Domain.ContentProviders.TikTok;
+﻿using ContentCollector.Domain.ContentProviders;
 using ContentCollector.Services.ContentProviders.TikTok.TikTokContentHandlers.Abstractions;
 using RestSharp;
 
@@ -6,15 +6,15 @@ namespace ContentCollector.Services.ContentProviders.TikTok.TikTokContentHandler
 
 public class DownloadLinkHandler : AbstractTikTokContentHandler
 {
-    public override async Task<ProcessedContent?> Handle(ProcessedContent processedContent)
+    public override async Task<ProcessedTikTokContent?> Handle(ProcessedTikTokContent processedTikTokContent)
     {
-        byte[]? bytes = await DownloadVideo(processedContent.DownloadLink, processedContent.OriginalLink);
+        byte[]? bytes = await DownloadVideo(processedTikTokContent.DownloadLink, processedTikTokContent.OriginalLink);
         if (bytes is null) {
-            return processedContent;
+            return processedTikTokContent;
         }
 
-        processedContent.Bytes = bytes;
-        return await base.Handle(processedContent);
+        processedTikTokContent.Bytes = bytes;
+        return await base.Handle(processedTikTokContent);
     }
     
     private async Task<byte[]?> DownloadVideo(string? downloadLink, string refererLink)
@@ -26,7 +26,7 @@ public class DownloadLinkHandler : AbstractTikTokContentHandler
         try
         {
             RestRequest request = new RestRequest(downloadLink);
-            request.AddHeader("User-Agent", Constants.USER_AGENT);
+            request.AddHeader("User-Agent", Constants.UserAgent);
             request.AddHeader("Referer", refererLink);
             return (await new RestClient().ExecuteAsync(request)).RawBytes;
         }

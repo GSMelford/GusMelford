@@ -1,24 +1,24 @@
-﻿using ContentCollector.MircoService.Domain.ContentProviders.TikTok;
+﻿using ContentCollector.Domain.ContentProviders;
 using ContentCollector.Services.ContentProviders.TikTok.TikTokContentHandlers.Abstractions;
 
 namespace ContentCollector.Services.ContentProviders.TikTok.TikTokContentHandlers;
 
 public class RefererLinkHandler : AbstractTikTokContentHandler
 {
-    public override async Task<ProcessedContent?> Handle(ProcessedContent processedContent)
+    public override async Task<ProcessedTikTokContent?> Handle(ProcessedTikTokContent processedTikTokContent)
     {
-        if (processedContent.OriginalLink.Contains("https://www.tiktok.com/@"))
+        if (processedTikTokContent.OriginalLink.Contains("https://www.tiktok.com/@"))
         {
-            return await base.Handle(processedContent);
+            return await base.Handle(processedTikTokContent);
         }
         
-        string? refererLink = await processedContent.OriginalLink.GetRefererLink();
+        string? refererLink = await processedTikTokContent.OriginalLink.GetRefererLink();
         if (string.IsNullOrEmpty(refererLink))
         {
-            return processedContent;
+            return processedTikTokContent;
         }
 
-        processedContent.OriginalLink = refererLink;
-        return await base.Handle(processedContent);
+        processedTikTokContent.OriginalLink = refererLink;
+        return await base.Handle(processedTikTokContent);
     }
 }

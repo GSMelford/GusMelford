@@ -1,5 +1,5 @@
 ﻿using System.Net;
-using ContentCollector.MircoService.Domain.System;
+using ContentCollector.Domain.System;
 using ContentCollector.Settings;
 
 namespace ContentCollector.Services.System;

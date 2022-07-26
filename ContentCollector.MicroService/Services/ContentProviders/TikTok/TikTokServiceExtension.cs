@@ -1,7 +1,6 @@
 ﻿using System.Text.RegularExpressions;
+using ContentCollector.Domain.ContentProviders;
 using ContentCollector.KafkaEventHandlers.Events;
-using ContentCollector.MircoService.Domain.ContentProviders;
-using ContentCollector.MircoService.Domain.ContentProviders.TikTok;
 using ContentCollector.Services.ContentProviders.TikTok.TikTokContentHandlers.Abstractions;
 using RestSharp;
 
@@ -9,7 +8,7 @@ namespace ContentCollector.Services.ContentProviders.TikTok;
 
 public static class TikTokServiceExtension
 {
-    public static ProcessedContent? ToBasicProcessedContent(Guid contentId, string messageText)
+    public static ProcessedTikTokContent? ToBasicProcessedContent(Guid contentId, string messageText)
     {
         string? sentTikTokLink = new Regex(@"https://\w*.tiktok.com/\S*")
             .Matches(messageText)
@@ -19,11 +18,10 @@ public static class TikTokServiceExtension
             return null;
         }
         
-        string accompanyingCommentary = messageText.Replace(sentTikTokLink, "");
-        return new ProcessedContent
+        return new ProcessedTikTokContent
         {
             ContentId = contentId,
-            AccompanyingCommentary = accompanyingCommentary,
+            AccompanyingCommentary = messageText.Replace(sentTikTokLink, ""),
             OriginalLink = sentTikTokLink,
             Provider = nameof(ContentProvider.TikTok)
         };
@@ -50,31 +48,31 @@ public static class TikTokServiceExtension
     public static string BuildPathToContent(this string refererLink)
     {
         UserVideo userVideo = GetUserVideo(refererLink);
-        return Path.Combine(Constants.CONTENT_FOLDER, $"{userVideo.Username}-{userVideo.VideoId}");
+        return Path.Combine(Constants.ContentFolder, $"{userVideo.Username}-{userVideo.VideoId}");
     }
 
     private static UserVideo GetUserVideo(string refererLink)
     {
         UserVideo userVideo = new UserVideo();
-        var a = Regex.Match(refererLink, "com/(.*?)/video/(.*)");
+        Match match = Regex.Match(refererLink, "com/(.*?)/video/(.*)");
 
-        userVideo.Username = a.Groups[1].Value;
-        userVideo.VideoId = a.Groups[2].Value;
+        userVideo.Username = match.Groups[1].Value;
+        userVideo.VideoId = match.Groups[2].Value;
 
         return userVideo;
     }
     
-    public static ContentProcessedEvent ToContentProcessedEvent(this ProcessedContent processedContent)
+    public static ContentProcessedEvent ToContentProcessedEvent(this ProcessedTikTokContent processedTikTokContent)
     {
         return new ContentProcessedEvent
         {
-            Id = processedContent.ContentId,
-            Path = processedContent.Path,
-            Provider = processedContent.Provider,
-            AccompanyingCommentary = processedContent.AccompanyingCommentary,
-            IsValid = processedContent.IsValid,
-            OriginalLink = processedContent.OriginalLink,
-            IsSaved = processedContent.IsSaved
+            Id = processedTikTokContent.ContentId,
+            Path = processedTikTokContent.Path,
+            Provider = processedTikTokContent.Provider,
+            AccompanyingCommentary = processedTikTokContent.AccompanyingCommentary,
+            IsValid = processedTikTokContent.IsValid,
+            OriginalLink = processedTikTokContent.OriginalLink,
+            IsSaved = processedTikTokContent.IsSaved
         };
     }
 }

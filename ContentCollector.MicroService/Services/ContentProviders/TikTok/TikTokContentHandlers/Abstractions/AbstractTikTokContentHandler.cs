@@ -1,4 +1,4 @@
-﻿using ContentCollector.MircoService.Domain.ContentProviders.TikTok;
+﻿using ContentCollector.Domain.ContentProviders;
 
 namespace ContentCollector.Services.ContentProviders.TikTok.TikTokContentHandlers.Abstractions;
 
@@ -12,8 +12,8 @@ public abstract class AbstractTikTokContentHandler : IHandler
         return handler;
     }
 
-    public virtual async Task<ProcessedContent?> Handle(ProcessedContent processedContent)
+    public virtual async Task<ProcessedTikTokContent?> Handle(ProcessedTikTokContent processedTikTokContent)
     {
-        return await _nextHandler?.Handle(processedContent)!;
+        return await _nextHandler?.Handle(processedTikTokContent)!;
     }
 }

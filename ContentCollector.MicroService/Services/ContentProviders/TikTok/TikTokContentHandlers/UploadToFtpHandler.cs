@@ -1,5 +1,5 @@
-﻿using ContentCollector.MircoService.Domain.ContentProviders.TikTok;
-using ContentCollector.MircoService.Domain.System;
+﻿using ContentCollector.Domain.ContentProviders;
+using ContentCollector.Domain.System;
 using ContentCollector.Services.ContentProviders.TikTok.TikTokContentHandlers.Abstractions;
 
 namespace ContentCollector.Services.ContentProviders.TikTok.TikTokContentHandlers;
@@ -13,17 +13,17 @@ public class UploadToFtpHandler : AbstractTikTokContentHandler
         _ftpServerService = ftpServerService;
     }
     
-    public override async Task<ProcessedContent?> Handle(ProcessedContent processedContent)
+    public override async Task<ProcessedTikTokContent?> Handle(ProcessedTikTokContent processedTikTokContent)
     {
-        processedContent.Path = processedContent.OriginalLink.BuildPathToContent();
+        processedTikTokContent.Path = processedTikTokContent.OriginalLink.BuildPathToContent();
         bool isSuccessfullySaved =
-            await _ftpServerService.UploadFile(processedContent.Path, new MemoryStream(processedContent.Bytes));
+            await _ftpServerService.UploadFile(processedTikTokContent.Path, new MemoryStream(processedTikTokContent.Bytes));
 
         if (!isSuccessfullySaved)
         {
-            return processedContent;
+            return processedTikTokContent;
         }
         
-        return await base.Handle(processedContent);
+        return await base.Handle(processedTikTokContent);
     }
 }
