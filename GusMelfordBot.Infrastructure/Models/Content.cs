@@ -12,7 +12,6 @@ public class Content : BaseEntity
     public string? Path { get; set; }
     public long? MessageId { get; set; }
     public string? AccompanyingCommentary { get; set; }
-    public Guid? SameContentId { get; set; }
     public int? Height { get; set; }
     public int? Width { get; set; }
     public int? Duration { get; set; }

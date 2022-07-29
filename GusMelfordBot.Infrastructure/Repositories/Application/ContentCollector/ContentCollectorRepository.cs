@@ -72,7 +72,6 @@ public class ContentCollectorRepository : IContentCollectorRepository
         content.IsValid = contentProcessed.IsValid;
         content.IsSaved = contentProcessed.IsSaved;
         content.OriginalLink = contentProcessed.OriginalLink;
-        content.SameContentId = sameContent?.Id;
         content.Height = contentProcessed.Height;
         content.Width = contentProcessed.Width;
         content.Duration = contentProcessed.Duration;
