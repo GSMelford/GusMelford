@@ -1,4 +1,4 @@
-﻿using SimpleKafka.Models;
+﻿using GusMelfordBot.SimpleKafka.Models;
 
 namespace ContentCollector.KafkaEventHandlers.Events;
 

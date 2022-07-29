@@ -4,7 +4,7 @@ using GusMelfordBot.Api.KafkaEventHandlers.Handlers;
 using GusMelfordBot.Api.Settings;
 using GusMelfordBot.Infrastructure;
 using GusMelfordBot.Infrastructure.Interfaces;
-using SimpleKafka.Interfaces;
+using GusMelfordBot.SimpleKafka.Interfaces;
 
 namespace GusMelfordBot.Api;
 

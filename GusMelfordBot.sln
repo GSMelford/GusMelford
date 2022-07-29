@@ -14,6 +14,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ContentCollector", "Content
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GusMelfordBot.Extensions", "GusMelfordBot.Extensions\GusMelfordBot.Extensions.csproj", "{988F5C1A-3979-4986-80B5-4A2B46C73B3D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GusMelfordBot.SimpleKafka", "GusMelfordBot.SimpleKafka\GusMelfordBot.SimpleKafka.csproj", "{6DC80D55-D673-48C7-8CEF-C0CC547EA765}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -40,6 +42,10 @@ Global
 		{988F5C1A-3979-4986-80B5-4A2B46C73B3D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{988F5C1A-3979-4986-80B5-4A2B46C73B3D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{988F5C1A-3979-4986-80B5-4A2B46C73B3D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6DC80D55-D673-48C7-8CEF-C0CC547EA765}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6DC80D55-D673-48C7-8CEF-C0CC547EA765}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6DC80D55-D673-48C7-8CEF-C0CC547EA765}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6DC80D55-D673-48C7-8CEF-C0CC547EA765}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{8034EF3D-64C6-426A-B8A4-9456D9C4FE0D} = {BEE7298B-24F2-4141-A120-D50B55284C24}

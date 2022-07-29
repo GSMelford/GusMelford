@@ -5,8 +5,8 @@ using ContentCollector.KafkaEventHandlers.Handlers;
 using ContentCollector.Services.ContentProviders.TikTok;
 using ContentCollector.Settings;
 using GusMelfordBot.Extensions.Services.Ftp;
-using SimpleKafka;
-using SimpleKafka.Interfaces;
+using GusMelfordBot.SimpleKafka;
+using GusMelfordBot.SimpleKafka.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 AppSettings appSettings = new AppSettings();

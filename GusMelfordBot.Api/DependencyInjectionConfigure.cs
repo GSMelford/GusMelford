@@ -12,7 +12,7 @@ using GusMelfordBot.Infrastructure.Interfaces;
 using GusMelfordBot.Infrastructure.Repositories.Application;
 using GusMelfordBot.Infrastructure.Repositories.Application.ContentCollector;
 using GusMelfordBot.Infrastructure.Repositories.Auth;
-using SimpleKafka;
+using GusMelfordBot.SimpleKafka;
 using TBot.Client;
 
 namespace GusMelfordBot.Api;

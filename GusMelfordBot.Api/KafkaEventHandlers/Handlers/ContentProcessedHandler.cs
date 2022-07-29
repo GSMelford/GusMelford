@@ -1,6 +1,6 @@
 ﻿using GusMelfordBot.Api.KafkaEventHandlers.Events;
 using GusMelfordBot.Domain.Application.ContentCollector;
-using SimpleKafka.Interfaces;
+using GusMelfordBot.SimpleKafka.Interfaces;
 
 namespace GusMelfordBot.Api.KafkaEventHandlers.Handlers;
 

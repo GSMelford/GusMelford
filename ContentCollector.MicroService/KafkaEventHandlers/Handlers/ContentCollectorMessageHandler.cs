@@ -2,7 +2,7 @@
 using ContentCollector.Domain.ContentProviders.TikTok;
 using ContentCollector.KafkaEventHandlers.Events;
 using ContentCollector.Services.ContentProviders.TikTok;
-using SimpleKafka.Interfaces;
+using GusMelfordBot.SimpleKafka.Interfaces;
 
 namespace ContentCollector.KafkaEventHandlers.Handlers;
 

@@ -4,16 +4,19 @@
         <TargetFramework>net6.0</TargetFramework>
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
+        <UserSecretsId>1cdb3043-9e6b-4368-bf3a-4fb247aa7d29</UserSecretsId>
+        <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
     </PropertyGroup>
 
     <ItemGroup>
       <ProjectReference Include="..\GusMelfordBot.Domain\GusMelfordBot.Domain.csproj" />
       <ProjectReference Include="..\GusMelfordBot.Extensions\GusMelfordBot.Extensions.csproj" />
       <ProjectReference Include="..\GusMelfordBot.Infrastructure\GusMelfordBot.Infrastructure.csproj" />
+      <ProjectReference Include="..\GusMelfordBot.SimpleKafka\GusMelfordBot.SimpleKafka.csproj" />
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="SimpleKafka" Version="0.1.3" />
+      <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.15.1" />
       <PackageReference Include="TBot.Client" Version="0.2.6" />
       <PackageReference Include="TBot.Telegram.Dto" Version="0.1.7" />
     </ItemGroup>
