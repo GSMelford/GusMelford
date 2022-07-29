@@ -12,7 +12,6 @@ services:
       - PGDATA=/var/lib/postgresql/data/pgdata
     volumes:
       - gusmelforddb:/var/lib/postgresql/data
-      - /home/pi/Test:/datalake
 
   gusmelford.contentcollector:
     image: $DOCKER_REPO/$CONTAINER_NAME_CONTENT:$DOCKER_CONTAINER_TAG
@@ -81,3 +80,4 @@ services:
 
 volumes:
   gusmelforddb:
+  rabbitmqdata:
