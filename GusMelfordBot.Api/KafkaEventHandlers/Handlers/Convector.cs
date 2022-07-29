@@ -15,7 +15,10 @@ public static class Convector
             ContentId = contentProcessedEvent.Id,
             IsSaved = contentProcessedEvent.IsSaved,
             IsValid = contentProcessedEvent.IsValid,
-            OriginalLink = contentProcessedEvent.OriginalLink
+            OriginalLink = contentProcessedEvent.OriginalLink,
+            Height = contentProcessedEvent.Height,
+            Width = contentProcessedEvent.Width,
+            Duration = contentProcessedEvent.Duration
         };
     }
 }

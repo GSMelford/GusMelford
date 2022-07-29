@@ -41,20 +41,26 @@ public class ContentCollectorRepository : IContentCollectorRepository
         Content? sameContent = await _databaseContext.Set<Content>()
             .FirstOrDefaultAsync(x => x.OriginalLink == contentProcessed.OriginalLink);
         
-        await Update(content, contentProcessed, sameContent?.Id);
-    }
-
-    private async Task Update(Content content, ContentProcessed contentProcessed, Guid? sameContentId)
-    {
         content.Path = contentProcessed.Path;
         content.Provider = contentProcessed.Provider;
         content.AccompanyingCommentary = contentProcessed.AccompanyingCommentary;
         content.IsValid = contentProcessed.IsValid;
         content.IsSaved = contentProcessed.IsSaved;
         content.OriginalLink = contentProcessed.OriginalLink;
-        content.SameContentId = sameContentId;
+        content.SameContentId = sameContent?.Id;
+        content.Height = contentProcessed.Height;
+        content.Width = contentProcessed.Width;
+        content.Duration = contentProcessed.Duration;
         
         _databaseContext.Update(content);
         await _databaseContext.SaveChangesAsync();
+    }
+
+    public IEnumerable<ContentDomain> GetContents(ContentFilter contentFilter)
+    {
+        return _databaseContext.Set<Content>()
+            .Include(x=>x.User)
+            .Where(x => x.IsViewed == contentFilter.IsViewed && x.IsSaved && x.IsValid == true)
+            .Select(x=>x.ToDomain());
     }
 }

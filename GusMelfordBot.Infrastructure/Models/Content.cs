@@ -14,6 +14,9 @@ public class Content : BaseEntity
     public long? MessageId { get; set; }
     public string? AccompanyingCommentary { get; set; }
     public Guid? SameContentId { get; set; }
+    public int? Height { get; set; }
+    public int? Width { get; set; }
+    public int? Duration { get; set; }
     public bool? IsValid { get; set; }
     public bool IsViewed { get; set; }
     public bool IsSaved { get; set; }

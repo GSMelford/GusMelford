@@ -1,5 +1,6 @@
 ﻿using ContentCollector.Domain.ContentProviders;
 using ContentCollector.Services.ContentProviders.TikTok.TikTokContentHandlers.Abstractions;
+using GusMelfordBot.Extensions;
 using Newtonsoft.Json.Linq;
 using RestSharp;
 
@@ -18,6 +19,9 @@ public class VideoInformationHandler : AbstractTikTokContentHandler
         int.TryParse(token["statusCode"]?.ToString(), out int code);
         processedTikTokContent.VideoStatusCode = code;
         processedTikTokContent.DownloadLink = GetDownloadLink(token);
+        processedTikTokContent.Height = GetHeightContent(token);
+        processedTikTokContent.Width = GetWidthContent(token);
+        processedTikTokContent.Duration = GetDurationContent(token);
         return await base.Handle(processedTikTokContent);
     }
     
@@ -38,5 +42,20 @@ public class VideoInformationHandler : AbstractTikTokContentHandler
     private static string? GetDownloadLink(JToken videoInformation)
     {
         return videoInformation["itemInfo"]?["itemStruct"]?["video"]?["downloadAddr"]?.ToString();
+    }
+    
+    private static int? GetHeightContent(JToken videoInformation)
+    {
+        return videoInformation["itemInfo"]?["itemStruct"]?["video"]?["height"]?.ToString().ToInt();
+    }
+    
+    private static int? GetWidthContent(JToken videoInformation)
+    {
+        return videoInformation["itemInfo"]?["itemStruct"]?["video"]?["width"]?.ToString().ToInt();
+    }
+    
+    private static int? GetDurationContent(JToken videoInformation)
+    {
+        return videoInformation["itemInfo"]?["itemStruct"]?["video"]?["duration"]?.ToString().ToInt();
     }
 }

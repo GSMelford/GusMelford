@@ -12,4 +12,7 @@ public class ProcessedTikTokContent
     public string? DownloadLink { get; set; }
     public byte[] Bytes { get; set; } = Array.Empty<byte>();
     public bool IsSaved { get; set; }
+    public int? Height { get; set; }
+    public int? Width { get; set; }
+    public int? Duration { get; set; }
 }

@@ -72,7 +72,10 @@ public static class TikTokServiceExtension
             AccompanyingCommentary = processedTikTokContent.AccompanyingCommentary,
             IsValid = processedTikTokContent.IsValid,
             OriginalLink = processedTikTokContent.OriginalLink,
-            IsSaved = processedTikTokContent.IsSaved
+            IsSaved = processedTikTokContent.IsSaved,
+            Height = processedTikTokContent.Height,
+            Width = processedTikTokContent.Width,
+            Duration = processedTikTokContent.Duration
         };
     }
 }
