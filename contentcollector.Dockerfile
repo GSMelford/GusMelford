@@ -7,20 +7,18 @@ EXPOSE 443
 
 FROM mcr.microsoft.com/dotnet/sdk:6.0.201-bullseye-slim-arm64v8 AS build
 WORKDIR /src
-COPY ["GusMelfordBot.Api/GusMelfordBot.Api.csproj", "GusMelfordBot.Api/"]
+COPY ["ContentCollector.MicroService/ContentCollector.MicroService.csproj", "ContentCollector.MicroService/"]
 COPY ["GusMelfordBot.Extensions/GusMelfordBot.Extensions.csproj", "GusMelfordBot.Extensions/"]
-COPY ["GusMelfordBot.Domain/GusMelfordBot.Domain.csproj", "GusMelfordBot.Domain/"]
-COPY ["GusMelfordBot.Infrastructure/GusMelfordBot.Infrastructure.csproj", "GusMelfordBot.Infrastructure/"]
 COPY ["GusMelfordBot.SimpleKafka/GusMelfordBot.SimpleKafka.csproj", "GusMelfordBot.SimpleKafka/"]
-RUN dotnet restore "GusMelfordBot.Api/GusMelfordBot.Api.csproj"
+RUN dotnet restore "ContentCollector.MicroService/ContentCollector.MicroService.csproj"
 COPY . .
-WORKDIR "/src/GusMelfordBot.Api"
-RUN dotnet build "GusMelfordBot.Api.csproj" -c Release -o /app/build
+WORKDIR "/src/ContentCollector.MicroService"
+RUN dotnet build "ContentCollector.MicroService.csproj" -c Release -o /app/build
 
 FROM build AS publish
-RUN dotnet publish "GusMelfordBot.Api.csproj" -c Release -o /app/publish
+RUN dotnet publish "ContentCollector.MicroService.csproj" -c Release -o /app/publish
 
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-ENTRYPOINT ["dotnet", "GusMelfordBot.Api.dll"]
+ENTRYPOINT ["dotnet", "ContentCollector.MicroService.dll"]
