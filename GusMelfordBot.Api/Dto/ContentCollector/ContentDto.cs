@@ -2,8 +2,10 @@
 
 public class ContentDto
 {
+    public Guid Id { get; set; }
+    public string ContentPath { get; set; }
     public long Number { get; set; }
-    public UserDto User { get; set; }
+    public List<UserDto> Users { get; set; }
     public string? Provider { get; set; }
     public string? OriginalLink { get; set; }
     public string? AccompanyingCommentary { get; set; }

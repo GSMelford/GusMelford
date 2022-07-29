@@ -1,9 +1,9 @@
 ﻿using ContentCollector.Domain.ContentProviders;
 using ContentCollector.Domain.ContentProviders.TikTok;
-using ContentCollector.Domain.System;
 using ContentCollector.Services.ContentProviders.TikTok.TikTokContentHandlers;
 using ContentCollector.Services.ContentProviders.TikTok.TikTokContentHandlers.Abstractions;
 using GusMelfordBot.Extensions;
+using GusMelfordBot.Extensions.Services.Ftp;
 using SimpleKafka.Interfaces;
 
 namespace ContentCollector.Services.ContentProviders.TikTok;

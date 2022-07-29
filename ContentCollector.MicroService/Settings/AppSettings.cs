@@ -1,4 +1,6 @@
-﻿namespace ContentCollector.Settings;
+﻿using GusMelfordBot.Extensions.Services.Ftp;
+
+namespace ContentCollector.Settings;
 
 public class AppSettings
 {

@@ -1,6 +1,6 @@
 ﻿using ContentCollector.Domain.ContentProviders;
-using ContentCollector.Domain.System;
 using ContentCollector.Services.ContentProviders.TikTok.TikTokContentHandlers.Abstractions;
+using GusMelfordBot.Extensions.Services.Ftp;
 
 namespace ContentCollector.Services.ContentProviders.TikTok.TikTokContentHandlers;
 

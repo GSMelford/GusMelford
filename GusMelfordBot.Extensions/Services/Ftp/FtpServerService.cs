@@ -1,17 +1,16 @@
 ﻿using System.Net;
-using ContentCollector.Domain.System;
-using ContentCollector.Settings;
+using Microsoft.Extensions.Logging;
 
-namespace ContentCollector.Services.System;
+namespace GusMelfordBot.Extensions.Services.Ftp;
 
 public class FtpServerService : IFtpServerService
 {
     private readonly FtpSettings _ftpSettings;
-    private readonly ILogger<FtpServerService> _logger;
+    private readonly ILogger<IFtpServerService> _logger;
 
-    public FtpServerService(AppSettings appSettings, ILogger<FtpServerService> logger)
+    public FtpServerService(FtpSettings ftpSettings, ILogger<IFtpServerService> logger)
     {
-        _ftpSettings = appSettings.FtpSettings;
+        _ftpSettings = ftpSettings;
         _logger = logger;
     }
     

@@ -13,11 +13,13 @@ public static class Convertor
     {
         return new ContentDto
         {
-            User = new UserDto
+            Id = contentDomain.Id,
+            ContentPath = contentDomain.ContentPath,
+            Users = contentDomain.Users.Select(x=>new UserDto
             {
-                FirstName = contentDomain.User.FirstName,
-                LastName = contentDomain.User.LastName
-            },
+                FirstName = x.FirstName,
+                LastName = x.LastName
+            }).ToList(),
             OriginalLink = contentDomain.OriginalLink,
             Height = contentDomain.Height,
             Width = contentDomain.Width,

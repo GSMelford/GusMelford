@@ -6,6 +6,7 @@ using GusMelfordBot.Domain.Application;
 using GusMelfordBot.Domain.Application.ContentCollector;
 using GusMelfordBot.Domain.Auth;
 using GusMelfordBot.Domain.Telegram;
+using GusMelfordBot.Extensions.Services.Ftp;
 using GusMelfordBot.Infrastructure;
 using GusMelfordBot.Infrastructure.Interfaces;
 using GusMelfordBot.Infrastructure.Repositories.Application;
@@ -23,12 +24,16 @@ public static class DependencyInjectionConfigure
         serviceCollection.AddHttpClient();
         serviceCollection.AddSignalR();
         serviceCollection.AddTBotClient(appSettings.TelegramBotSettings.Token);
-        serviceCollection.AddTransient<IDatabaseContext, DatabaseContext>(_ => new DatabaseContext(appSettings.DatabaseSettings));
+        serviceCollection.AddTransient<IDatabaseContext, DatabaseContext>(_ =>
+            new DatabaseContext(appSettings.DatabaseSettings));
         serviceCollection.AddTransient<IUpdateService, UpdateService>();
         serviceCollection.AddTransient<IAuthRepository, AuthRepository>();
         serviceCollection.AddTransient<IApplicationRepository, ApplicationRepository>();
         serviceCollection.AddTransient<IContentCollectorRepository, ContentCollectorRepository>();
         serviceCollection.AddTransient<IContentCollectorService, ContentCollectorService>();
+        serviceCollection.AddTransient<IFtpServerService, FtpServerService>(
+            provider => new FtpServerService(appSettings.FtpSettings, 
+                provider.GetRequiredService<ILogger<IFtpServerService>>()));
         serviceCollection.AddSingleton(appSettings);
         serviceCollection.AddHealthChecks();
         serviceCollection.AddControllers();

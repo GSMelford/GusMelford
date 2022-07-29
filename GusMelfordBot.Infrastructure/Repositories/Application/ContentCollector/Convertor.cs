@@ -8,8 +8,10 @@ public static class Convertor
     public static ContentDomain ToDomain(this Content content)
     {
         return new ContentDomain(
+            content.Id,
+            $"api/content-collector/content?contentId={content.Id}",
             content.Number,
-            new UserDomain(content.User.FirstName, content.User.LastName),
+            content.Users.Select(x=> new UserDomain(x.FirstName, x.LastName)).ToList(),
             content.Provider,
             content.OriginalLink,
             content.AccompanyingCommentary,

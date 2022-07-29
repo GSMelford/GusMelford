@@ -1,4 +1,4 @@
-﻿namespace ContentCollector.Domain.System;
+﻿namespace GusMelfordBot.Extensions.Services.Ftp;
 
 public interface IFtpServerService
 {

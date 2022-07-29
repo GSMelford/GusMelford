@@ -24,11 +24,11 @@ public class ContentCollectorRepository : IContentCollectorRepository
         {
             Id = contentId,
             Chat = await _databaseContext.Set<TelegramChat>().FirstAsync(x => x.ChatId == chatId),
-            User = await _databaseContext.Set<User>().FirstAsync(x => x.Id == telegramUser.UserId),
             OriginalLink = Regex.Match(messageText, "https://\\S*").Groups[0].Value,
             MessageId = messageId
         };
         
+        content.Users.Add(await _databaseContext.Set<User>().FirstAsync(x => x.Id == telegramUser.UserId));
         await _databaseContext.AddAsync(content);
         await _databaseContext.SaveChangesAsync();
     }
@@ -36,10 +36,35 @@ public class ContentCollectorRepository : IContentCollectorRepository
     public async Task Update(ContentProcessed contentProcessed)
     {
         Content content = await _databaseContext.Set<Content>()
+            .Include(x=>x.Users)
             .FirstAsync(x => x.Id == contentProcessed.ContentId);
         
         Content? sameContent = await _databaseContext.Set<Content>()
+            .Include(x=>x.Users)
             .FirstOrDefaultAsync(x => x.OriginalLink == contentProcessed.OriginalLink);
+
+        if (sameContent is not null)
+        {
+            if (!string.IsNullOrEmpty(contentProcessed.AccompanyingCommentary))
+            {
+                string? updateAccompanyingCommentary = sameContent.AccompanyingCommentary;
+                if (sameContent.Users.Count == 1 && !string.IsNullOrEmpty(updateAccompanyingCommentary))
+                {
+                    updateAccompanyingCommentary =
+                        $"{sameContent.Users.First().FirstName} {sameContent.Users.First().FirstName}: {sameContent.AccompanyingCommentary}";
+                }
+
+                updateAccompanyingCommentary +=
+                    $"{content.Users.First().FirstName} {content.Users.First().FirstName}: {contentProcessed.AccompanyingCommentary}";
+                sameContent.AccompanyingCommentary = updateAccompanyingCommentary;
+            }
+            
+            sameContent.Users.Add(content.Users.FirstOrDefault()!);
+            _databaseContext.Update(sameContent);
+            _databaseContext.Remove(content);
+            await _databaseContext.SaveChangesAsync();
+            return;
+        }
         
         content.Path = contentProcessed.Path;
         content.Provider = contentProcessed.Provider;
@@ -59,8 +84,13 @@ public class ContentCollectorRepository : IContentCollectorRepository
     public IEnumerable<ContentDomain> GetContents(ContentFilter contentFilter)
     {
         return _databaseContext.Set<Content>()
-            .Include(x=>x.User)
+            .Include(x => x.Users)
             .Where(x => x.IsViewed == contentFilter.IsViewed && x.IsSaved && x.IsValid == true)
             .Select(x=>x.ToDomain());
+    }
+
+    public async Task<string?> GetContentPath(Guid contentId)
+    {
+        return (await _databaseContext.Set<Content>().FirstOrDefaultAsync(x => x.Id == contentId))?.Path;
     }
 }

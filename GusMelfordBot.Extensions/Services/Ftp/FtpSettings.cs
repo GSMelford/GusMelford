@@ -1,4 +1,4 @@
-﻿namespace ContentCollector.Settings;
+﻿namespace GusMelfordBot.Extensions.Services.Ftp;
 
 public class FtpSettings
 {

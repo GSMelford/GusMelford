@@ -21,7 +21,7 @@ public static class TikTokServiceExtension
         return new ProcessedTikTokContent
         {
             ContentId = contentId,
-            AccompanyingCommentary = messageText.Replace(sentTikTokLink, ""),
+            AccompanyingCommentary = messageText.Replace(sentTikTokLink, "").Trim(),
             OriginalLink = sentTikTokLink,
             Provider = nameof(ContentProvider.TikTok)
         };

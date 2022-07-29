@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace GusMelfordBot.Api.Controllers;
 
 [ApiController]
-[Route("content-collector")]
+[Route("api/content-collector")]
 public class ContentCollectorController : Controller
 {
     private readonly IContentCollectorService _contentCollectorService;
@@ -19,5 +19,20 @@ public class ContentCollectorController : Controller
     public IEnumerable<ContentDto> GetContents([FromQuery] ContentFilterDto filterDto)
     {
         return _contentCollectorService.GetContents(filterDto.ToDomain()).Select(x => x.ToDto());
+    }
+    
+    [HttpGet("content")]
+    public async Task<FileStreamResult?> GetContent([FromQuery] Guid contentId)
+    {
+        MemoryStream memoryStream = await _contentCollectorService.GetContentStreamAsync(contentId);
+        FileStreamResult fileStreamResult = new FileStreamResult(memoryStream, "video/mp4");
+        
+        HttpContext.Response.Headers.Add("Content-Length", memoryStream.Length.ToString());
+        HttpContext.Response.Headers.Add("Accept-Ranges", "bytes");
+        HttpContext.Response.Headers.Add("Cache-Control", "no-cache, no-store, must-revalidate");
+        HttpContext.Response.Headers.Add("Pragma", "no-cache");
+        HttpContext.Response.Headers.Add("Expires", "0");
+        
+        return fileStreamResult;
     }
 }
