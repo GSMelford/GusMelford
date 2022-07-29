@@ -17,9 +17,9 @@ services:
     image: $DOCKER_REPO/$CONTAINER_NAME_CONTENT:$DOCKER_CONTAINER_TAG
     restart: always
     ports:
-      - 5667:80
+      - 5668:80
     environment:
-      - AppSettings:KafkaSettings:BootstrapServers=kafka
+      - AppSettings:KafkaSettings:BootstrapServers=localhost
       - AppSettings:FtpSettings:FtpUrl=$FTP_URL
       - AppSettings:FtpSettings:Username=$FTP_USER
       - AppSettings:FtpSettings:Password=$FTP_PASSWORD
@@ -34,7 +34,7 @@ services:
       - $PORT:80
     environment:
       - AppSettings:TelegramBotSettings:Token=$GUSMELFORDBOT_TELEGRAM_TOKEN
-      - AppSettings:KafkaSettings:BootstrapServers=kafka
+      - AppSettings:KafkaSettings:BootstrapServers=localhost
       - AppSettings:DatabaseSettings:Host=$GUSMELFORDBOT_HOST
       - AppSettings:DatabaseSettings:Port=5432
       - AppSettings:DatabaseSettings:Database=gusmelford.app
