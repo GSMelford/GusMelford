@@ -25,7 +25,7 @@ public class ContentCollectorRepository : IContentCollectorRepository
             Id = contentId,
             Chat = await _databaseContext.Set<TelegramChat>().FirstAsync(x => x.ChatId == chatId),
             User = await _databaseContext.Set<User>().FirstAsync(x => x.Id == telegramUser.UserId),
-            OriginalLink = Regex.Match(messageText, "https:///\\S*").Groups[1].Value,
+            OriginalLink = Regex.Match(messageText, "https://\\S*").Groups[0].Value,
             MessageId = messageId
         };
         

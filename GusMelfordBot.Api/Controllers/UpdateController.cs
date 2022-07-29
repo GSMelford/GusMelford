@@ -32,7 +32,7 @@ public class UpdateController : Controller
         }
         catch (Exception e)
         {
-            _logger.LogError(e, "Update from telegram error. UpdateId: {UpdateId}", update.UpdateId);
+           _logger.LogError(e, "Update from telegram error. UpdateId: {UpdateId}", update.UpdateId);
             return BadRequest();
         }
         

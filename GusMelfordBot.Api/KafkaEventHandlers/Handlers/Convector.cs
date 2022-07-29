@@ -10,7 +10,7 @@ public static class Convector
         return new ContentProcessed
         {
             Path = contentProcessedEvent.Path,
-            Provider = contentProcessedEvent.Path,
+            Provider = contentProcessedEvent.Provider,
             AccompanyingCommentary = contentProcessedEvent.AccompanyingCommentary,
             ContentId = contentProcessedEvent.Id,
             IsSaved = contentProcessedEvent.IsSaved,

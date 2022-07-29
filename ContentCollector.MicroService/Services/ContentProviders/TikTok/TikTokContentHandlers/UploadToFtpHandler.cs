@@ -23,7 +23,8 @@ public class UploadToFtpHandler : AbstractTikTokContentHandler
         {
             return processedTikTokContent;
         }
-        
+
+        processedTikTokContent.IsSaved = isSuccessfullySaved;
         return await base.Handle(processedTikTokContent);
     }
 }

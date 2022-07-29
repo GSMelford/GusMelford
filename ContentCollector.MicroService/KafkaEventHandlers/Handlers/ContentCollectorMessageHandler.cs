@@ -9,9 +9,11 @@ namespace ContentCollector.KafkaEventHandlers.Handlers;
 public class ContentCollectorMessageHandler : IEventHandler<ContentCollectorMessageEvent>
 {
     private readonly ITikTokService _tikTokService;
+    private readonly IKafkaProducer<string> _kafkaProducer;
     
-    public ContentCollectorMessageHandler(ITikTokService tikTokService)
+    public ContentCollectorMessageHandler(IKafkaProducer<string> kafkaProducer, ITikTokService tikTokService)
     {
+        _kafkaProducer = kafkaProducer;
         _tikTokService = tikTokService;
     }
     
@@ -24,6 +26,7 @@ public class ContentCollectorMessageHandler : IEventHandler<ContentCollectorMess
                 await _tikTokService.Process(TikTokServiceExtension.ToBasicProcessedContent(@event.Id, messageText));
                 break;
             case ContentProvider.Unknown:
+                await _kafkaProducer.ProduceAsync(new ContentProcessedEvent { IsValid = false });
                 break;
             default:
                 throw new ArgumentOutOfRangeException();

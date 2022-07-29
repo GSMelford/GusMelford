@@ -17,5 +17,4 @@ public class Content : BaseEntity
     public bool? IsValid { get; set; }
     public bool IsViewed { get; set; }
     public bool IsSaved { get; set; }
-    public ICollection<TelegramChat> TelegramChats { get; set; } = new List<TelegramChat>();
 }

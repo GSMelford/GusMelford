@@ -14,6 +14,11 @@ public abstract class AbstractTikTokContentHandler : IHandler
 
     public virtual async Task<ProcessedTikTokContent?> Handle(ProcessedTikTokContent processedTikTokContent)
     {
-        return await _nextHandler?.Handle(processedTikTokContent)!;
+        if (_nextHandler is not null)
+        {
+            return await _nextHandler.Handle(processedTikTokContent);
+        }
+        
+        return processedTikTokContent;
     }
 }

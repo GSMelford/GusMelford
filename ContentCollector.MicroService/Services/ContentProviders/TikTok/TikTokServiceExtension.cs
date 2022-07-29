@@ -48,7 +48,7 @@ public static class TikTokServiceExtension
     public static string BuildPathToContent(this string refererLink)
     {
         UserVideo userVideo = GetUserVideo(refererLink);
-        return Path.Combine(Constants.ContentFolder, $"{userVideo.Username}-{userVideo.VideoId}");
+        return Path.Combine(Constants.ContentFolder, $"{userVideo.Username}-{userVideo.VideoId}.mp4");
     }
 
     private static UserVideo GetUserVideo(string refererLink)

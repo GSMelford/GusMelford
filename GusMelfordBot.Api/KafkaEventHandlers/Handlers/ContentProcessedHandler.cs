@@ -13,9 +13,8 @@ public class ContentProcessedHandler : IEventHandler<ContentProcessedEvent>
         _contentCollectorRepository = contentCollectorRepository;
     }
 
-    public Task Handle(ContentProcessedEvent @event)
+    public async Task Handle(ContentProcessedEvent @event)
     {
-        _contentCollectorRepository.Update(@event.ToContentProcessed());
-        return Task.CompletedTask;
+        await _contentCollectorRepository.Update(@event.ToContentProcessed());
     }
 }

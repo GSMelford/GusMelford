@@ -43,9 +43,10 @@ public class TelegramMessageReceivedHandler : IEventHandler<TelegramMessageRecei
         if (string.IsNullOrEmpty(messageText)) {
             return;
         }
-                    
+                   
+        Guid contentId = Guid.NewGuid();
         await _contentCollectorRepository.Create(
-            @event.Id,
+            contentId,
             @event.Message?.Chat?.Id,
             @event.Message?.From?.Id,
             messageText,
@@ -53,7 +54,7 @@ public class TelegramMessageReceivedHandler : IEventHandler<TelegramMessageRecei
 
         await _kafkaProducer.ProduceAsync(new ContentCollectorMessageEvent
         {
-            Id = @event.Id,
+            Id = contentId,
             MessageText = messageText
         });
     }
