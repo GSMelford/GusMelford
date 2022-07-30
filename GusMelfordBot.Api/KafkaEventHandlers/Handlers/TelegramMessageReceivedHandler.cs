@@ -1,6 +1,7 @@
 ﻿using GusMelfordBot.Api.KafkaEventHandlers.Events;
 using GusMelfordBot.Domain.Application;
 using GusMelfordBot.Domain.Application.ContentCollector;
+using GusMelfordBot.Domain.Telegram;
 using GusMelfordBot.SimpleKafka.Interfaces;
 
 namespace GusMelfordBot.Api.KafkaEventHandlers.Handlers;
@@ -10,15 +11,18 @@ public class TelegramMessageReceivedHandler : IEventHandler<TelegramMessageRecei
     private readonly IKafkaProducer<string> _kafkaProducer;
     private readonly IApplicationRepository _applicationRepository;
     private readonly IContentCollectorRepository _contentCollectorRepository;
+    private readonly IGusMelfordBotService _gusMelfordBotService;
 
     public TelegramMessageReceivedHandler(
         IKafkaProducer<string> kafkaProducer,
         IApplicationRepository applicationRepository,
-        IContentCollectorRepository contentCollectorRepository)
+        IContentCollectorRepository contentCollectorRepository, 
+        IGusMelfordBotService gusMelfordBotService)
     {
         _kafkaProducer = kafkaProducer;
         _applicationRepository = applicationRepository;
         _contentCollectorRepository = contentCollectorRepository;
+        _gusMelfordBotService = gusMelfordBotService;
     }
 
     public async Task Handle(TelegramMessageReceivedEvent @event)
@@ -30,6 +34,7 @@ public class TelegramMessageReceivedHandler : IEventHandler<TelegramMessageRecei
             {
                 case ApplicationService.ContentCollector:
                     await HandleContentCollector(@event);
+                    await _gusMelfordBotService.DeleteMessage(chatId.Value, @event.Message!.MessageId!.Value);
                     break;
                 case ApplicationService.Unknown:
                     break;
