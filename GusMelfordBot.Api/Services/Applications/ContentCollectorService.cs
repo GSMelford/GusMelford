@@ -36,4 +36,9 @@ public class ContentCollectorService : IContentCollectorService
         
         return memoryStream;
     }
+
+    public Task<ContentCollectorInfo> GetContentCollectorInfo(ContentFilter contentFilter)
+    {
+        return _contentCollectorRepository.GetContentCollectorInfo(contentFilter);
+    }
 }

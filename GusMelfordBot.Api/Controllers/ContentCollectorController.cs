@@ -35,4 +35,10 @@ public class ContentCollectorController : Controller
         
         return fileStreamResult;
     }
+    
+    [HttpGet("info")]
+    public async Task<ContentCollectorInfoDto> GetInfo([FromQuery] ContentFilterDto filterDto)
+    {
+        return (await _contentCollectorService.GetContentCollectorInfo(filterDto.ToDomain())).ToDto();
+    }
 }

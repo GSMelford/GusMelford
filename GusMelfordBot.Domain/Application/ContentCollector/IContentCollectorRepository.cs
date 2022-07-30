@@ -6,4 +6,5 @@ public interface IContentCollectorRepository
     Task Update(ContentProcessed contentProcessed);
     IEnumerable<ContentDomain> GetContents(ContentFilter contentFilter);
     Task<string?> GetContentPath(Guid contentId);
+    Task<ContentCollectorInfo> GetContentCollectorInfo(ContentFilter contentFilter);
 }

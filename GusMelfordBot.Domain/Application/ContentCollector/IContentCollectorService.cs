@@ -4,4 +4,5 @@ public interface IContentCollectorService
 {
     IEnumerable<ContentDomain> GetContents(ContentFilter contentFilter);
     Task<MemoryStream> GetContentStreamAsync(Guid contentId);
+    Task<ContentCollectorInfo> GetContentCollectorInfo(ContentFilter contentFilter);
 }

@@ -29,4 +29,13 @@ public static class Convertor
             Provider = contentDomain.Provider
         };
     }
+    
+    public static ContentCollectorInfoDto ToDto(this ContentCollectorInfo contentCollectorInfo)
+    {
+        return new ContentCollectorInfoDto
+        {
+            Duration = contentCollectorInfo.Duration,
+            ContentCount = contentCollectorInfo.ContentCount
+        };
+    }
 }
