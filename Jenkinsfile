@@ -16,23 +16,6 @@ pipeline {
     }
 
     stages {
-        stage("Build docker image") {
-            steps {
-                script {
-                    echo "=== building image ==="
-                    sh "docker build -t $DOCKER_REPO/$CONTAINER_NAME:$DOCKER_CONTAINER_TAG ."
-                    sh "docker build -f contentcollector.Dockerfile -t $DOCKER_REPO/$CONTAINER_NAME_CONTENT:$DOCKER_CONTAINER_TAG ."
-                }
-            }
-        }
-        stage("Push docker image") {
-            steps {
-                echo "=== pushing image ==="
-                sh "echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin"
-                sh "docker push $DOCKER_REPO/$CONTAINER_NAME:$DOCKER_CONTAINER_TAG"
-                sh "docker push $DOCKER_REPO/$CONTAINER_NAME_CONTENT:$DOCKER_CONTAINER_TAG"
-            }
-        }
         stage("Update and preparation docker-compose") {
             steps {
                 echo "=== stop the old docker-compose ==="

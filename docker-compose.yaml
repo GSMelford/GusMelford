@@ -2,6 +2,7 @@ version: "3.3"
 
 services:
   gusmelford.db:
+    container_name: db
     image: postgres
     restart: always
     ports:
@@ -14,6 +15,7 @@ services:
       - gusmelforddb:/var/lib/postgresql/data
 
   gusmelford.contentcollector:
+    container_name: gusmelford.contentcollector
     image: $DOCKER_REPO/$CONTAINER_NAME_CONTENT:$DOCKER_CONTAINER_TAG
     restart: always
     ports:
@@ -24,7 +26,8 @@ services:
       - AppSettings:FtpSettings:Username=$FTP_USER
       - AppSettings:FtpSettings:Password=$FTP_PASSWORD
 
-  gusmelfordbot.core:
+  gusmelfordbot:
+    container_name: gusmelfordbot
     image: $DOCKER_REPO/$CONTAINER_NAME:$DOCKER_CONTAINER_TAG
     restart: always
     depends_on:
@@ -45,12 +48,14 @@ services:
       - AppSettings:FtpSettings:Password=$FTP_PASSWORD
 
   zookeeper:
+    container_name: zookeeper
     image: confluentinc/cp-zookeeper:latest
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
 
   kafka:
+    container_name: kafka
     image: ubuntu/kafka:latest
     ports:
       - 9092:9092
@@ -65,6 +70,7 @@ services:
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
 
   kafka-ui:
+    container_name: kafka-ui
     restart: always
     image: provectuslabs/kafka-ui:latest
     ports:
@@ -79,4 +85,3 @@ services:
 
 volumes:
   gusmelforddb:
-  rabbitmqdata:
