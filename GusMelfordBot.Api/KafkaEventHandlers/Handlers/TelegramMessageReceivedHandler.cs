@@ -1,8 +1,9 @@
 ﻿using GusMelfordBot.Api.KafkaEventHandlers.Events;
 using GusMelfordBot.Domain.Application;
 using GusMelfordBot.Domain.Application.ContentCollector;
-using GusMelfordBot.Domain.Telegram;
 using GusMelfordBot.SimpleKafka.Interfaces;
+using TBot.Client;
+using TBot.Client.Api.Telegram.DeleteMessage;
 
 namespace GusMelfordBot.Api.KafkaEventHandlers.Handlers;
 
@@ -11,18 +12,18 @@ public class TelegramMessageReceivedHandler : IEventHandler<TelegramMessageRecei
     private readonly IKafkaProducer<string> _kafkaProducer;
     private readonly IApplicationRepository _applicationRepository;
     private readonly IContentCollectorRepository _contentCollectorRepository;
-    private readonly IGusMelfordBotService _gusMelfordBotService;
+    private readonly ITBot _tBot;
 
     public TelegramMessageReceivedHandler(
         IKafkaProducer<string> kafkaProducer,
         IApplicationRepository applicationRepository,
         IContentCollectorRepository contentCollectorRepository, 
-        IGusMelfordBotService gusMelfordBotService)
+        ITBot tBot)
     {
         _kafkaProducer = kafkaProducer;
         _applicationRepository = applicationRepository;
         _contentCollectorRepository = contentCollectorRepository;
-        _gusMelfordBotService = gusMelfordBotService;
+        _tBot = tBot;
     }
 
     public async Task Handle(TelegramMessageReceivedEvent @event)
@@ -34,7 +35,11 @@ public class TelegramMessageReceivedHandler : IEventHandler<TelegramMessageRecei
             {
                 case ApplicationService.ContentCollector:
                     await HandleContentCollector(@event);
-                    await _gusMelfordBotService.DeleteMessage(chatId.Value, @event.Message!.MessageId!.Value);
+                    await _tBot.DeleteMessageAsync(new DeleteMessageParameters
+                    {
+                        ChatId = chatId,
+                        MessageId = @event.Message!.MessageId!.Value
+                    });
                     break;
                 case ApplicationService.Unknown:
                     break;
