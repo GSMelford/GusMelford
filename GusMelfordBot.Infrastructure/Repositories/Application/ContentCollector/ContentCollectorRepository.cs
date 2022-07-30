@@ -93,6 +93,13 @@ public class ContentCollectorRepository : IContentCollectorRepository
         return (await _databaseContext.Set<Content>().FirstOrDefaultAsync(x => x.Id == contentId))?.Path;
     }
 
+    public async Task<long?> GetChatId(Guid contentId)
+    {
+        return (await _databaseContext.Set<Content>()
+            .Include(x=>x.Chat)
+            .FirstOrDefaultAsync(x => x.Id == contentId))?.Chat.ChatId;
+    }
+    
     public async Task<ContentCollectorInfo> GetContentCollectorInfo(ContentFilter contentFilter)
     {
         List<Content> contents = await _databaseContext.Set<Content>()

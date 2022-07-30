@@ -7,7 +7,7 @@ using TBot.Telegram.Dto;
 namespace GusMelfordBot.Api.Controllers;
 
 [ApiController]
-[Route("update")]
+[Route("api/update")]
 public class UpdateController : Controller
 {
     private readonly ILogger<UpdateController> _logger;

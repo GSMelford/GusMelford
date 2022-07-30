@@ -10,9 +10,9 @@ namespace GusMelfordBot.Api.KafkaEventHandlers.Handlers;
 public class ContentProcessedHandler : IEventHandler<ContentProcessedEvent>
 {
     private readonly IContentCollectorRepository _contentCollectorRepository;
-    private readonly ITBot _tBot;
     private readonly IContentCollectorRepository _collectorRepository;
     private readonly IFtpServerService _ftpServerService;
+    private readonly ITBot _tBot;
 
     public ContentProcessedHandler(
         IContentCollectorRepository contentCollectorRepository, 
@@ -32,12 +32,12 @@ public class ContentProcessedHandler : IEventHandler<ContentProcessedEvent>
 
         if (@event.IsSaved)
         {
-            string? contentPath = await _collectorRepository.GetContentPath(@event.Id);
-            MemoryStream? contentStream = await _ftpServerService.DownloadFile(contentPath!);
+            MemoryStream? contentStream = await _ftpServerService.DownloadFile(@event.Path);
             await _tBot.SendVideoAsync(new SendVideoParameters
             {
                 Caption = @event.OriginalLink,
-                Video = new VideoFile(contentStream!, @event.Id.ToString())
+                Video = new VideoFile(contentStream!, @event.Id.ToString()),
+                ChatId = await _collectorRepository.GetChatId(@event.Id) ?? default
             });
         }
     }

@@ -7,4 +7,5 @@ public interface IContentCollectorRepository
     IEnumerable<ContentDomain> GetContents(ContentFilter contentFilter);
     Task<string?> GetContentPath(Guid contentId);
     Task<ContentCollectorInfo> GetContentCollectorInfo(ContentFilter contentFilter);
+    Task<long?> GetChatId(Guid contentId);
 }
