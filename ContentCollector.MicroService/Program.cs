@@ -25,7 +25,7 @@ var app = builder.Build();
 IKafkaConsumerFactory kafkaConsumerFactory = app.Services.GetRequiredService<IKafkaConsumerFactory>();
 kafkaConsumerFactory.Subscribe<ContentCollectorMessageEvent, ContentCollectorMessageHandler>(new ConsumerConfig
 {
-    BootstrapServers = "localhost"
+    BootstrapServers = appSettings.KafkaSettings.BootstrapServers
 });
 
 app.Run();

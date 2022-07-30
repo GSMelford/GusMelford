@@ -1,9 +1,9 @@
-version: "3.3"
+version: "3.9"
 
 services:
-  gusmelford.db:
+  db:
     container_name: db
-    image: postgres
+    image: postgres:latest
     restart: always
     ports:
       - 5432:5432
@@ -18,12 +18,15 @@ services:
     container_name: gusmelford.contentcollector
     image: $DOCKER_REPO/$CONTAINER_NAME_CONTENT:$DOCKER_CONTAINER_TAG
     restart: always
+    depends_on:
+      - db
+      - kafka
     ports:
-      - 5669:80
+      - 5670:80
     environment:
       - AppSettings:KafkaSettings:BootstrapServers=kafka
       - AppSettings:FtpSettings:FtpUrl=$FTP_URL
-      - AppSettings:FtpSettings:Username=$FTP_USER
+      - AppSettings:FtpSettings:UserName=$FTP_USER
       - AppSettings:FtpSettings:Password=$FTP_PASSWORD
 
   gusmelfordbot:
@@ -31,42 +34,44 @@ services:
     image: $DOCKER_REPO/$CONTAINER_NAME:$DOCKER_CONTAINER_TAG
     restart: always
     depends_on:
-      - gusmelford.db
+      - db
       - kafka
     ports:
-      - $PORT:80
+      - 5665:80
     environment:
       - AppSettings:TelegramBotSettings:Token=$GUSMELFORDBOT_TELEGRAM_TOKEN
       - AppSettings:KafkaSettings:BootstrapServers=kafka
-      - AppSettings:DatabaseSettings:Host=$GUSMELFORDBOT_HOST
+      - AppSettings:DatabaseSettings:Host=db
       - AppSettings:DatabaseSettings:Port=5432
       - AppSettings:DatabaseSettings:Database=gusmelford.app
       - AppSettings:DatabaseSettings:Username=$POSTGRES_USER
       - AppSettings:DatabaseSettings:Password=$POSTGRES_PASSWORD
       - AppSettings:FtpSettings:FtpUrl=$FTP_URL
-      - AppSettings:FtpSettings:UserName=$FTP_USER
+      - AppSettings:FtpSettings:Username=$FTP_USER
       - AppSettings:FtpSettings:Password=$FTP_PASSWORD
 
   zookeeper:
-    container_name: zookeeper
-    restart: always
-    image: zookeeper:latest
-    hostname: zookeeper
-    ports:
-      - 2181:2181
-    environment:
-      ZOOKEEPER_CLIENT_PORT: 2181
-      ZOOKEEPER_TICK_TIME: 2000
+   image: confluentinc/cp-zookeeper:latest
+   container_name: zookeeper
+   environment:
+     ZOOKEEPER_CLIENT_PORT: 2181
+     ZOOKEEPER_TICK_TIME: 2000
+   ports:
+     - 22181:2181
+   volumes:
+      - zookeeperdata:/var/lib/zookeeper/data
+      - zookeeperdatalog:/var/lib/zookeeper/log
 
   kafka:
+    image: confluentinc/cp-kafka:latest
     container_name: kafka
-    restart: always
-    image: confluentinc/cp-kafka:7.0.5
-    ports:
-      - 9092:9092
     depends_on:
       - zookeeper
+    ports:
+      - 9092:9092
+      - 29092:29092
     environment:
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
       KAFKA_BROKER_ID: 1
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092
@@ -85,7 +90,9 @@ services:
     environment:
       SERVER_SERVLET_CONTEXT_PATH: /kafka-ui
       KAFKA_CLUSTERS_0_NAME: local
-      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:29092
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:9092
 
 volumes:
   gusmelforddb:
+  zookeeperdata:
+  zookeeperdatalog:
