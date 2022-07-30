@@ -19,7 +19,7 @@ services:
     ports:
       - 5669:80
     environment:
-      - AppSettings:KafkaSettings:BootstrapServers=localhost
+      - AppSettings:KafkaSettings:BootstrapServers=kafka
       - AppSettings:FtpSettings:FtpUrl=$FTP_URL
       - AppSettings:FtpSettings:Username=$FTP_USER
       - AppSettings:FtpSettings:Password=$FTP_PASSWORD
@@ -34,7 +34,7 @@ services:
       - $PORT:80
     environment:
       - AppSettings:TelegramBotSettings:Token=$GUSMELFORDBOT_TELEGRAM_TOKEN
-      - AppSettings:KafkaSettings:BootstrapServers=localhost
+      - AppSettings:KafkaSettings:BootstrapServers=kafka
       - AppSettings:DatabaseSettings:Host=$GUSMELFORDBOT_HOST
       - AppSettings:DatabaseSettings:Port=5432
       - AppSettings:DatabaseSettings:Database=gusmelford.app
@@ -45,7 +45,7 @@ services:
       - AppSettings:FtpSettings:Password=$FTP_PASSWORD
 
   zookeeper:
-    image: confluentinc/cp-zookeeper:7.0.5
+    image: confluentinc/cp-zookeeper:latest
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
@@ -54,13 +54,12 @@ services:
     image: ubuntu/kafka:latest
     ports:
       - 9092:9092
-      - 2181:2181
     depends_on:
       - zookeeper
     environment:
       KAFKA_BROKER_ID: 1
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://kafka:29092
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
       KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
