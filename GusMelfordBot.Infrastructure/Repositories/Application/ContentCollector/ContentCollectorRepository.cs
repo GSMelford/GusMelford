@@ -93,6 +93,25 @@ public class ContentCollectorRepository : IContentCollectorRepository
         return (await _databaseContext.Set<Content>().FirstOrDefaultAsync(x => x.Id == contentId))?.Path;
     }
 
+    public async Task<string> GetVideoCaption(Guid contentId)
+    {
+        Content? content = await _databaseContext.Set<Content>()
+            .Include(x => x.Chat)
+            .Include(x => x.Users)
+            .FirstOrDefaultAsync(x => x.Id == contentId);
+
+        if (content is null) {
+            return string.Empty;
+        }
+        
+        User lastUser = content.Users.Last();
+        
+        return $"🤖 {contentId}\n" + 
+               $"👉 {lastUser.FirstName} {lastUser.LastName}\n" +
+               $"{content.OriginalLink}\n" +
+               $"🧐 {content.AccompanyingCommentary}";
+    }
+
     public async Task<long?> GetChatId(Guid contentId)
     {
         return (await _databaseContext.Set<Content>()

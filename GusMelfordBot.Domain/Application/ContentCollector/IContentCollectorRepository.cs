@@ -8,4 +8,5 @@ public interface IContentCollectorRepository
     Task<string?> GetContentPath(Guid contentId);
     Task<ContentCollectorInfo> GetContentCollectorInfo(ContentFilter contentFilter);
     Task<long?> GetChatId(Guid contentId);
+    Task<string> GetVideoCaption(Guid contentId);
 }
