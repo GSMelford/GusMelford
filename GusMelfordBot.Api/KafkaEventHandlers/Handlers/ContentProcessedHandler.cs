@@ -33,7 +33,6 @@ public class ContentProcessedHandler : IEventHandler<ContentProcessedEvent>
         if (@event.IsSaved)
         {
             MemoryStream? contentStream = await _ftpServerService.DownloadFile(@event.Path);
-            await _contentCollectorRepository.Update(@event.ToContentProcessed());
             await _tBot.SendVideoAsync(new SendVideoParameters
             {
                 Caption = await _collectorRepository.GetVideoCaption(@event.Id),
