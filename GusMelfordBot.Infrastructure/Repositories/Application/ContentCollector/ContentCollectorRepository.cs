@@ -85,6 +85,7 @@ public class ContentCollectorRepository : IContentCollectorRepository
         return _databaseContext.Set<Content>()
             .Include(x => x.Users)
             .Where(x => x.IsViewed == contentFilter.IsViewed && x.IsSaved && x.IsValid == true)
+            .OrderBy(x=> x.Number)
             .Select(x=>x.ToDomain());
     }
 
@@ -105,11 +106,17 @@ public class ContentCollectorRepository : IContentCollectorRepository
         }
         
         User lastUser = content.Users.Last();
-        
-        return $"🤖 {contentId}\n" + 
-               $"👉 {lastUser.FirstName} {lastUser.LastName}\n" +
-               $"{content.OriginalLink}\n" +
-               $"🧐 {content.AccompanyingCommentary}";
+
+        string caption = $"🐤 Content №{content.Number}" +
+                         $"🤖 {contentId}\n" +
+                         $"👉 {lastUser.FirstName} {lastUser.LastName}\n" +
+                         $"{content.OriginalLink}\n";
+
+        if (!string.IsNullOrEmpty(content.AccompanyingCommentary)) {
+            caption += $"🧐 {content.AccompanyingCommentary}";
+        }
+
+        return caption;
     }
 
     public async Task<long?> GetChatId(Guid contentId)

@@ -1,4 +1,5 @@
 ﻿using Confluent.Kafka;
+using GusMelfordBot.Api.HostedServices;
 using GusMelfordBot.Api.Services.Applications;
 using GusMelfordBot.Api.Services.Telegram;
 using GusMelfordBot.Api.Settings;
@@ -37,6 +38,7 @@ public static class DependencyInjectionConfigure
         serviceCollection.AddSingleton(appSettings);
         serviceCollection.AddHealthChecks();
         serviceCollection.AddControllers();
+        serviceCollection.AddHostedService<ContentCollectorHostedService>();
         serviceCollection.AddKafkaProducer<string>(new ProducerConfig
         {
             BootstrapServers = appSettings.KafkaSettings.BootstrapServers
