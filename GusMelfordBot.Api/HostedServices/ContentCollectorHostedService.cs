@@ -36,24 +36,31 @@ public class ContentCollectorHostedService : IHostedService, IDisposable
     {
         var count = Interlocked.Increment(ref _executionCount);
 
-        List<Content> contents = _databaseContext.Set<Content>()
-            .Where(x => x.IsValid == null || x.IsSaved == false)
-            .ToList();
-
-        foreach (Content content in contents)
+        try
         {
-            if (string.IsNullOrEmpty(content.OriginalLink))
-            {
-                /*_databaseContext.Remove(content);
-                _databaseContext.SaveChanges();*/
-                continue;
-            }
+            List<Content> contents = _databaseContext.Set<Content>()
+                .Where(x => x.IsValid == null || x.IsSaved == false)
+                .ToList();
 
-            _ = _kafkaProducer.ProduceAsync(new ContentCollectorMessageEvent
+            foreach (Content content in contents)
             {
-                Id = content.Id,
-                MessageText = content.OriginalLink
-            }).Result;
+                if (string.IsNullOrEmpty(content.OriginalLink))
+                {
+                    /*_databaseContext.Remove(content);
+                _databaseContext.SaveChanges();*/
+                    continue;
+                }
+
+                _ = _kafkaProducer.ProduceAsync(new ContentCollectorMessageEvent
+                {
+                    Id = content.Id,
+                    MessageText = content.OriginalLink
+                }).Result;
+            }
+        }
+        catch
+        {
+            //
         }
     }
     

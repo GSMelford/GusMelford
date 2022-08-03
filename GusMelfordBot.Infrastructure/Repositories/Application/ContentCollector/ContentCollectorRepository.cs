@@ -33,7 +33,7 @@ public class ContentCollectorRepository : IContentCollectorRepository
         await _databaseContext.SaveChangesAsync();
     }
     
-    public async Task Update(ContentProcessed contentProcessed)
+    public async Task<Guid> Update(ContentProcessed contentProcessed)
     {
         Content content = await _databaseContext.Set<Content>()
             .Include(x=>x.Users)
@@ -63,7 +63,7 @@ public class ContentCollectorRepository : IContentCollectorRepository
             _databaseContext.Update(sameContent);
             _databaseContext.Remove(content);
             await _databaseContext.SaveChangesAsync();
-            return;
+            return sameContent.Id;
         }
         
         content.Path = contentProcessed.Path;
@@ -78,6 +78,7 @@ public class ContentCollectorRepository : IContentCollectorRepository
         
         _databaseContext.Update(content);
         await _databaseContext.SaveChangesAsync();
+        return content.Id;
     }
 
     public IEnumerable<ContentDomain> GetContents(ContentFilter contentFilter)

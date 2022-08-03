@@ -28,16 +28,17 @@ public class ContentProcessedHandler : IEventHandler<ContentProcessedEvent>
 
     public async Task Handle(ContentProcessedEvent @event)
     {
-        await _contentCollectorRepository.Update(@event.ToContentProcessed());
+        Guid contentId = 
+            await _contentCollectorRepository.Update(@event.ToContentProcessed());
 
         if (@event.IsSaved)
         {
             MemoryStream? contentStream = await _ftpServerService.DownloadFile(@event.Path);
             await _tBot.SendVideoAsync(new SendVideoParameters
             {
-                Caption = await _collectorRepository.GetVideoCaption(@event.Id),
-                Video = new VideoFile(contentStream!, @event.Id.ToString()),
-                ChatId = await _collectorRepository.GetChatId(@event.Id) ?? default
+                Caption = await _collectorRepository.GetVideoCaption(contentId),
+                Video = new VideoFile(contentStream!, contentId.ToString()),
+                ChatId = await _collectorRepository.GetChatId(contentId) ?? default
             });
         }
     }
