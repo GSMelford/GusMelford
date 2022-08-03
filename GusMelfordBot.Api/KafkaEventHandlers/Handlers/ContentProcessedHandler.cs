@@ -15,9 +15,9 @@ public class ContentProcessedHandler : IEventHandler<ContentProcessedEvent>
     private readonly ITBot _tBot;
 
     public ContentProcessedHandler(
-        IContentCollectorRepository contentCollectorRepository, 
-        IContentCollectorRepository collectorRepository, 
-        IFtpServerService ftpServerService, 
+        IContentCollectorRepository contentCollectorRepository,
+        IContentCollectorRepository collectorRepository,
+        IFtpServerService ftpServerService,
         ITBot tBot)
     {
         _contentCollectorRepository = contentCollectorRepository;
@@ -28,18 +28,31 @@ public class ContentProcessedHandler : IEventHandler<ContentProcessedEvent>
 
     public async Task Handle(ContentProcessedEvent @event)
     {
-        Guid contentId = 
-            await _contentCollectorRepository.Update(@event.ToContentProcessed());
+        Guid contentId = await _contentCollectorRepository.Update(@event.ToContentProcessed());
+        if (@event.IsSaved) {
+            await SendMessageWithRetry(@event, contentId);
+        }
+    }
 
-        if (@event.IsSaved)
+    private async Task SendMessageWithRetry(ContentProcessedEvent @event, Guid contentId)
+    {
+        MemoryStream? contentStream = await _ftpServerService.DownloadFile(@event.Path);
+
+        HttpResponseMessage httpResponseMessage;
+        do
         {
-            MemoryStream? contentStream = await _ftpServerService.DownloadFile(@event.Path);
-            await _tBot.SendVideoAsync(new SendVideoParameters
+            httpResponseMessage = await _tBot.SendVideoAsync(new SendVideoParameters
             {
                 Caption = await _collectorRepository.GetVideoCaption(contentId),
                 Video = new VideoFile(contentStream!, contentId.ToString()),
                 ChatId = await _collectorRepository.GetChatId(contentId) ?? default
             });
-        }
+            
+            if (!httpResponseMessage.IsSuccessStatusCode)
+            {
+                await Task.Delay(5000);
+            }
+            
+        } while (!httpResponseMessage.IsSuccessStatusCode);
     }
 }

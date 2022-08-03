@@ -32,7 +32,7 @@ public class ContentCollectorHostedService : IHostedService, IDisposable
         return Task.CompletedTask;
     }
 
-    private void Retry(object? state)
+    private async void Retry(object? state)
     {
         var count = Interlocked.Increment(ref _executionCount);
 
@@ -56,6 +56,8 @@ public class ContentCollectorHostedService : IHostedService, IDisposable
                     Id = content.Id,
                     MessageText = content.OriginalLink
                 }).Result;
+
+                await Task.Delay(2000);
             }
         }
         catch
