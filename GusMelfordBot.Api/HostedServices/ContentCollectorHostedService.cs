@@ -44,8 +44,8 @@ public class ContentCollectorHostedService : IHostedService, IDisposable
         {
             if (string.IsNullOrEmpty(content.OriginalLink))
             {
-                _databaseContext.Remove(content);
-                _databaseContext.SaveChanges();
+                /*_databaseContext.Remove(content);
+                _databaseContext.SaveChanges();*/
                 continue;
             }
 
@@ -55,7 +55,6 @@ public class ContentCollectorHostedService : IHostedService, IDisposable
                 MessageText = content.OriginalLink
             }).Result;
         }
-        
     }
     
     public Task StopAsync(CancellationToken cancellationToken)
