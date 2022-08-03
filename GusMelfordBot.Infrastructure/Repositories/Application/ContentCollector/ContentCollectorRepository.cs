@@ -39,12 +39,16 @@ public class ContentCollectorRepository : IContentCollectorRepository
             .Include(x=>x.Users)
             .FirstAsync(x => x.Id == contentProcessed.ContentId);
         
-        Content? sameContent = await _databaseContext.Set<Content>()
+        List<Content> contents = await _databaseContext.Set<Content>()
             .Include(x=>x.Users)
-            .FirstOrDefaultAsync(x => x.OriginalLink == contentProcessed.OriginalLink);
+            .Where(x => x.OriginalLink == contentProcessed.OriginalLink)
+            .OrderBy(x=>x.CreatedOn)
+            .ToListAsync();
 
-        if (sameContent is not null)
+        if (contents.Count > 1)
         {
+            Content sameContent = contents.First();
+            
             if (!string.IsNullOrEmpty(contentProcessed.AccompanyingCommentary))
             {
                 string? updateAccompanyingCommentary = sameContent.AccompanyingCommentary;
