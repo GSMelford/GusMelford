@@ -51,7 +51,7 @@ pipeline {
             }
         }
         stage('Micro Services approval'){
-            input "Build and deploy Micro Services?"
+            input ('Build and deploy Micro Services?')
         }
         stage("Build Micro Services") {
             steps {    
@@ -60,7 +60,7 @@ pipeline {
                 echo "====== Build completed ======"
             }
         }
-        stage("Deploy") {
+        stage("Deploy Micro Services") {
             steps {
                 echo "====== Pushing image to docker hub... ======"
                 sh "echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin"
