@@ -16,7 +16,27 @@ pipeline {
     }
 
     stages {
+        stage('Only Deploy') {
+            steps {
+                script {
+
+                    USER_INPUT_DEPLOY = input(
+                            message: 'Just restart services?',
+                            parameters: [
+                                    [$class: 'ChoiceParameterDefinition',
+                                     choices: ['no','yes'].join('\n'),
+                                     name: 'input',
+                                     description: 'Menu - select box option']
+                            ])
+
+                    echo "The answer is: ${USER_INPUT}"
+                }
+            }
+        }
         stage('Micro Services approval') {
+            when {
+                expression { USER_INPUT_DEPLOY == 'no' }
+            }
             steps {
                 script {
 
@@ -34,6 +54,9 @@ pipeline {
             }
         }
         stage("Build") {
+            when {
+                expression { USER_INPUT_DEPLOY == 'no' }
+            }
             steps {
                 script {
                     echo "====== Building image... ======"
@@ -44,7 +67,7 @@ pipeline {
         }
         stage("Build Micro Services") {
             when {
-                expression { USER_INPUT == 'yes' }
+                expression { USER_INPUT == 'yes' && USER_INPUT_DEPLOY == 'no' }
             }
             steps {    
                 echo "====== Building image... ======"
