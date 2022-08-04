@@ -51,7 +51,9 @@ pipeline {
             }
         }
         stage('Micro Services approval'){
-            input ('Build and deploy Micro Services?')
+            steps {
+                input (message: 'Build and deploy Micro Services?')
+            }
         }
         stage("Build Micro Services") {
             steps {    
