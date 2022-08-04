@@ -12,7 +12,8 @@ pipeline {
         CONTAINER_NAME_CONTENT = "gusmelfordbot.contentcollector"
         DOCKER_CONTAINER_TAG = "latest"
         DOCKER_REPO = "gsmelford"
-        PORT = "5665"
+        PORT = "5665",
+        USER_INPUT = 'no'
     }
 
     stages {
