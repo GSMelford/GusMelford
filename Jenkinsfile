@@ -50,18 +50,20 @@ pipeline {
             }
         }
         stage('Micro Services approval') {
-            script {
+            steps {
+                script {
 
-                def USER_INPUT = input(
-                        message: 'Build Micro Services?',
-                        parameters: [
-                                [$class: 'ChoiceParameterDefinition',
-                                 choices: ['no','yes'].join('\n'),
-                                 name: 'input',
-                                 description: 'Menu - select box option']
-                        ])
+                    def USER_INPUT = input(
+                            message: 'Build Micro Services?',
+                            parameters: [
+                                    [$class: 'ChoiceParameterDefinition',
+                                     choices: ['no','yes'].join('\n'),
+                                     name: 'input',
+                                     description: 'Menu - select box option']
+                            ])
 
-                echo "The answer is: ${USER_INPUT}"
+                    echo "The answer is: ${USER_INPUT}"
+                }
             }
         }
         stage("Build Micro Services") {
