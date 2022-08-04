@@ -21,7 +21,6 @@ pipeline {
                 script {
                     echo "====== Building image... ======"
                     sh "docker build -t $DOCKER_REPO/$CONTAINER_NAME:$DOCKER_CONTAINER_TAG ."
-                    sh "docker build -f contentcollector.Dockerfile -t $DOCKER_REPO/$CONTAINER_NAME_CONTENT:$DOCKER_CONTAINER_TAG ."
                     echo "====== Build completed ======"
                 }
             }
@@ -50,12 +49,25 @@ pipeline {
                 echo "====== Docker pruned ======" 
             }
         }
-        stage('Micro Services approval'){
-            steps {
-                input (message: 'Build and deploy Micro Services?')
+        stage('Micro Services approval') {
+            script {
+
+                def USER_INPUT = input(
+                        message: 'Build Micro Services?',
+                        parameters: [
+                                [$class: 'ChoiceParameterDefinition',
+                                 choices: ['no','yes'].join('\n'),
+                                 name: 'input',
+                                 description: 'Menu - select box option']
+                        ])
+
+                echo "The answer is: ${USER_INPUT}"
             }
         }
         stage("Build Micro Services") {
+            when {
+                expression { USER_INPUT == 'yes' }
+            }
             steps {    
                 echo "====== Building image... ======"
                 sh "docker build -f contentcollector.Dockerfile -t $DOCKER_REPO/$CONTAINER_NAME_CONTENT:$DOCKER_CONTAINER_TAG ."
