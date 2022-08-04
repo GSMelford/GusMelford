@@ -53,7 +53,7 @@ pipeline {
             steps {
                 script {
 
-                    def USER_INPUT = input(
+                    USER_INPUT = input(
                             message: 'Build Micro Services?',
                             parameters: [
                                     [$class: 'ChoiceParameterDefinition',
