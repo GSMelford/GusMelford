@@ -18,10 +18,11 @@ services:
     container_name: gusmelford.contentcollector
     image: $DOCKER_REPO/$CONTAINER_NAME_CONTENT:$DOCKER_CONTAINER_TAG
     restart: always
+      - kafka
     ports:
       - 5670:80
     environment:
-      - AppSettings:KafkaSettings:BootstrapServers=localhost
+      - AppSettings:KafkaSettings:BootstrapServers=kafka
       - AppSettings:FtpSettings:FtpUrl=$FTP_URL
       - AppSettings:FtpSettings:UserName=$FTP_USER
       - AppSettings:FtpSettings:Password=$FTP_PASSWORD
@@ -32,11 +33,12 @@ services:
     restart: always
     depends_on:
       - db
+      - kafka
     ports:
       - 5665:80
     environment:
       - AppSettings:TelegramBotSettings:Token=$GUSMELFORDBOT_TELEGRAM_TOKEN
-      - AppSettings:KafkaSettings:BootstrapServers=localhost
+      - AppSettings:KafkaSettings:BootstrapServers=kafka
       - AppSettings:DatabaseSettings:Host=db
       - AppSettings:DatabaseSettings:Port=5432
       - AppSettings:DatabaseSettings:Database=gusmelford.app
@@ -45,3 +47,49 @@ services:
       - AppSettings:FtpSettings:FtpUrl=$FTP_URL
       - AppSettings:FtpSettings:Username=$FTP_USER
       - AppSettings:FtpSettings:Password=$FTP_PASSWORD
+
+  zookeeper:
+   image: confluentinc/cp-zookeeper:latest
+   container_name: zookeeper
+   environment:
+     ZOOKEEPER_CLIENT_PORT: 2181
+     ZOOKEEPER_TICK_TIME: 2000
+   ports:
+     - 22181:2181
+   volumes:
+      - zookeeperdata:/var/lib/zookeeper/data
+      - zookeeperdatalog:/var/lib/zookeeper/log
+
+  kafka:
+    image: confluentinc/cp-kafka:latest
+    container_name: kafka
+    depends_on:
+      - zookeeper
+    ports:
+      - 9092:9092
+      - 29092:29092
+    environment:
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+
+  kafka-ui:
+    container_name: kafka-ui
+    restart: always
+    image: provectuslabs/kafka-ui:latest
+    depends_on:
+      - kafka
+    ports:
+      - 9001:8080
+    environment:
+      SERVER_SERVLET_CONTEXT_PATH: /kafka-ui
+      KAFKA_CLUSTERS_0_NAME: local
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:9092
+
+volumes:
+  zookeeperdata:
+  zookeeperdatalog:
