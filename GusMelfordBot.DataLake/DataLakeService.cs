@@ -6,7 +6,7 @@ public class DataLakeService : IDataLakeService
 {
     public void CreateDirectoryIfNotExist(string directoryPath)
     {
-        if (Directory.Exists(directoryPath))
+        if (!Directory.Exists(directoryPath))
         {
             Directory.CreateDirectory(directoryPath);
         }
