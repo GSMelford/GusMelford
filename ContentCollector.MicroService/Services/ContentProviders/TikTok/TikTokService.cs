@@ -12,11 +12,16 @@ public class TikTokService : ITikTokService
 {
     private readonly IKafkaProducer<string> _kafkaProducer;
     private readonly IDataLakeService _dataLakeService;
+    private readonly ILogger<ITikTokService> _logger;
 
-    public TikTokService(IKafkaProducer<string> kafkaProducer, IDataLakeService dataLakeService)
+    public TikTokService(
+        IKafkaProducer<string> kafkaProducer, 
+        IDataLakeService dataLakeService, 
+        ILogger<ITikTokService> logger)
     {
         _kafkaProducer = kafkaProducer;
         _dataLakeService = dataLakeService;
+        _logger = logger;
     }
 
     public async Task Process(ProcessedTikTokContent? processedContent)
@@ -30,7 +35,7 @@ public class TikTokService : ITikTokService
             .SetNext(new VideoInformationHandler())
             .SetNext(new ValidVideoHandler())
             .SetNext(new DownloadLinkHandler())
-            .SetNext(new SaveHandler(_dataLakeService));
+            .SetNext(new SaveHandler(_dataLakeService, _logger));
         
         processedContent = (await handler.Handle(processedContent)).IfNullThrow();
         await _kafkaProducer.ProduceAsync(processedContent.ToContentProcessedEvent());

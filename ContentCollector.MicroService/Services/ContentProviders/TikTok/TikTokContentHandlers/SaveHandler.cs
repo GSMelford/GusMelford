@@ -1,4 +1,5 @@
 ﻿using ContentCollector.Domain.ContentProviders;
+using ContentCollector.Domain.ContentProviders.TikTok;
 using ContentCollector.Services.ContentProviders.TikTok.TikTokContentHandlers.Abstractions;
 using GusMelfordBot.DataLake;
 
@@ -6,11 +7,13 @@ namespace ContentCollector.Services.ContentProviders.TikTok.TikTokContentHandler
 
 public class SaveHandler : AbstractTikTokContentHandler
 {
+    private readonly ILogger<ITikTokService> _logger;
     private readonly IDataLakeService _dataLakeService;
     
-    public SaveHandler(IDataLakeService dataLakeService)
+    public SaveHandler(IDataLakeService dataLakeService, ILogger<ITikTokService> logger)
     {
         _dataLakeService = dataLakeService;
+        _logger = logger;
     }
     
     public override async Task<ProcessedTikTokContent?> Handle(ProcessedTikTokContent processedTikTokContent)
@@ -21,7 +24,8 @@ public class SaveHandler : AbstractTikTokContentHandler
             await _dataLakeService.WriteFile(processedTikTokContent.Path, processedTikTokContent.Bytes);
             processedTikTokContent.IsSaved = true;
         }
-        catch {
+        catch (Exception exception) {
+            _logger.LogError("Error while saving content. {ErrorMessage}", exception.Message);
             processedTikTokContent.IsSaved = false;
         }
 
