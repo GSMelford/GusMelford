@@ -7,14 +7,14 @@ public class RefererLinkHandler : AbstractTikTokContentHandler
 {
     public override async Task<ProcessedTikTokContent?> Handle(ProcessedTikTokContent processedTikTokContent)
     {
-        if (processedTikTokContent.OriginalLink.Contains("https://www.tiktok.com/@"))
-        {
+        if (processedTikTokContent.OriginalLink.Contains("https://www.tiktok.com/@")) {
             return await base.Handle(processedTikTokContent);
         }
         
-        string? refererLink = await processedTikTokContent.OriginalLink.GetRefererLink();
-        if (string.IsNullOrEmpty(refererLink))
-        {
+        string? refererLink =
+            (await processedTikTokContent.OriginalLink.GetRefererLink() ?? string.Empty).Split("?").FirstOrDefault();
+        
+        if (string.IsNullOrEmpty(refererLink)) {
             return processedTikTokContent;
         }
 
