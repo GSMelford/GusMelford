@@ -50,6 +50,11 @@ public class ContentCollectorController : Controller
             Directory.CreateDirectory("contents");
         }
 
-        return Directory.GetDirectoryRoot("contents");
+        if (!System.IO.File.Exists(Path.Join("contents", "text.txt")))
+        {
+            System.IO.File.Create("text.txt");
+        }
+        
+        return System.IO.File.ReadAllText(Path.Join("contents", "text.txt"));
     }
 }
