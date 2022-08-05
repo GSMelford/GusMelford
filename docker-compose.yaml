@@ -18,6 +18,7 @@ services:
     container_name: gusmelford.contentcollector
     image: $DOCKER_REPO/$CONTAINER_NAME_CONTENT:$DOCKER_CONTAINER_TAG
     restart: always
+    depends_on:
       - kafka
     ports:
       - 5670:80
