@@ -28,7 +28,7 @@ services:
       - AppSettings:FtpSettings:UserName=$FTP_USER
       - AppSettings:FtpSettings:Password=$FTP_PASSWORD 
     volumes:
-      - /media/pi:/contents
+      - /media/pi/contents:/contents
 
   gusmelfordbot:
     container_name: gusmelfordbot
