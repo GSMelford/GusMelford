@@ -41,20 +41,4 @@ public class ContentCollectorController : Controller
     {
         return (await _contentCollectorService.GetContentCollectorInfo(filterDto.ToDomain())).ToDto();
     }
-    
-    [HttpGet("test")]
-    public string GetTest()
-    {
-        if (!Directory.Exists("contents"))
-        {
-            Directory.CreateDirectory("contents");
-        }
-
-        if (!System.IO.File.Exists(Path.Join("contents", "text.txt")))
-        {
-            System.IO.File.Create("text.txt");
-        }
-        
-        return System.IO.File.ReadAllText(Path.Join("contents", "text.txt"));
-    }
 }

@@ -10,6 +10,7 @@ WORKDIR /src
 COPY ["ContentCollector.MicroService/ContentCollector.MicroService.csproj", "ContentCollector.MicroService/"]
 COPY ["GusMelfordBot.Extensions/GusMelfordBot.Extensions.csproj", "GusMelfordBot.Extensions/"]
 COPY ["GusMelfordBot.SimpleKafka/GusMelfordBot.SimpleKafka.csproj", "GusMelfordBot.SimpleKafka/"]
+COPY ["GusMelfordBot.DataLake/GusMelfordBot.DataLake.csproj", "GusMelfordBot.DataLake/"]
 RUN dotnet restore "ContentCollector.MicroService/ContentCollector.MicroService.csproj"
 COPY . .
 WORKDIR "/src/ContentCollector.MicroService"

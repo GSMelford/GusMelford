@@ -9,6 +9,7 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\GusMelfordBot.DataLake\GusMelfordBot.DataLake.csproj" />
       <ProjectReference Include="..\GusMelfordBot.Domain\GusMelfordBot.Domain.csproj" />
       <ProjectReference Include="..\GusMelfordBot.Extensions\GusMelfordBot.Extensions.csproj" />
       <ProjectReference Include="..\GusMelfordBot.Infrastructure\GusMelfordBot.Infrastructure.csproj" />

@@ -1,19 +1,19 @@
-﻿using GusMelfordBot.Domain.Application.ContentCollector;
-using GusMelfordBot.Extensions.Services.Ftp;
+﻿using GusMelfordBot.DataLake;
+using GusMelfordBot.Domain.Application.ContentCollector;
 
 namespace GusMelfordBot.Api.Services.Applications;
 
 public class ContentCollectorService : IContentCollectorService
 {
     private readonly IContentCollectorRepository _contentCollectorRepository;
-    private readonly IFtpServerService _ftpServerService;
+    private readonly IDataLakeService _dataLakeService;
 
     public ContentCollectorService(
         IContentCollectorRepository contentCollectorRepository,
-        IFtpServerService ftpServerService)
+        IDataLakeService dataLakeService)
     {
         _contentCollectorRepository = contentCollectorRepository;
-        _ftpServerService = ftpServerService;
+        _dataLakeService = dataLakeService;
     }
 
     public IEnumerable<ContentDomain> GetContents(ContentFilter contentFilter)
@@ -29,7 +29,7 @@ public class ContentCollectorService : IContentCollectorService
             throw new Exception("Not video path");
         }
 
-        MemoryStream? memoryStream = await _ftpServerService.DownloadFile(contentPath);
+        MemoryStream? memoryStream = new MemoryStream(await _dataLakeService.ReadFileAsync(contentPath));
         if (memoryStream is null) {
             throw new Exception("Video not found");
         }

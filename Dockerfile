@@ -12,6 +12,7 @@ COPY ["GusMelfordBot.Extensions/GusMelfordBot.Extensions.csproj", "GusMelfordBot
 COPY ["GusMelfordBot.Domain/GusMelfordBot.Domain.csproj", "GusMelfordBot.Domain/"]
 COPY ["GusMelfordBot.Infrastructure/GusMelfordBot.Infrastructure.csproj", "GusMelfordBot.Infrastructure/"]
 COPY ["GusMelfordBot.SimpleKafka/GusMelfordBot.SimpleKafka.csproj", "GusMelfordBot.SimpleKafka/"]
+COPY ["GusMelfordBot.DataLake/GusMelfordBot.DataLake.csproj", "GusMelfordBot.DataLake/"]
 RUN dotnet restore "GusMelfordBot.Api/GusMelfordBot.Api.csproj"
 COPY . .
 WORKDIR "/src/GusMelfordBot.Api"
