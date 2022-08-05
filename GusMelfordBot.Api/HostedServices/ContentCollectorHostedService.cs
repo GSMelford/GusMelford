@@ -42,20 +42,13 @@ public class ContentCollectorHostedService : IHostedService, IDisposable
                 .Where(x => x.IsValid == null || x.IsSaved == false)
                 .ToList();
 
-            foreach (Content content in contents)
+            foreach (var content in contents.Where(content => !string.IsNullOrEmpty(content.OriginalLink)))
             {
-                if (string.IsNullOrEmpty(content.OriginalLink))
-                {
-                    /*_databaseContext.Remove(content);
-                _databaseContext.SaveChanges();*/
-                    continue;
-                }
-
-                _ = _kafkaProducer.ProduceAsync(new ContentCollectorMessageEvent
+                await _kafkaProducer.ProduceAsync(new ContentCollectorMessageEvent
                 {
                     Id = content.Id,
-                    MessageText = content.OriginalLink
-                }).Result;
+                    MessageText = content.OriginalLink!
+                });
 
                 await Task.Delay(2000);
             }

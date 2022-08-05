@@ -9,17 +9,20 @@ namespace GusMelfordBot.Api.KafkaEventHandlers.Handlers;
 
 public class ContentProcessedHandler : IEventHandler<ContentProcessedEvent>
 {
+    private readonly ILogger<IEventHandler<ContentProcessedEvent>> _logger;
     private readonly IContentCollectorRepository _contentCollectorRepository;
     private readonly IContentCollectorRepository _collectorRepository;
     private readonly IFtpServerService _ftpServerService;
     private readonly ITBot _tBot;
 
     public ContentProcessedHandler(
+        ILogger<IEventHandler<ContentProcessedEvent>> logger,
         IContentCollectorRepository contentCollectorRepository,
         IContentCollectorRepository collectorRepository,
         IFtpServerService ftpServerService,
         ITBot tBot)
     {
+        _logger = logger;
         _contentCollectorRepository = contentCollectorRepository;
         _collectorRepository = collectorRepository;
         _ftpServerService = ftpServerService;
@@ -30,29 +33,18 @@ public class ContentProcessedHandler : IEventHandler<ContentProcessedEvent>
     {
         Guid contentId = await _contentCollectorRepository.Update(@event.ToContentProcessed());
         if (@event.IsSaved) {
-            await SendMessageWithRetry(@event, contentId);
-        }
-    }
+            MemoryStream? contentStream = await _ftpServerService.DownloadFile(@event.Path);
 
-    private async Task SendMessageWithRetry(ContentProcessedEvent @event, Guid contentId)
-    {
-        MemoryStream? contentStream = await _ftpServerService.DownloadFile(@event.Path);
-
-        HttpResponseMessage httpResponseMessage;
-        do
-        {
-            httpResponseMessage = await _tBot.SendVideoAsync(new SendVideoParameters
+            if (contentStream is null) {
+                _logger.LogError("ContentId: {ContentId}. Error while getting content from ftp server.", contentId);
+            }
+            
+            await _tBot.SendVideoAsync(new SendVideoParameters
             {
                 Caption = await _collectorRepository.GetVideoCaption(contentId),
                 Video = new VideoFile(contentStream!, contentId.ToString()),
                 ChatId = await _collectorRepository.GetChatId(contentId) ?? default
             });
-            
-            if (!httpResponseMessage.IsSuccessStatusCode)
-            {
-                await Task.Delay(5000);
-            }
-            
-        } while (!httpResponseMessage.IsSuccessStatusCode);
+        }
     }
 }

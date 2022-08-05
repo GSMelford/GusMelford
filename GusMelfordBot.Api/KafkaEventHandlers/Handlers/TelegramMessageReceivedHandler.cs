@@ -13,17 +13,20 @@ public class TelegramMessageReceivedHandler : IEventHandler<TelegramMessageRecei
     private readonly IApplicationRepository _applicationRepository;
     private readonly IContentCollectorRepository _contentCollectorRepository;
     private readonly ITBot _tBot;
+    private readonly HttpClient _httpClient;
 
     public TelegramMessageReceivedHandler(
         IKafkaProducer<string> kafkaProducer,
         IApplicationRepository applicationRepository,
         IContentCollectorRepository contentCollectorRepository, 
-        ITBot tBot)
+        ITBot tBot, 
+        HttpClient httpClient)
     {
         _kafkaProducer = kafkaProducer;
         _applicationRepository = applicationRepository;
         _contentCollectorRepository = contentCollectorRepository;
         _tBot = tBot;
+        _httpClient = httpClient;
     }
 
     public async Task Handle(TelegramMessageReceivedEvent @event)
@@ -39,7 +42,7 @@ public class TelegramMessageReceivedHandler : IEventHandler<TelegramMessageRecei
                     {
                         ChatId = chatId,
                         MessageId = @event.Message!.MessageId!.Value
-                    });
+                    }, _httpClient);
                     break;
                 case ApplicationService.Unknown:
                     break;
@@ -55,13 +58,18 @@ public class TelegramMessageReceivedHandler : IEventHandler<TelegramMessageRecei
         }
                    
         Guid contentId = Guid.NewGuid();
-        await _contentCollectorRepository.Create(
+        bool isSuccessfullySaved = await _contentCollectorRepository.SaveNew(
             contentId,
             @event.Message?.Chat?.Id,
             @event.Message?.From?.Id,
             messageText,
             @event.Message?.Chat?.Id);
 
+        if (!isSuccessfullySaved)
+        {
+            return;
+        }
+        
         await _kafkaProducer.ProduceAsync(new ContentCollectorMessageEvent
         {
             Id = contentId,

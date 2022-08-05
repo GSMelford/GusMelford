@@ -3,71 +3,75 @@ using GusMelfordBot.Domain.Application.ContentCollector;
 using GusMelfordBot.Infrastructure.Interfaces;
 using GusMelfordBot.Infrastructure.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace GusMelfordBot.Infrastructure.Repositories.Application.ContentCollector;
 
 public class ContentCollectorRepository : IContentCollectorRepository
 {
+    private readonly ILogger<IContentCollectorRepository> _logger;
     private readonly IDatabaseContext _databaseContext;
     
-    public ContentCollectorRepository(IDatabaseContext databaseContext)
+    public ContentCollectorRepository(ILogger<IContentCollectorRepository> logger, IDatabaseContext databaseContext)
     {
+        _logger = logger;
         _databaseContext = databaseContext;
     }
 
-    public async Task Create(Guid contentId, long? chatId, long? telegramUserId, string messageText, long? messageId)
+    public async Task<bool> SaveNew(Guid contentId, long? chatId, long? telegramUserId, string messageText, long? messageId)
     {
-        TelegramUser telegramUser = await _databaseContext.Set<TelegramUser>()
-            .FirstAsync(x => x.TelegramId == telegramUserId);
+        User? user = (await _databaseContext.Set<TelegramUser>()
+            .Include(x => x.User)
+            .FirstOrDefaultAsync(x => x.TelegramId == telegramUserId))?.User;
+
+        if (user is null) {
+            _logger.LogWarning("ContentId: {ContentId}. User not found or not registered. " +
+                               "TelegramUserId {TelegramUserId}", contentId, telegramUserId);
+            return false;
+        }
+        
+        TelegramChat? telegramChat = 
+            await _databaseContext.Set<TelegramChat>().FirstOrDefaultAsync(x => x.ChatId == chatId);
+        
+        if (telegramChat is null) {
+            _logger.LogWarning("ContentId: {ContentId}. Chat not found. ChatId: {ChatId}", contentId, chatId);
+            return false;
+        }
         
         Content content = new Content
         {
             Id = contentId,
-            Chat = await _databaseContext.Set<TelegramChat>().FirstAsync(x => x.ChatId == chatId),
+            Chat = telegramChat,
             OriginalLink = Regex.Match(messageText, "https://\\S*").Groups[0].Value,
             MessageId = messageId
         };
         
-        content.Users.Add(await _databaseContext.Set<User>().FirstAsync(x => x.Id == telegramUser.UserId));
+        content.Users.Add(user);
         await _databaseContext.AddAsync(content);
         await _databaseContext.SaveChangesAsync();
+        return true;
     }
     
     public async Task<Guid> Update(ContentProcessed contentProcessed)
     {
-        Content content = await _databaseContext.Set<Content>()
-            .Include(x=>x.Users)
-            .FirstAsync(x => x.Id == contentProcessed.ContentId);
-        
         List<Content> contents = await _databaseContext.Set<Content>()
             .Include(x=>x.Users)
-            .Where(x => x.OriginalLink == contentProcessed.OriginalLink)
+            .Where(x => x.OriginalLink == contentProcessed.OriginalLink || x.Id == contentProcessed.ContentId)
             .OrderBy(x=>x.CreatedOn)
             .ToListAsync();
 
-        if (contents.Count > 1)
+        Content content = new Content();
+        if (IsDuplicateContent(contents))
         {
-            Content sameContent = contents.First();
-            
-            if (!string.IsNullOrEmpty(contentProcessed.AccompanyingCommentary))
+            content = UpdateFirstContent(contents);
+            for (int i = 1; i < contents.Count; i++)
             {
-                string? updateAccompanyingCommentary = sameContent.AccompanyingCommentary;
-                if (sameContent.Users.Count == 1 && !string.IsNullOrEmpty(updateAccompanyingCommentary))
-                {
-                    updateAccompanyingCommentary =
-                        $"{sameContent.Users.First().FirstName} {sameContent.Users.First().FirstName}: {sameContent.AccompanyingCommentary}";
-                }
-
-                updateAccompanyingCommentary +=
-                    $"{content.Users.First().FirstName} {content.Users.First().FirstName}: {contentProcessed.AccompanyingCommentary}";
-                sameContent.AccompanyingCommentary = updateAccompanyingCommentary;
+                _databaseContext.Remove(contents[i]);
             }
-            
-            sameContent.Users.Add(content.Users.FirstOrDefault()!);
-            _databaseContext.Update(sameContent);
-            _databaseContext.Remove(content);
-            await _databaseContext.SaveChangesAsync();
-            return sameContent.Id;
+        }
+        else if (contents.Count > 0)
+        {
+            content = contents.First();
         }
         
         content.Path = contentProcessed.Path;
@@ -83,6 +87,32 @@ public class ContentCollectorRepository : IContentCollectorRepository
         _databaseContext.Update(content);
         await _databaseContext.SaveChangesAsync();
         return content.Id;
+    }
+
+    private bool IsDuplicateContent(List<Content> contents)
+    {
+        return contents.Count > 1;
+    }
+
+    private Content UpdateFirstContent(List<Content> contents)
+    {
+        Content firstContent = contents.First();
+        for (int i = 1; i < contents.Count; i++)
+        {
+            User? user = contents[i].Users.FirstOrDefault();
+            if (user is null) {
+                continue;
+            }
+            
+            firstContent.Users.Add(user);
+        }
+
+        List<string> accompanyingCommentaries = 
+            (firstContent.AccompanyingCommentary?.Split(";") ?? Array.Empty<string>()).ToList();
+        firstContent.AccompanyingCommentary = 
+            string.Join(";", accompanyingCommentaries.Concat(contents.Select(x => x.AccompanyingCommentary)));
+
+        return firstContent;
     }
 
     public IEnumerable<ContentDomain> GetContents(ContentFilter contentFilter)
