@@ -49,7 +49,7 @@ services:
       - AppSettings:FtpSettings:Username=$FTP_USER
       - AppSettings:FtpSettings:Password=$FTP_PASSWORD
     volumes:
-      - /media/pi/contents:contents
+      - /media/pi/contents:/contents
 
   zookeeper:
    image: confluentinc/cp-zookeeper:latest
