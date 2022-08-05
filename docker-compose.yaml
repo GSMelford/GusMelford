@@ -28,7 +28,7 @@ services:
       - AppSettings:FtpSettings:UserName=$FTP_USER
       - AppSettings:FtpSettings:Password=$FTP_PASSWORD 
     volumes:
-      - /media/pi/data:/data
+      - /media/pi/contents:/app/contents
 
   gusmelfordbot:
     container_name: gusmelfordbot
@@ -51,7 +51,7 @@ services:
       - AppSettings:FtpSettings:Username=$FTP_USER
       - AppSettings:FtpSettings:Password=$FTP_PASSWORD
     volumes:
-      - /media/pi/data:/data
+      - /media/pi/contents:/contents
 
   zookeeper:
    image: confluentinc/cp-zookeeper:latest
