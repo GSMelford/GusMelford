@@ -1,7 +1,7 @@
-﻿using GusMelfordBot.DataLake;
-using GusMelfordBot.Domain.Application.ContentCollector;
+﻿using GusMelfordBot.Domain.Application.ContentCollector;
+using GusMelfordBot.Extensions.Services.DataLake;
 
-namespace GusMelfordBot.Api.Services.Applications;
+namespace GusMelfordBot.Api.Services.Applications.ContentCollector;
 
 public class ContentCollectorService : IContentCollectorService
 {

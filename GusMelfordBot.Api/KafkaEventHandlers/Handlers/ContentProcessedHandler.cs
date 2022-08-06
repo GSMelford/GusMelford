@@ -1,6 +1,6 @@
 ﻿using GusMelfordBot.Api.KafkaEventHandlers.Events;
-using GusMelfordBot.DataLake;
 using GusMelfordBot.Domain.Application.ContentCollector;
+using GusMelfordBot.Extensions.Services.DataLake;
 using GusMelfordBot.SimpleKafka.Interfaces;
 using TBot.Client;
 using TBot.Client.Api.Telegram.SendVideo;

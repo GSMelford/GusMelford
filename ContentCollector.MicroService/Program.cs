@@ -4,7 +4,7 @@ using ContentCollector.KafkaEventHandlers.Events;
 using ContentCollector.KafkaEventHandlers.Handlers;
 using ContentCollector.Services.ContentProviders.TikTok;
 using ContentCollector.Settings;
-using GusMelfordBot.DataLake;
+using GusMelfordBot.Extensions.Services.DataLake;
 using GusMelfordBot.Extensions.Services.Ftp;
 using GusMelfordBot.SimpleKafka;
 using GusMelfordBot.SimpleKafka.Interfaces;

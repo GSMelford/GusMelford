@@ -1,7 +1,7 @@
 ﻿using ContentCollector.Domain.ContentProviders;
 using ContentCollector.Domain.ContentProviders.TikTok;
 using ContentCollector.Services.ContentProviders.TikTok.TikTokContentHandlers.Abstractions;
-using GusMelfordBot.DataLake;
+using GusMelfordBot.Extensions.Services.DataLake;
 
 namespace ContentCollector.Services.ContentProviders.TikTok.TikTokContentHandlers;
 
@@ -28,15 +28,6 @@ public class SaveHandler : AbstractTikTokContentHandler
         catch (Exception exception) {
             _logger.LogError("Error while saving content. {ErrorMessage}", exception.Message);
             processedTikTokContent.IsSaved = false;
-            try
-            {
-                await _dataLakeService.WriteFile2(processedTikTokContent.Path, processedTikTokContent.Bytes);
-            }
-            catch (Exception exception2)
-            {
-                _logger.LogError("Error while saving content 2. {ErrorMessage}", exception2.Message);
-                processedTikTokContent.IsSaved = false;
-            }
         }
 
         if (!processedTikTokContent.IsSaved)

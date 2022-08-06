@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace GusMelfordBot.DataLake;
+﻿namespace GusMelfordBot.Extensions.Services.DataLake;
 
 public class DataLakeService : IDataLakeService
 {

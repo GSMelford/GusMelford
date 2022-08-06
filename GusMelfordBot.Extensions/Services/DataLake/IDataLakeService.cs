@@ -1,4 +1,4 @@
-﻿namespace GusMelfordBot.DataLake;
+﻿namespace GusMelfordBot.Extensions.Services.DataLake;
 
 public interface IDataLakeService
 {

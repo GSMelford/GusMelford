@@ -1,21 +1,50 @@
-﻿using Microsoft.AspNetCore.SignalR;
+﻿using GusMelfordBot.Api.Services.Applications.ContentCollector;
+using Microsoft.AspNetCore.SignalR;
 
 namespace GusMelfordBot.Api.WebSoketHandlers;
 
 public class ContentCollectorHub : Hub
 {
-    public async Task ChangeVideoTime(double currentTime)
+    private readonly IContentCollectorRoomFactory _contentCollectorRoomFactory;
+    
+    public ContentCollectorHub(IContentCollectorRoomFactory contentCollectorRoomFactory)
     {
-        await Clients.Others.SendAsync("ChangeVideoTime", currentTime);
+        _contentCollectorRoomFactory = contentCollectorRoomFactory;
+    }
+
+    public async Task JoinToRoom(string roomCode)
+    {
+        _contentCollectorRoomFactory.AddUser(roomCode, Context.ConnectionId);
+        await Clients.All.SendAsync("UserJoined", Context.ConnectionId);
     }
     
-    public async Task SwitchVideo(string direction)
+    public async Task NextContent(string roomCode)
     {
-        await Clients.All.SendAsync("SwitchVideo", direction);
+        _contentCollectorRoomFactory.GetContentCollectorRoom(roomCode).Next();
+        await Clients.All.SendAsync("VideoChanged");
     }
     
-    public async Task PauseVideo(bool isPaused)
+    public async Task PrevContent(string roomCode)
     {
-        await Clients.All.SendAsync("PauseVideo", isPaused);
+        _contentCollectorRoomFactory.GetContentCollectorRoom(roomCode).Prev();
+        await Clients.All.SendAsync("VideoChanged");
+    }
+    
+    public async Task ChangePause(string roomCode)
+    {
+        bool isPaused = _contentCollectorRoomFactory.GetContentCollectorRoom(roomCode).ChangePause();
+        await Clients.All.SendAsync("PauseChanged", isPaused);
+    }
+    
+    public async Task ChangeRoute(string roomCode)
+    {
+        int route = _contentCollectorRoomFactory.GetContentCollectorRoom(roomCode).ChangeRoute();
+        await Clients.All.SendAsync("RouteChanged", route);
+    }
+
+    public override Task OnDisconnectedAsync(Exception? exception)
+    {
+        _contentCollectorRoomFactory.RemoveUser(Context.ConnectionId);
+        return base.OnDisconnectedAsync(exception);
     }
 }

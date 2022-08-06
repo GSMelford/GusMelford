@@ -2,8 +2,8 @@
 using ContentCollector.Domain.ContentProviders.TikTok;
 using ContentCollector.Services.ContentProviders.TikTok.TikTokContentHandlers;
 using ContentCollector.Services.ContentProviders.TikTok.TikTokContentHandlers.Abstractions;
-using GusMelfordBot.DataLake;
 using GusMelfordBot.Extensions;
+using GusMelfordBot.Extensions.Services.DataLake;
 using GusMelfordBot.SimpleKafka.Interfaces;
 
 namespace ContentCollector.Services.ContentProviders.TikTok;

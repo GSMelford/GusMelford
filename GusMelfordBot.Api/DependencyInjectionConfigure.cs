@@ -1,13 +1,14 @@
 ﻿using Confluent.Kafka;
 using GusMelfordBot.Api.HostedServices;
 using GusMelfordBot.Api.Services.Applications;
+using GusMelfordBot.Api.Services.Applications.ContentCollector;
 using GusMelfordBot.Api.Services.Telegram;
 using GusMelfordBot.Api.Settings;
-using GusMelfordBot.DataLake;
 using GusMelfordBot.Domain.Application;
 using GusMelfordBot.Domain.Application.ContentCollector;
 using GusMelfordBot.Domain.Auth;
 using GusMelfordBot.Domain.Telegram;
+using GusMelfordBot.Extensions.Services.DataLake;
 using GusMelfordBot.Extensions.Services.Ftp;
 using GusMelfordBot.Infrastructure;
 using GusMelfordBot.Infrastructure.Interfaces;
