@@ -20,6 +20,18 @@ public class ContentCollectorController : Controller
         _contentCollectorRoomFactory = contentCollectorRoomFactory;
     }
     
+    [HttpGet("contents")]
+    public IEnumerable<ContentDto> GetContents([FromQuery] ContentFilterDto filterDto)
+    {
+        return _contentCollectorService.GetContents(filterDto.ToDomain()).Select(x => x.ToDto());
+    }
+    
+    [HttpGet("info")]
+    public async Task<ContentCollectorInfoDto> GetInfo([FromQuery] ContentFilterDto filterDto)
+    {
+        return (await _contentCollectorService.GetContentCollectorInfo(filterDto.ToDomain())).ToDto();
+    }
+    
     [HttpGet("content")]
     public async Task<FileStreamResult?> GetContent([FromQuery] Guid contentId)
     {
