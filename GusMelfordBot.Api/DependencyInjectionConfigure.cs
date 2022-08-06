@@ -2,6 +2,7 @@
 using GusMelfordBot.Api.HostedServices;
 using GusMelfordBot.Api.Services.Applications;
 using GusMelfordBot.Api.Services.Applications.ContentCollector;
+using GusMelfordBot.Api.Services.Auth;
 using GusMelfordBot.Api.Services.Telegram;
 using GusMelfordBot.Api.Settings;
 using GusMelfordBot.Domain.Application;
@@ -30,6 +31,8 @@ public static class DependencyInjectionConfigure
         serviceCollection.AddTransient<IDatabaseContext, DatabaseContext>(_ =>
             new DatabaseContext(appSettings.DatabaseSettings));
         serviceCollection.AddTransient<IUpdateService, UpdateService>();
+        serviceCollection.AddTransient<IContentCollectorRoomFactory, ContentCollectorRoomFactory>();
+        serviceCollection.AddTransient<IAuthService, AuthService>();
         serviceCollection.AddTransient<IDataLakeService, DataLakeService>();
         serviceCollection.AddTransient<IAuthRepository, AuthRepository>();
         serviceCollection.AddTransient<IApplicationRepository, ApplicationRepository>();
