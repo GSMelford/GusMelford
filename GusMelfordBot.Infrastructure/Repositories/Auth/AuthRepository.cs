@@ -66,4 +66,13 @@ public class AuthRepository : IAuthRepository
     {
         return new RegisterData(registerData.FirstName, registerData.LastName, tempEmail, registerData.Password);
     }
+
+    public async Task<AuthUserDomain?> AuthenticateUserByTelegramAsync(long telegramId, string password)
+    {
+        return (await _databaseContext.Set<TelegramUser>()
+            .Include(x => x.User)
+            .ThenInclude(x=>x.Role)
+            .FirstOrDefaultAsync(x => x.TelegramId == telegramId && x.User.Password == password))?
+            .ToDomain();
+    }
 }

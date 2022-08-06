@@ -10,4 +10,8 @@
       <PackageReference Include="TBot.Telegram.Dto" Version="0.1.2" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="DatabaseModels" />
+    </ItemGroup>
+
 </Project>

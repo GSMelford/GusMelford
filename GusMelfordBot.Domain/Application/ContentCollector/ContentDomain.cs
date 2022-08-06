@@ -5,7 +5,7 @@ public class ContentDomain
     public Guid Id { get; }
     public string ContentPath { get; }
     public long Number { get; }
-    public List<UserDomain> Users { get; private set; }
+    public List<ContentUserDomain> Users { get; private set; }
     public string? Provider { get; }
     public string? OriginalLink { get; }
     public string? AccompanyingCommentary { get; }
@@ -17,7 +17,7 @@ public class ContentDomain
         Guid id,
         string contentPath,
         long number,
-        List<UserDomain> users,
+        List<ContentUserDomain> users,
         string? provider, 
         string? originalLink,
         string? accompanyingCommentary,
@@ -37,7 +37,7 @@ public class ContentDomain
         Duration = duration;
     }
 
-    public void SetUsers(List<UserDomain> userDomains)
+    public void SetUsers(List<ContentUserDomain> userDomains)
     {
         Users = userDomains;
     }

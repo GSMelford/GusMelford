@@ -11,7 +11,7 @@ public static class Convertor
             content.Id,
             $"api/content-collector/content?contentId={content.Id}",
             content.Number,
-            content.Users.Select(x=> new UserDomain(x.FirstName, x.LastName)).ToList(),
+            content.Users.Select(x=> new ContentUserDomain(x.FirstName, x.LastName)).ToList(),
             content.Provider,
             content.OriginalLink,
             content.AccompanyingCommentary,

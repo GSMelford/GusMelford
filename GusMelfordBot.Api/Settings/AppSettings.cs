@@ -9,4 +9,5 @@ public class AppSettings
     public KafkaSettings KafkaSettings { get; set; }
     public DatabaseSettings DatabaseSettings { get; set; }
     public FtpSettings FtpSettings { get; set; }
+    public AuthSettings AuthSettings { get; set; }
 }
