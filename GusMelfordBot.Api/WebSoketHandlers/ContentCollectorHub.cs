@@ -47,4 +47,19 @@ public class ContentCollectorHub : Hub
         _contentCollectorRoomFactory.RemoveUser(Context.ConnectionId);
         return base.OnDisconnectedAsync(exception);
     }
+    
+    public async Task ChangeVideoTime(double currentTime)
+    {
+        await Clients.Others.SendAsync("ChangeVideoTime", currentTime);
+    }
+    
+    public async Task SwitchVideo(string direction)
+    {
+        await Clients.All.SendAsync("SwitchVideo", direction);
+    }
+    
+    public async Task PauseVideo(bool isPaused)
+    {
+        await Clients.All.SendAsync("PauseVideo", isPaused);
+    }
 }
