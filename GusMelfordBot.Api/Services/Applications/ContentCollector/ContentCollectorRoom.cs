@@ -4,14 +4,16 @@ namespace GusMelfordBot.Api.Services.Applications.ContentCollector;
 
 public class ContentCollectorRoom
 {
+    public string RoomCode { get; }
     public List<string> Users { get; set; } = new ();
     private readonly List<ContentDomain> _contents;
-    private int _cursor = -1;
+    private int _cursor;
     private bool _isPause;
-    private int _route;
+    private int _rotate;
 
-    public ContentCollectorRoom(List<ContentDomain> contents)
+    public ContentCollectorRoom(string roomCode, List<ContentDomain> contents)
     {
+        RoomCode = roomCode;
         _contents = contents;
     }
 
@@ -40,7 +42,7 @@ public class ContentCollectorRoom
         {
             _cursor--;
         }
-        else if (tempCursor == -1)
+        else
         {
             _cursor = _contents.Count - 1;
         }
@@ -51,14 +53,14 @@ public class ContentCollectorRoom
         return _isPause = !_isPause;
     }
 
-    public int ChangeRoute()
+    public int ChangeRotate()
     {
-        _route += 90;
-        if (_route > 360)
+        _rotate += 90;
+        if (_rotate > 360)
         {
-            _route = 0;
+            _rotate = 0;
         }
 
-        return _route;
+        return _rotate;
     }
 }

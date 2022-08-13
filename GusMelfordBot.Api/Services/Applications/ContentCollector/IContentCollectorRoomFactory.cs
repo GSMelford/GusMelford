@@ -6,6 +6,7 @@ public interface IContentCollectorRoomFactory
 {
     string Create(List<ContentDomain> contents);
     void AddUser(string roomCode, string userId);
-    void RemoveUser(string userId);
-    ContentCollectorRoom GetContentCollectorRoom(string roomCode);
+    List<string> GetUsers(string roomCode);
+    ContentCollectorRoom? FindRoomByRoomCode(string roomCode);
+    ContentCollectorRoom? FindRoomByUserId(string userId);
 }

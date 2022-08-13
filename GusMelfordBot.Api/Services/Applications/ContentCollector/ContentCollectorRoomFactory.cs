@@ -9,8 +9,13 @@ public class ContentCollectorRoomFactory : IContentCollectorRoomFactory
     public string Create(List<ContentDomain> contents)
     {
         string roomCode = new Random().Next(0, 9999).ToString("D");
-        _rooms.Add(roomCode, new ContentCollectorRoom(contents));
+        _rooms.Add(roomCode, new ContentCollectorRoom(roomCode, contents));
         return roomCode;
+    }
+    
+    public List<string> GetUsers(string roomCode)
+    {
+        return _rooms[roomCode].Users;
     }
     
     public void AddUser(string roomCode, string userId)
@@ -18,13 +23,20 @@ public class ContentCollectorRoomFactory : IContentCollectorRoomFactory
         _rooms[roomCode].Users.Add(userId);
     }
     
-    public void RemoveUser(string userId)
+    public ContentCollectorRoom? FindRoomByRoomCode(string roomCode)
     {
-        _rooms.FirstOrDefault(x=>x.Value.Users.Contains(userId)).Value.Users.Remove(userId);
+        _rooms.TryGetValue(roomCode, out ContentCollectorRoom? contentCollectorRoom);
+        return contentCollectorRoom;
     }
 
-    public ContentCollectorRoom GetContentCollectorRoom(string roomCode)
+    public ContentCollectorRoom? FindRoomByUserId(string userId)
     {
-        return _rooms[roomCode];
+        var room = _rooms.FirstOrDefault(x=>x.Value.Users.Contains(userId));
+        if (room.Value is not null)
+        {
+           return room.Value;
+        }
+
+        return null;
     }
 }

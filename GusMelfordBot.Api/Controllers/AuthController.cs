@@ -20,4 +20,10 @@ public class AuthController : Controller
     {
         return Ok((await _authService.Login(telegramLoginDataDto.ToDomain())).ToDto());
     }
+    
+    [HttpGet("video2")]
+    public FileResult Get()
+    {
+        return PhysicalFile("/app/contents/eva.mkv", "application/octet-stream", enableRangeProcessing: true);
+    }
 }

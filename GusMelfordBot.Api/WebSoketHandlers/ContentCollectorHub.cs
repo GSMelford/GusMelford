@@ -12,54 +12,63 @@ public class ContentCollectorHub : Hub
         _contentCollectorRoomFactory = contentCollectorRoomFactory;
     }
 
-    public async Task JoinToRoom(string roomCode)
+    public async Task JoinToRoom(object roomCode)
     {
-        _contentCollectorRoomFactory.AddUser(roomCode, Context.ConnectionId);
-        await Clients.All.SendAsync("UserJoined", Context.ConnectionId);
+        _contentCollectorRoomFactory.AddUser(roomCode.ToString()!, Context.ConnectionId);
+        var room = _contentCollectorRoomFactory.FindRoomByRoomCode(roomCode.ToString()!);
+            
+        await Clients.All.SendAsync("UserJoined", new
+        {
+            Users = room?.Users,
+            RoomCode = room?.RoomCode
+        });
     }
     
     public async Task NextContent(string roomCode)
     {
-        _contentCollectorRoomFactory.GetContentCollectorRoom(roomCode).Next();
+        _contentCollectorRoomFactory.FindRoomByRoomCode(roomCode)?.Next();
         await Clients.All.SendAsync("VideoChanged");
     }
     
     public async Task PrevContent(string roomCode)
     {
-        _contentCollectorRoomFactory.GetContentCollectorRoom(roomCode).Prev();
+        _contentCollectorRoomFactory.FindRoomByRoomCode(roomCode)?.Prev();
         await Clients.All.SendAsync("VideoChanged");
     }
     
     public async Task ChangePause(string roomCode)
     {
-        bool isPaused = _contentCollectorRoomFactory.GetContentCollectorRoom(roomCode).ChangePause();
+        bool isPaused = _contentCollectorRoomFactory.FindRoomByRoomCode(roomCode)?.ChangePause() ?? false;
         await Clients.All.SendAsync("PauseChanged", isPaused);
     }
     
-    public async Task ChangeRoute(string roomCode)
+    public async Task ChangeRotate(string roomCode)
     {
-        int route = _contentCollectorRoomFactory.GetContentCollectorRoom(roomCode).ChangeRoute();
-        await Clients.All.SendAsync("RouteChanged", route);
+        int rotate = _contentCollectorRoomFactory.FindRoomByRoomCode(roomCode)?.ChangeRotate() ?? 90;
+        await Clients.All.SendAsync("RotateChanged", rotate);
     }
 
-    public override Task OnDisconnectedAsync(Exception? exception)
+    public override async Task<Task> OnDisconnectedAsync(Exception? exception)
     {
-        _contentCollectorRoomFactory.RemoveUser(Context.ConnectionId);
+        var room = _contentCollectorRoomFactory.FindRoomByUserId(Context.ConnectionId);
+        room?.Users.Remove(Context.ConnectionId);
+        
+        await Clients.All.SendAsync("UserLeft", new
+        {
+            Users = room?.Users,
+            RoomCode = room?.RoomCode
+        });
+        
         return base.OnDisconnectedAsync(exception);
+    }
+    
+    public async Task StartWatch(string roomCode)
+    {
+        await Clients.All.SendAsync("StartWatch", roomCode);
     }
     
     public async Task ChangeVideoTime(double currentTime)
     {
         await Clients.Others.SendAsync("ChangeVideoTime", currentTime);
-    }
-    
-    public async Task SwitchVideo(string direction)
-    {
-        await Clients.All.SendAsync("SwitchVideo", direction);
-    }
-    
-    public async Task PauseVideo(bool isPaused)
-    {
-        await Clients.All.SendAsync("PauseVideo", isPaused);
     }
 }

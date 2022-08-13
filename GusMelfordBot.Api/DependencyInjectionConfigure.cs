@@ -31,7 +31,7 @@ public static class DependencyInjectionConfigure
         serviceCollection.AddTransient<IDatabaseContext, DatabaseContext>(_ =>
             new DatabaseContext(appSettings.DatabaseSettings));
         serviceCollection.AddTransient<IUpdateService, UpdateService>();
-        serviceCollection.AddTransient<IContentCollectorRoomFactory, ContentCollectorRoomFactory>();
+        serviceCollection.AddSingleton<IContentCollectorRoomFactory, ContentCollectorRoomFactory>();
         serviceCollection.AddTransient<IAuthService, AuthService>();
         serviceCollection.AddTransient<IDataLakeService, DataLakeService>();
         serviceCollection.AddTransient<IAuthRepository, AuthRepository>();

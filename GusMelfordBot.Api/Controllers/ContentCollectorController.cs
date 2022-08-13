@@ -50,7 +50,7 @@ public class ContentCollectorController : Controller
     [HttpGet("room/content/info")]
     public ContentDto GetContentInfo([FromQuery] string roomCode)
     {
-        return _contentCollectorRoomFactory.GetContentCollectorRoom(roomCode).GetContentInfo().ToDto();
+        return _contentCollectorRoomFactory.FindRoomByRoomCode(roomCode)?.GetContentInfo().ToDto() ?? new ContentDto();
     }
     
     [HttpPost("room")]
