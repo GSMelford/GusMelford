@@ -7,6 +7,7 @@
         <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
         <RootNamespace>ContentCollector</RootNamespace>
         <UserSecretsId>d31223fa-f7a9-4196-8b73-8e4f8c6e1d4d</UserSecretsId>
+        <LangVersion>10</LangVersion>
     </PropertyGroup>
 
     <ItemGroup>
@@ -15,7 +16,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\GusMelfordBot.DataLake\GusMelfordBot.DataLake.csproj" />
       <ProjectReference Include="..\GusMelfordBot.Extensions\GusMelfordBot.Extensions.csproj" />
       <ProjectReference Include="..\GusMelfordBot.SimpleKafka\GusMelfordBot.SimpleKafka.csproj" />
     </ItemGroup>

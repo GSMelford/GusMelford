@@ -2,6 +2,7 @@
 using GusMelfordBot.Infrastructure.Interfaces;
 using GusMelfordBot.Infrastructure.Models;
 using GusMelfordBot.SimpleKafka.Interfaces;
+
 namespace GusMelfordBot.Api.HostedServices;
 
 public class ContentCollectorHostedService : IHostedService, IDisposable

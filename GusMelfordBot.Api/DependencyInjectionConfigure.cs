@@ -1,6 +1,5 @@
 ﻿using Confluent.Kafka;
 using GusMelfordBot.Api.HostedServices;
-using GusMelfordBot.Api.Services.Applications;
 using GusMelfordBot.Api.Services.Applications.ContentCollector;
 using GusMelfordBot.Api.Services.Auth;
 using GusMelfordBot.Api.Services.Telegram;

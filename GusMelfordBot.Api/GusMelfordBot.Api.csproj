@@ -6,10 +6,10 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <UserSecretsId>1cdb3043-9e6b-4368-bf3a-4fb247aa7d29</UserSecretsId>
         <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+        <LangVersion>10</LangVersion>
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\GusMelfordBot.DataLake\GusMelfordBot.DataLake.csproj" />
       <ProjectReference Include="..\GusMelfordBot.Domain\GusMelfordBot.Domain.csproj" />
       <ProjectReference Include="..\GusMelfordBot.Extensions\GusMelfordBot.Extensions.csproj" />
       <ProjectReference Include="..\GusMelfordBot.Infrastructure\GusMelfordBot.Infrastructure.csproj" />

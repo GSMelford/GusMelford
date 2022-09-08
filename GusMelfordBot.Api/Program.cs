@@ -1,4 +1,5 @@
 using GusMelfordBot.Api;
+using GusMelfordBot.Api.Middlewares;
 using GusMelfordBot.Api.Settings;
 using GusMelfordBot.Api.WebSoketHandlers;
 
@@ -11,13 +12,14 @@ builder.Services.AddCors(options => options.AddPolicy("CorsPolicy",
     {
         x.AllowAnyHeader()
             .AllowAnyMethod()
-            .SetIsOriginAllowed((host) => true)
+            .SetIsOriginAllowed((_) => true)
             .AllowCredentials();
     }));
 
 WebApplication app = builder.Build();
 
 AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
+app.UseMiddleware<ExceptionMiddleware>();
 app.InitializeDatabase(appSettings.DatabaseSettings);
 app.UseCors("CorsPolicy");
 app.MapGet("/", () => "GusMelfordBot 2.0");
