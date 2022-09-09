@@ -19,4 +19,13 @@ public static class TypeCast
         
         return DateTime.TryParse(value, out DateTime result) ? result : default;
     }
+    
+    public static long ToLong(this string? value)
+    {
+        if (string.IsNullOrEmpty(value)) {
+            return default;
+        }
+        
+        return long.TryParse(value, out long result) ? result : default;
+    }
 }

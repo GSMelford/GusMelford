@@ -15,6 +15,7 @@ using GusMelfordBot.Infrastructure.Interfaces;
 using GusMelfordBot.Infrastructure.Repositories.Application;
 using GusMelfordBot.Infrastructure.Repositories.Application.ContentCollector;
 using GusMelfordBot.Infrastructure.Repositories.Auth;
+using GusMelfordBot.Infrastructure.Repositories.Telegram;
 using GusMelfordBot.SimpleKafka;
 using TBot.Client;
 
@@ -37,6 +38,9 @@ public static class DependencyInjectionConfigure
         serviceCollection.AddTransient<IApplicationRepository, ApplicationRepository>();
         serviceCollection.AddTransient<IContentCollectorRepository, ContentCollectorRepository>();
         serviceCollection.AddTransient<IContentCollectorService, ContentCollectorService>();
+        serviceCollection.AddTransient<ICommandService, CommandService>();
+        serviceCollection.AddTransient<ICommandRepository, CommandRepository>();
+        serviceCollection.AddSingleton<ILongCommandService, LongCommandService>();
         serviceCollection.AddTransient<IFtpServerService, FtpServerService>(
             provider => new FtpServerService(appSettings.FtpSettings, 
                 provider.GetRequiredService<ILogger<IFtpServerService>>()));

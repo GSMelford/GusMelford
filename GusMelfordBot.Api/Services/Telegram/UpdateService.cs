@@ -38,7 +38,7 @@ public class UpdateService : IUpdateService
 
         return await _authRepository.RegisterUserFromTelegramIfNotExist(
             new RegisterData(
-                userDomain.FirstName /*?? throw new Exception()*/,
+                userDomain.FirstName!,
                 userDomain.LastName,
                 string.Empty,
                 string.Empty),

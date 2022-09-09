@@ -75,4 +75,20 @@ public class AuthRepository : IAuthRepository
             .FirstOrDefaultAsync(x => x.TelegramId == telegramId && x.User.Password == password))?
             .ToDomain();
     }
+
+    public async Task UpdatePasswordAsync(long telegramId, string password)
+    {
+        TelegramUser? telegramUser = await _databaseContext.Set<TelegramUser>()
+            .Include(x=>x.User)
+            .FirstOrDefaultAsync(x => x.TelegramId == telegramId);
+
+        if (telegramUser is null)
+        {
+            return;
+        }
+
+        telegramUser.User.Password = password;
+        _databaseContext.Update(telegramUser);
+        await _databaseContext.SaveChangesAsync();
+    }
 }
