@@ -1,12 +1,10 @@
 ﻿using GusMelfordBot.Api.Services.Applications.ContentCollector;
 using GusMelfordBot.Domain.Application.ContentCollector;
 using GusMelfordBot.Extensions;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
 
 namespace GusMelfordBot.Api.WebSoketHandlers;
 
-[Authorize]
 public class ContentCollectorHub : Hub
 {
     private readonly IContentCollectorRoomFactory _contentCollectorRoomFactory;
@@ -28,6 +26,7 @@ public class ContentCollectorHub : Hub
         }
         
         ContentCollectorUser contentCollectorUser = await _contentCollectorRepository.GetUserAsync(Context.GetHttpContext()!.GetUserId());
+        contentCollectorUser.ConnectionId = Context.ConnectionId;
         contentCollectorRoom.AddUser(contentCollectorUser);
         
         await Clients.All.SendAsync("UserJoined", new
@@ -92,6 +91,14 @@ public class ContentCollectorHub : Hub
         if (contentCollectorRoom.GetUsers().All(x=>x.IsReady)) 
         {
             await Clients.All.SendAsync("StartWatch", roomCode);
+        }
+        else
+        {
+            await Clients.All.SendAsync("UserJoined", new
+            {
+                Users = contentCollectorRoom.GetUsers(),
+                contentCollectorRoom.RoomCode
+            });
         }
     }
     
