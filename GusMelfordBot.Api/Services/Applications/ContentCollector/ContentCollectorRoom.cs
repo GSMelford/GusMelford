@@ -28,6 +28,7 @@ public class ContentCollectorRoom
         if (tempCursor < _contents.Count)
         {
             _cursor++;
+            _rotate = 0;
         }
         else if (tempCursor == _contents.Count)
         {
@@ -41,6 +42,7 @@ public class ContentCollectorRoom
         if (tempCursor > 0)
         {
             _cursor--;
+            _rotate = 0;
         }
         else
         {
