@@ -143,7 +143,7 @@ public class ContentCollectorRepository : IContentCollectorRepository
         
         User lastUser = content.Users.Last();
 
-        string caption = $"🐤 Content №{content.Number}" +
+        string caption = $"🐤 Content №{content.Number}\n" +
                          $"🤖 {contentId}\n" +
                          $"👉 {lastUser.FirstName} {lastUser.LastName}\n" +
                          $"{content.OriginalLink}\n";
