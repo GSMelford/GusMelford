@@ -9,4 +9,5 @@ public interface IContentCollectorRepository
     Task<ContentCollectorInfo> GetContentCollectorInfo(ContentFilter contentFilter);
     Task<long?> GetChatId(Guid contentId);
     Task<string> GetVideoCaption(Guid contentId);
+    Task MarkContentAsViewed(Guid contentId);
 }

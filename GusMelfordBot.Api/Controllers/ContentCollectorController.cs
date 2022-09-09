@@ -11,13 +11,16 @@ public class ContentCollectorController : Controller
 {
     private readonly IContentCollectorService _contentCollectorService;
     private readonly IContentCollectorRoomFactory _contentCollectorRoomFactory;
+    private readonly IContentCollectorRepository _contentCollectorRepository;
     
     public ContentCollectorController(
         IContentCollectorService contentCollectorService,
-        IContentCollectorRoomFactory contentCollectorRoomFactory)
+        IContentCollectorRoomFactory contentCollectorRoomFactory, 
+        IContentCollectorRepository contentCollectorRepository)
     {
         _contentCollectorService = contentCollectorService;
         _contentCollectorRoomFactory = contentCollectorRoomFactory;
+        _contentCollectorRepository = contentCollectorRepository;
     }
     
     [HttpGet("contents")]
@@ -58,5 +61,11 @@ public class ContentCollectorController : Controller
     {
         return _contentCollectorRoomFactory.Create(
             _contentCollectorService.GetContents(contentFilterDto.ToDomain()).ToList());
+    }
+
+    [HttpPatch("mark-content-as-viewed")]
+    public async Task MarkContentAsViewed([FromQuery] Guid contentId)
+    {
+        await _contentCollectorRepository.MarkContentAsViewed(contentId);
     }
 }

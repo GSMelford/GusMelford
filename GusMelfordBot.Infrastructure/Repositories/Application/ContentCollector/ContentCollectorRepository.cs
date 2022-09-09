@@ -170,4 +170,16 @@ public class ContentCollectorRepository : IContentCollectorRepository
         
         return new ContentCollectorInfo(contents.Count, contents.Sum(x => x.Duration)!.Value);
     }
+
+    public async Task MarkContentAsViewed(Guid contentId)
+    {
+        Content? content = await _databaseContext.Set<Content>().FirstOrDefaultAsync(x => x.Id == contentId);
+        if (content is null) {
+            return;
+        }
+
+        content.IsViewed = true;
+        _databaseContext.Update(content);
+        await _databaseContext.SaveChangesAsync();
+    }
 }
