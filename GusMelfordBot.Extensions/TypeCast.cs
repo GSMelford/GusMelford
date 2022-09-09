@@ -28,4 +28,13 @@ public static class TypeCast
         
         return long.TryParse(value, out long result) ? result : default;
     }
+    
+    public static Guid ToGuid(this string? value)
+    {
+        if (string.IsNullOrEmpty(value)) {
+            return default;
+        }
+        
+        return Guid.TryParse(value, out Guid result) ? result : default;
+    }
 }

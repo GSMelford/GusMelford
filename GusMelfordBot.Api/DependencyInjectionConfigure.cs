@@ -1,4 +1,5 @@
-﻿using Confluent.Kafka;
+﻿using System.Text;
+using Confluent.Kafka;
 using GusMelfordBot.Api.HostedServices;
 using GusMelfordBot.Api.Services.Applications.ContentCollector;
 using GusMelfordBot.Api.Services.Auth;
@@ -17,6 +18,8 @@ using GusMelfordBot.Infrastructure.Repositories.Application.ContentCollector;
 using GusMelfordBot.Infrastructure.Repositories.Auth;
 using GusMelfordBot.Infrastructure.Repositories.Telegram;
 using GusMelfordBot.SimpleKafka;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
 using TBot.Client;
 
 namespace GusMelfordBot.Api;
@@ -53,5 +56,32 @@ public static class DependencyInjectionConfigure
             BootstrapServers = appSettings.KafkaSettings.BootstrapServers
         });
         serviceCollection.AddKafkaConsumersFactory();
+        serviceCollection.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+            .AddJwtBearer(options =>
+            {
+                options.RequireHttpsMetadata = false;
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuer = true,
+                    ValidIssuer = appSettings.AuthSettings.Issuer,
+                    ValidateAudience = true,
+                    ValidAudience = appSettings.AuthSettings.Audience,
+                    ValidateLifetime = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(appSettings.AuthSettings.Key)),
+                    ValidateIssuerSigningKey = true,
+                };
+                options.Events = new JwtBearerEvents
+                {
+                    OnMessageReceived = context =>
+                    {
+                        var accessToken = context.Request.Query["access_token"];
+                        var path = context.HttpContext.Request.Path;
+                        if (!string.IsNullOrEmpty(accessToken) && path.StartsWithSegments("/content-viewer-hub")) {
+                            context.Token = accessToken;
+                        }
+                        return Task.CompletedTask;
+                    }
+                };
+            });
     }
 }

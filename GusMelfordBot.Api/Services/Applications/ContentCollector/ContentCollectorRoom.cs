@@ -1,11 +1,12 @@
 ﻿using GusMelfordBot.Domain.Application.ContentCollector;
+using GusMelfordBot.Infrastructure.Models;
 
 namespace GusMelfordBot.Api.Services.Applications.ContentCollector;
 
 public class ContentCollectorRoom
 {
     public string RoomCode { get; }
-    public List<string> Users { get; set; } = new ();
+    private List<ContentCollectorUser> Users { get; set; } = new ();
     private readonly List<ContentDomain> _contents;
     private int _cursor;
     private bool _isPause;
@@ -17,6 +18,49 @@ public class ContentCollectorRoom
         _contents = contents;
     }
 
+    public IEnumerable<ContentCollectorUser> GetUsers()
+    {
+        return Users;
+    }
+
+    public void AddUser(ContentCollectorUser newContentCollectorUser)
+    {
+        ContentCollectorUser? contentCollectorUser = Users.FirstOrDefault(x => x.Id == newContentCollectorUser.Id);
+        if (contentCollectorUser is null)
+        {
+            Users.Add(newContentCollectorUser);
+        }
+    }
+    
+    public void RemoveUser(Guid userId)
+    {
+        ContentCollectorUser? contentCollectorUser = Users.FirstOrDefault(x => x.Id == userId);
+        
+        if (contentCollectorUser is not null) {
+            Users.Remove(contentCollectorUser);
+        }
+    }
+
+    public bool IsRoomEmpty()
+    {
+        return !Users.Any();
+    }
+    
+    public bool IsUserExist(Guid userId)
+    {
+        return Users.FirstOrDefault(x => x.Id == userId) != null;
+    }
+    
+    public void SetReady(Guid userId)
+    {
+        ContentCollectorUser? contentCollectorUser = Users.FirstOrDefault(x => x.Id == userId);
+        if (contentCollectorUser is null) {
+            return;
+        }
+
+        contentCollectorUser.IsReady = true;
+    }
+    
     public ContentDomain GetContentInfo()
     {
         return _contents[_cursor];

@@ -1,5 +1,6 @@
 ﻿using System.Text.RegularExpressions;
 using GusMelfordBot.Domain.Application.ContentCollector;
+using GusMelfordBot.Domain.Telegram.Models;
 using GusMelfordBot.Infrastructure.Interfaces;
 using GusMelfordBot.Infrastructure.Models;
 using Microsoft.EntityFrameworkCore;
@@ -181,5 +182,20 @@ public class ContentCollectorRepository : IContentCollectorRepository
         content.IsViewed = true;
         _databaseContext.Update(content);
         await _databaseContext.SaveChangesAsync();
+    }
+    
+    public async Task<ContentCollectorUser> GetUserAsync(Guid userId)
+    {
+        User? user = await _databaseContext.Set<User>().FirstOrDefaultAsync(x => x.Id == userId);
+        if (user is null) {
+            return new ContentCollectorUser();
+        }
+        
+        return new ContentCollectorUser
+        {
+            Id = user.Id,
+            FirstName = user.FirstName,
+            LastName = user.LastName
+        };
     }
 }

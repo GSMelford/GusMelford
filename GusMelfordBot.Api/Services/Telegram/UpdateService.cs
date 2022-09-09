@@ -30,7 +30,7 @@ public class UpdateService : IUpdateService
         }
     }
 
-    private async Task<Guid> RegisterIfNotExist(UserDomain? userDomain)
+    private async Task<Guid> RegisterIfNotExist(TelegramObjectUserDomain? userDomain)
     {
         if (userDomain is null) {
             throw new Exception();

@@ -27,6 +27,8 @@ app.SetEnvironmentSettings(builder);
 app.UseDefaultFiles();
 app.UseStaticFiles();
 app.UseRouting();
+app.UseAuthorization();
+app.UseAuthentication();
 app.SubscribeOnEvents(appSettings);
 app.UseEndpoints(endpoints => { endpoints.MapHealthChecks("/health"); });
 app.UseEndpoints(endpoints => { endpoints.MapControllers(); });

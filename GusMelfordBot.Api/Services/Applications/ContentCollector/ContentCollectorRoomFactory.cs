@@ -13,30 +13,23 @@ public class ContentCollectorRoomFactory : IContentCollectorRoomFactory
         return roomCode;
     }
     
-    public List<string> GetUsers(string roomCode)
-    {
-        return _rooms[roomCode].Users;
-    }
-    
-    public void AddUser(string roomCode, string userId)
-    {
-        _rooms[roomCode].Users.Add(userId);
-    }
-    
-    public ContentCollectorRoom? FindRoomByRoomCode(string roomCode)
+    public ContentCollectorRoom? GetRoomByRoomCode(string roomCode)
     {
         _rooms.TryGetValue(roomCode, out ContentCollectorRoom? contentCollectorRoom);
         return contentCollectorRoom;
     }
 
-    public ContentCollectorRoom? FindRoomByUserId(string userId)
+    public ContentCollectorRoom? GetRoomByUserId(Guid userId)
     {
-        var room = _rooms.FirstOrDefault(x=>x.Value.Users.Contains(userId));
-        if (room.Value is not null)
-        {
-           return room.Value;
-        }
+        var room = _rooms.FirstOrDefault(x => x.Value.IsUserExist(userId));
+        return room.Value ?? null;
+    }
 
-        return null;
+    public void DestroyRoomIfEmpty(string roomCode)
+    {
+        if (GetRoomByRoomCode(roomCode)?.IsRoomEmpty() == true)
+        {
+            _rooms.Remove(roomCode);
+        }
     }
 }

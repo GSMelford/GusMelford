@@ -1,13 +1,13 @@
 ﻿namespace GusMelfordBot.Domain.Telegram.Models;
 
-public class UserDomain
+public class TelegramObjectUserDomain
 {
     public long? Id { get; set; }
     public string? FirstName { get; set; }
     public string? LastName { get; set; }
     public string? Username { get; set; }
 
-    public UserDomain(long? id, string? firstName, string? lastName, string? username)
+    public TelegramObjectUserDomain(long? id, string? firstName, string? lastName, string? username)
     {
         Id = id;
         FirstName = firstName;

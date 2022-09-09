@@ -21,9 +21,9 @@ public static class Convertor
             message.Chat.ToDomain());
     }
 
-    private static UserDomain ToDomain(this User user)
+    private static TelegramObjectUserDomain ToDomain(this User user)
     {
-        return new UserDomain(user.Id, user.FirstName, user.LastName, user.Username);
+        return new TelegramObjectUserDomain(user.Id, user.FirstName, user.LastName, user.Username);
     }
 
     private static ChatDomain ToDomain(this Chat chat)

@@ -10,4 +10,5 @@ public interface IContentCollectorRepository
     Task<long?> GetChatId(Guid contentId);
     Task<string> GetVideoCaption(Guid contentId);
     Task MarkContentAsViewed(Guid contentId);
+    Task<ContentCollectorUser> GetUserAsync(Guid userId);
 }
