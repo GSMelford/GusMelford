@@ -40,6 +40,7 @@ services:
     ports:
       - 5665:80
     environment:
+      - AppSettings:AuthSettings:Key=$BOT_KEY
       - AppSettings:TelegramBotSettings:Token=$GUSMELFORDBOT_TELEGRAM_TOKEN
       - AppSettings:KafkaSettings:BootstrapServers=kafka
       - AppSettings:DatabaseSettings:Host=db
