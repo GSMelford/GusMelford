@@ -1,6 +1,5 @@
 ﻿using System.Text.RegularExpressions;
 using GusMelfordBot.Domain.Application.ContentCollector;
-using GusMelfordBot.Domain.Telegram.Models;
 using GusMelfordBot.Infrastructure.Interfaces;
 using GusMelfordBot.Infrastructure.Models;
 using Microsoft.EntityFrameworkCore;
@@ -196,6 +195,28 @@ public class ContentCollectorRepository : IContentCollectorRepository
             Id = user.Id,
             FirstName = user.FirstName,
             LastName = user.LastName
+        };
+    }
+
+    public async Task<ContentCollectorStatistic> GetStatistics()
+    {
+        List<Content> contents = await _databaseContext.Set<Content>()
+            .Include(x=>x.Users)
+            .Where(x => !x.IsViewed && x.IsValid == true && x.IsSaved).ToListAsync();
+
+        return new ContentCollectorStatistic
+        {
+            Duration = contents.Sum(x => x.Duration)!.Value,
+            NotViewedVideoCount = contents.Count,
+            UserNewContents = (await _databaseContext.Set<User>()
+                .ToDictionaryAsync(
+                    x => x.Id, 
+                    y => $"{y.FirstName} {y.LastName}"))
+                .ToDictionary(
+                    user => user.Value, 
+                    user => contents.Count(x => x.Users.FirstOrDefault(y => y.Id == user.Key) != null))
+                .OrderByDescending(x=>x.Value)
+                .ToDictionary(x=>x.Key, x=>x.Value)
         };
     }
 }

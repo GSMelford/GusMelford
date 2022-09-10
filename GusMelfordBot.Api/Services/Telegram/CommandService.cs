@@ -17,7 +17,10 @@ public class CommandService : ICommandService
     {
         AbstractCommandHandler abstractCommandHandler = 
             ActivatorUtilities.CreateInstance<UserInfoCommandHandler>(_serviceProvider);
-        abstractCommandHandler.SetNext(ActivatorUtilities.CreateInstance<SetPasswordCommandHandler>(_serviceProvider));
+        
+        abstractCommandHandler
+            .SetNext(ActivatorUtilities.CreateInstance<SetPasswordCommandHandler>(_serviceProvider))
+            .SetNext(ActivatorUtilities.CreateInstance<ContentCollectorStatisticsCommandHandler>(_serviceProvider));
         
         await abstractCommandHandler.Handle(command);
     }

@@ -11,4 +11,5 @@ public interface IContentCollectorRepository
     Task<string> GetVideoCaption(Guid contentId);
     Task MarkContentAsViewed(Guid contentId);
     Task<ContentCollectorUser> GetUserAsync(Guid userId);
+    Task<ContentCollectorStatistic> GetStatistics();
 }
