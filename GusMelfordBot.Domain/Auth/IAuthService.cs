@@ -2,5 +2,6 @@
 
 public interface IAuthService
 {
-    Task<Jwt> Login(TelegramLoginData telegramLoginData);
+    Task<Jwt> LoginAsync(TelegramLoginData telegramLoginData);
+    Task<Jwt> RefreshTokenAsync(TokensDomain tokensDomain);
 }

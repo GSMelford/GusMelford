@@ -18,6 +18,12 @@ public class AuthController : Controller
     [HttpPost("login")]
     public async Task<ActionResult<JwtDto>> Login([FromBody] TelegramLoginDataDto telegramLoginDataDto)
     {
-        return Ok((await _authService.Login(telegramLoginDataDto.ToDomain())).ToDto());
+        return Ok((await _authService.LoginAsync(telegramLoginDataDto.ToDomain())).ToDto());
+    }
+    
+    [HttpPost("refresh-token")]
+    public async Task<ActionResult<JwtDto>> RefreshToken([FromBody] TokensDto tokensDto)
+    {
+        return (await _authService.RefreshTokenAsync(tokensDto.ToDomain())).ToDto();
     }
 }

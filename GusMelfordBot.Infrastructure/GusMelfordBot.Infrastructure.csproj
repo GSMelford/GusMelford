@@ -19,6 +19,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\GusMelfordBot.Domain\GusMelfordBot.Domain.csproj" />
+      <ProjectReference Include="..\GusMelfordBot.Extensions\GusMelfordBot.Extensions.csproj" />
     </ItemGroup>
 
 </Project>

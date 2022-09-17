@@ -6,12 +6,14 @@ public class AuthUserDomain
     public string Role { get; }
     public string FirstName { get; }
     public string? LastName { get; }
+    public string? RefreshToken { get; }
     
-    public AuthUserDomain(Guid id, string role, string firstName, string? lastName)
+    public AuthUserDomain(Guid id, string role, string firstName, string? lastName, string? refreshToken)
     {
         Id = id;
         Role = role;
         FirstName = firstName;
         LastName = lastName;
+        RefreshToken = refreshToken;
     }
 }

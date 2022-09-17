@@ -1,4 +1,6 @@
 ﻿using GusMelfordBot.Domain.Auth;
+using GusMelfordBot.Extensions;
+using GusMelfordBot.Extensions.Exceptions;
 using GusMelfordBot.Infrastructure.Interfaces;
 using GusMelfordBot.Infrastructure.Models;
 using Microsoft.EntityFrameworkCore;
@@ -67,7 +69,7 @@ public class AuthRepository : IAuthRepository
         return new RegisterData(registerData.FirstName, registerData.LastName, tempEmail, registerData.Password);
     }
 
-    public async Task<AuthUserDomain?> AuthenticateUserByTelegramAsync(long telegramId, string password)
+    public async Task<AuthUserDomain?> AuthenticateUser(long telegramId, string password)
     {
         return (await _databaseContext.Set<TelegramUser>()
             .Include(x => x.User)
@@ -75,6 +77,14 @@ public class AuthRepository : IAuthRepository
             .FirstOrDefaultAsync(x => x.TelegramId == telegramId && x.User.Password == password))?
             .ToDomain();
     }
+    
+    public async Task<AuthUserDomain> AuthenticateUser(Guid userId)
+    {
+        return (await _databaseContext.Set<User>()
+                .Include(x => x.Role)
+                .FirstOrDefaultAsync(x => x.Id == userId))
+            !.ToDomain();
+    } 
 
     public async Task UpdatePasswordAsync(long telegramId, string password)
     {
@@ -87,8 +97,18 @@ public class AuthRepository : IAuthRepository
             return;
         }
 
-        telegramUser.User.Password = password;
+        telegramUser.User.Password = password.ToSha512();
         _databaseContext.Update(telegramUser);
+        await _databaseContext.SaveChangesAsync();
+    }
+
+    public async Task UpdateRefreshTokenAsync(Guid userId, string refreshToken)
+    {
+        User user = ( await _databaseContext.Set<User>().FirstOrDefaultAsync(x => x.Id == userId))
+            .IfNullThrow(new UnauthorizedException($"User not found {userId}"));
+
+        user.RefreshToken = refreshToken;
+        _databaseContext.Update(user);
         await _databaseContext.SaveChangesAsync();
     }
 }

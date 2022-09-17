@@ -14,7 +14,15 @@ public static class Convertor
         return new JwtDto
         {
             AccessToken = jwt.AccessToken,
-            UserFullName = jwt.UserFullName
+            UserFullName = jwt.UserFullName,
+            Role = jwt.Role,
+            ExpiredIn = jwt.ExpiredIn,
+            RefreshToken = jwt.RefreshToken
         };
+    }
+
+    public static TokensDomain ToDomain(this TokensDto tokensDto)
+    {
+        return new TokensDomain(tokensDto.AccessToken, tokensDto.RefreshToken);
     }
 }
