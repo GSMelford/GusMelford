@@ -12,7 +12,7 @@ services:
       - POSTGRES_PASSWORD=$POSTGRES_PASSWORD
       - PGDATA=/var/lib/postgresql/data/pgdata
     volumes:
-      - /var/lib/postgresql/data:/var/lib/postgresql/data
+      - /media/pi/KINGSTON/data/var/lib/postgresql/data:/var/lib/postgresql/data
 
   gusmelford.contentcollector:
     container_name: gusmelford.contentcollector
@@ -64,8 +64,8 @@ services:
    ports:
      - 22181:2181
    volumes:
-      - zookeeperdata:/var/lib/zookeeper/data
-      - zookeeperdatalog:/var/lib/zookeeper/log
+      - /media/pi/KINGSTON/data/zookeeperdata:/var/lib/zookeeper/data
+      - /media/pi/KINGSTON/data/zookeeperdatalog:/var/lib/zookeeper/log
 
   kafka:
     image: confluentinc/cp-kafka:latest
@@ -97,7 +97,3 @@ services:
       SERVER_SERVLET_CONTEXT_PATH: /kafka-ui
       KAFKA_CLUSTERS_0_NAME: local
       KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:9092
-
-volumes:
-  zookeeperdata:
-  zookeeperdatalog:
