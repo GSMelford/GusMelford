@@ -1,20 +1,22 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GusMelfordBot.Api", "GusMelfordBot.Api\GusMelfordBot.Api.csproj", "{3D2F978E-225D-4E1C-B139-690F531C4DE0}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GusMelford.Core.Api", "GusMelford.Core.Api\GusMelford.Core.Api.csproj", "{3D2F978E-225D-4E1C-B139-690F531C4DE0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GusMelfordBot.Infrastructure", "GusMelfordBot.Infrastructure\GusMelfordBot.Infrastructure.csproj", "{080027F1-0F5E-4DC0-98EE-E073E449C799}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GusMelford.Core.Infrastructure", "GusMelford.Core.Infrastructure\GusMelford.Core.Infrastructure.csproj", "{080027F1-0F5E-4DC0-98EE-E073E449C799}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GusMelfordBot.Domain", "GusMelfordBot.Domain\GusMelfordBot.Domain.csproj", "{5B186686-8A92-47F8-B96C-BCBF663DDEE0}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GusMelford.Core.Domain", "GusMelford.Core.Domain\GusMelford.Core.Domain.csproj", "{5B186686-8A92-47F8-B96C-BCBF663DDEE0}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Applications", "Applications", "{BEE7298B-24F2-4141-A120-D50B55284C24}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Services", "Services", "{BEE7298B-24F2-4141-A120-D50B55284C24}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ContentCollector.MicroService", "ContentCollector.MicroService\ContentCollector.MicroService.csproj", "{FAF77666-B14F-4AE4-A3C3-E2D80AABCEF4}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GusMelford.Content", "GusMelford.Content\GusMelford.Content.csproj", "{FAF77666-B14F-4AE4-A3C3-E2D80AABCEF4}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ContentCollector", "ContentCollector", "{8034EF3D-64C6-426A-B8A4-9456D9C4FE0D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GusMelford.Extensions", "GusMelford.Extensions\GusMelford.Extensions.csproj", "{988F5C1A-3979-4986-80B5-4A2B46C73B3D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GusMelfordBot.Extensions", "GusMelfordBot.Extensions\GusMelfordBot.Extensions.csproj", "{988F5C1A-3979-4986-80B5-4A2B46C73B3D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GusMelford.SimpleKafka", "GusMelford.SimpleKafka\GusMelford.SimpleKafka.csproj", "{6DC80D55-D673-48C7-8CEF-C0CC547EA765}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GusMelfordBot.SimpleKafka", "GusMelfordBot.SimpleKafka\GusMelfordBot.SimpleKafka.csproj", "{6DC80D55-D673-48C7-8CEF-C0CC547EA765}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Core", "Core", "{8BA37EB6-E1BF-4017-9AFA-DFCFAF0D461C}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Libraries", "Libraries", "{82AA6377-3A6C-4E8E-8022-A0EFD61AA944}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -48,7 +50,12 @@ Global
 		{6DC80D55-D673-48C7-8CEF-C0CC547EA765}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{8034EF3D-64C6-426A-B8A4-9456D9C4FE0D} = {BEE7298B-24F2-4141-A120-D50B55284C24}
-		{FAF77666-B14F-4AE4-A3C3-E2D80AABCEF4} = {8034EF3D-64C6-426A-B8A4-9456D9C4FE0D}
+		{FAF77666-B14F-4AE4-A3C3-E2D80AABCEF4} = {BEE7298B-24F2-4141-A120-D50B55284C24}
+		{8BA37EB6-E1BF-4017-9AFA-DFCFAF0D461C} = {BEE7298B-24F2-4141-A120-D50B55284C24}
+		{3D2F978E-225D-4E1C-B139-690F531C4DE0} = {8BA37EB6-E1BF-4017-9AFA-DFCFAF0D461C}
+		{5B186686-8A92-47F8-B96C-BCBF663DDEE0} = {8BA37EB6-E1BF-4017-9AFA-DFCFAF0D461C}
+		{080027F1-0F5E-4DC0-98EE-E073E449C799} = {8BA37EB6-E1BF-4017-9AFA-DFCFAF0D461C}
+		{988F5C1A-3979-4986-80B5-4A2B46C73B3D} = {82AA6377-3A6C-4E8E-8022-A0EFD61AA944}
+		{6DC80D55-D673-48C7-8CEF-C0CC547EA765} = {82AA6377-3A6C-4E8E-8022-A0EFD61AA944}
 	EndGlobalSection
 EndGlobal

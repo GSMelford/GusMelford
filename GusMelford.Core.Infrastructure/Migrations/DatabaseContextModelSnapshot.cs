@@ -3,7 +3,6 @@ using System;
 using GusMelfordBot.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -12,14 +11,13 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace GusMelfordBot.Infrastructure.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    [Migration("20220729222304_InitialCreate")]
-    partial class InitialCreate
+    partial class DatabaseContextModelSnapshot : ModelSnapshot
     {
-        protected override void BuildTargetModel(ModelBuilder modelBuilder)
+        protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "6.0.7")
+                .HasAnnotation("ProductVersion", "7.0.0-preview.7.22376.2")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -39,7 +37,7 @@ namespace GusMelfordBot.Infrastructure.Migrations
                     b.ToTable("ContentUser");
                 });
 
-            modelBuilder.Entity("GusMelfordBot.Infrastructure.Models.Application", b =>
+            modelBuilder.Entity("GusMelford.Core.Infrastructure.Models.Application", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -60,7 +58,7 @@ namespace GusMelfordBot.Infrastructure.Migrations
                     b.ToTable("Applications");
                 });
 
-            modelBuilder.Entity("GusMelfordBot.Infrastructure.Models.Content", b =>
+            modelBuilder.Entity("GusMelford.Core.Infrastructure.Models.Content", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -121,7 +119,7 @@ namespace GusMelfordBot.Infrastructure.Migrations
                     b.ToTable("Contents");
                 });
 
-            modelBuilder.Entity("GusMelfordBot.Infrastructure.Models.Role", b =>
+            modelBuilder.Entity("GusMelford.Core.Infrastructure.Models.Role", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -142,7 +140,7 @@ namespace GusMelfordBot.Infrastructure.Migrations
                     b.ToTable("Roles");
                 });
 
-            modelBuilder.Entity("GusMelfordBot.Infrastructure.Models.TelegramChat", b =>
+            modelBuilder.Entity("GusMelford.Core.Infrastructure.Models.TelegramChat", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -167,7 +165,7 @@ namespace GusMelfordBot.Infrastructure.Migrations
                     b.ToTable("TelegramChats");
                 });
 
-            modelBuilder.Entity("GusMelfordBot.Infrastructure.Models.TelegramUser", b =>
+            modelBuilder.Entity("GusMelford.Core.Infrastructure.Models.TelegramUser", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -195,7 +193,7 @@ namespace GusMelfordBot.Infrastructure.Migrations
                     b.ToTable("TelegramUsers");
                 });
 
-            modelBuilder.Entity("GusMelfordBot.Infrastructure.Models.User", b =>
+            modelBuilder.Entity("GusMelford.Core.Infrastructure.Models.User", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -221,6 +219,10 @@ namespace GusMelfordBot.Infrastructure.Migrations
                     b.Property<string>("Password")
                         .HasColumnType("text");
 
+                    b.Property<string>("RefreshToken")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.Property<Guid?>("RoleId")
                         .HasColumnType("uuid");
 
@@ -236,22 +238,22 @@ namespace GusMelfordBot.Infrastructure.Migrations
 
             modelBuilder.Entity("ContentUser", b =>
                 {
-                    b.HasOne("GusMelfordBot.Infrastructure.Models.Content", null)
+                    b.HasOne("GusMelford.Core.Infrastructure.Models.Content", null)
                         .WithMany()
                         .HasForeignKey("ContentsId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("GusMelfordBot.Infrastructure.Models.User", null)
+                    b.HasOne("GusMelford.Core.Infrastructure.Models.User", null)
                         .WithMany()
                         .HasForeignKey("UsersId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("GusMelfordBot.Infrastructure.Models.Content", b =>
+            modelBuilder.Entity("GusMelford.Core.Infrastructure.Models.Content", b =>
                 {
-                    b.HasOne("GusMelfordBot.Infrastructure.Models.TelegramChat", "Chat")
+                    b.HasOne("GusMelford.Core.Infrastructure.Models.TelegramChat", "Chat")
                         .WithMany("Contents")
                         .HasForeignKey("ChatId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -260,9 +262,9 @@ namespace GusMelfordBot.Infrastructure.Migrations
                     b.Navigation("Chat");
                 });
 
-            modelBuilder.Entity("GusMelfordBot.Infrastructure.Models.TelegramChat", b =>
+            modelBuilder.Entity("GusMelford.Core.Infrastructure.Models.TelegramChat", b =>
                 {
-                    b.HasOne("GusMelfordBot.Infrastructure.Models.Application", "Application")
+                    b.HasOne("GusMelford.Core.Infrastructure.Models.Application", "Application")
                         .WithMany("TelegramChats")
                         .HasForeignKey("ApplicationId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -271,9 +273,9 @@ namespace GusMelfordBot.Infrastructure.Migrations
                     b.Navigation("Application");
                 });
 
-            modelBuilder.Entity("GusMelfordBot.Infrastructure.Models.TelegramUser", b =>
+            modelBuilder.Entity("GusMelford.Core.Infrastructure.Models.TelegramUser", b =>
                 {
-                    b.HasOne("GusMelfordBot.Infrastructure.Models.User", "User")
+                    b.HasOne("GusMelford.Core.Infrastructure.Models.User", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -282,26 +284,26 @@ namespace GusMelfordBot.Infrastructure.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("GusMelfordBot.Infrastructure.Models.User", b =>
+            modelBuilder.Entity("GusMelford.Core.Infrastructure.Models.User", b =>
                 {
-                    b.HasOne("GusMelfordBot.Infrastructure.Models.Role", "Role")
+                    b.HasOne("GusMelford.Core.Infrastructure.Models.Role", "Role")
                         .WithMany("Users")
                         .HasForeignKey("RoleId");
 
                     b.Navigation("Role");
                 });
 
-            modelBuilder.Entity("GusMelfordBot.Infrastructure.Models.Application", b =>
+            modelBuilder.Entity("GusMelford.Core.Infrastructure.Models.Application", b =>
                 {
                     b.Navigation("TelegramChats");
                 });
 
-            modelBuilder.Entity("GusMelfordBot.Infrastructure.Models.Role", b =>
+            modelBuilder.Entity("GusMelford.Core.Infrastructure.Models.Role", b =>
                 {
                     b.Navigation("Users");
                 });
 
-            modelBuilder.Entity("GusMelfordBot.Infrastructure.Models.TelegramChat", b =>
+            modelBuilder.Entity("GusMelford.Core.Infrastructure.Models.TelegramChat", b =>
                 {
                     b.Navigation("Contents");
                 });

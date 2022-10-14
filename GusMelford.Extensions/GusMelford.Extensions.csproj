@@ -5,10 +5,11 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <LangVersion>10</LangVersion>
+        <RootNamespace>GusMelfordBot.Extensions</RootNamespace>
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="TBot.Telegram.Dto" Version="0.1.7" />
+      <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.2.0" />
+      <PackageReference Include="Microsoft.Extensions.Logging" Version="7.0.0-preview.7.22375.6" />
     </ItemGroup>
-
 </Project>

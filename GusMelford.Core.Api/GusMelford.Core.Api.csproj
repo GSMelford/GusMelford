@@ -7,13 +7,14 @@
         <UserSecretsId>1cdb3043-9e6b-4368-bf3a-4fb247aa7d29</UserSecretsId>
         <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
         <LangVersion>10</LangVersion>
+        <RootNamespace>GusMelfordBot.Api</RootNamespace>
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\GusMelfordBot.Domain\GusMelfordBot.Domain.csproj" />
-      <ProjectReference Include="..\GusMelfordBot.Extensions\GusMelfordBot.Extensions.csproj" />
-      <ProjectReference Include="..\GusMelfordBot.Infrastructure\GusMelfordBot.Infrastructure.csproj" />
-      <ProjectReference Include="..\GusMelfordBot.SimpleKafka\GusMelfordBot.SimpleKafka.csproj" />
+      <ProjectReference Include="..\GusMelford.Core.Domain\GusMelford.Core.Domain.csproj" />
+      <ProjectReference Include="..\GusMelford.Extensions\GusMelford.Extensions.csproj" />
+      <ProjectReference Include="..\GusMelford.Core.Infrastructure\GusMelford.Core.Infrastructure.csproj" />
+      <ProjectReference Include="..\GusMelford.SimpleKafka\GusMelford.SimpleKafka.csproj" />
     </ItemGroup>
 
     <ItemGroup>

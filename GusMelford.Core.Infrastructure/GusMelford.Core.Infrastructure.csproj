@@ -5,6 +5,7 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <LangVersion>10</LangVersion>
+        <RootNamespace>GusMelfordBot.Infrastructure</RootNamespace>
     </PropertyGroup>
 
     <ItemGroup>
@@ -18,8 +19,8 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\GusMelfordBot.Domain\GusMelfordBot.Domain.csproj" />
-      <ProjectReference Include="..\GusMelfordBot.Extensions\GusMelfordBot.Extensions.csproj" />
+      <ProjectReference Include="..\GusMelford.Core.Domain\GusMelford.Core.Domain.csproj" />
+      <ProjectReference Include="..\GusMelford.Extensions\GusMelford.Extensions.csproj" />
     </ItemGroup>
 
 </Project>
