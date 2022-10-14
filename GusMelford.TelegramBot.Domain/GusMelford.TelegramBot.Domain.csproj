@@ -6,4 +6,8 @@
         <Nullable>enable</Nullable>
     </PropertyGroup>
 
+    <ItemGroup>
+      <PackageReference Include="TBot.Telegram.Dto" Version="0.1.7" />
+    </ItemGroup>
+
 </Project>
