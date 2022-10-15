@@ -17,20 +17,21 @@ public class ContentCollectorMessageHandler : IEventHandler<ContentCollectorMess
         _tikTokService = tikTokService;
     }
     
-    public async Task Handle(ContentCollectorMessageEvent @event)
+    public Task Handle(ContentCollectorMessageEvent @event)
     {
         string messageText = @event.MessageText;
         switch (Define(messageText))
         {
             case ContentProvider.TikTok:
-                await _tikTokService.Process(TikTokServiceExtension.ToBasicProcessedContent(@event.Id, messageText));
-                break;
+                _tikTokService.Process(TikTokServiceExtension.ToBasicProcessedContent(@event.Id, messageText)).Wait();
+                return Task.CompletedTask;
             case ContentProvider.Unknown:
-                await _kafkaProducer.ProduceAsync(new ContentProcessedEvent { IsValid = false });
+                //await _kafkaProducer.ProduceAsync(new ContentProcessedEvent { IsValid = false });
                 break;
             default:
                 throw new ArgumentOutOfRangeException();
         }
+        return Task.CompletedTask;
     }
     
     private static ContentProvider Define(string message)

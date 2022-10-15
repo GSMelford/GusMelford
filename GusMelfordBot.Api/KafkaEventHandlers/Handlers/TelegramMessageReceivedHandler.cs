@@ -43,7 +43,9 @@ public class TelegramMessageReceivedHandler : IEventHandler<TelegramMessageRecei
 
         if (chatId is not null)
         {
-            await HandleCommand(@event);
+            if (await HandleCommand(@event)) {
+                return;
+            }
             
             switch (await _applicationRepository.GetApplicationService(chatId.Value))
             {
@@ -56,7 +58,7 @@ public class TelegramMessageReceivedHandler : IEventHandler<TelegramMessageRecei
         }
     }
 
-    private async Task HandleCommand(TelegramMessageReceivedEvent @event)
+    private async Task<bool> HandleCommand(TelegramMessageReceivedEvent @event)
     {
         Command command = new Command
         {
@@ -73,6 +75,7 @@ public class TelegramMessageReceivedHandler : IEventHandler<TelegramMessageRecei
                 command.Name = match.Groups[1].Value.Replace("@GusMelfordBot", "");
                 command.Arguments = match.Groups[2].Value.Split(' ').ToList();
                 await _commandService.ExecuteAsync(command);
+                return true;
             }
         }
         else
@@ -81,7 +84,10 @@ public class TelegramMessageReceivedHandler : IEventHandler<TelegramMessageRecei
             command.Arguments = @event.Message!.Text!.Split("").ToList();
             command.IsLongCommandActive = true;
             await _commandService.ExecuteAsync(command);
+            return true;
         }
+        
+        return false;
     }
     
     private async Task HandleContentCollector(TelegramMessageReceivedEvent @event)
@@ -99,8 +105,7 @@ public class TelegramMessageReceivedHandler : IEventHandler<TelegramMessageRecei
             messageText,
             @event.Message?.Chat?.Id);
 
-        if (!isSuccessfullySaved)
-        {
+        if (!isSuccessfullySaved) {
             return;
         }
         
