@@ -16,8 +16,7 @@ public class VideoInformationHandler : AbstractTikTokContentHandler
     public override async Task<ProcessedTikTokContent?> Handle(ProcessedTikTokContent processedTikTokContent)
     {
         RestRequest restRequest = new RestRequest(processedTikTokContent.OriginalLink) { Timeout = 60000 };
-        restRequest.AddHeader("User-Agent", Constants.UserAgent);
-        string content = (await new RestClient().ExecuteAsync(restRequest)).Content!;
+        string content = new RestClient().Execute(restRequest).Content!;
         
         if (string.IsNullOrEmpty(content))
         {

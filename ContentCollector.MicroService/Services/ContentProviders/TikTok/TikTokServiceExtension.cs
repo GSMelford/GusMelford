@@ -54,7 +54,7 @@ public static class TikTokServiceExtension
     private static UserVideo GetUserVideo(string refererLink)
     {
         UserVideo userVideo = new UserVideo();
-        Match match = Regex.Match(refererLink, "com/(.*?)/video/(.*)");
+        Match match = Regex.Match(refererLink.Split('?').FirstOrDefault()!, "com/(.*?)/video/(.*)");
 
         userVideo.Username = match.Groups[1].Value;
         userVideo.VideoId = match.Groups[2].Value;
