@@ -220,7 +220,6 @@ namespace GusMelfordBot.Infrastructure.Migrations
                         .HasColumnType("text");
 
                     b.Property<string>("RefreshToken")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<Guid?>("RoleId")

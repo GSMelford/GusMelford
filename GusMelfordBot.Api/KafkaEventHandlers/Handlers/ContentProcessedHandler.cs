@@ -3,6 +3,7 @@ using GusMelfordBot.Domain.Application.ContentCollector;
 using GusMelfordBot.Extensions.Services.DataLake;
 using GusMelfordBot.SimpleKafka.Interfaces;
 using TBot.Client;
+using TBot.Client.Api.Telegram.SendMessage;
 using TBot.Client.Api.Telegram.SendVideo;
 
 namespace GusMelfordBot.Api.KafkaEventHandlers.Handlers;
@@ -39,6 +40,14 @@ public class ContentProcessedHandler : IEventHandler<ContentProcessedEvent>
             {
                 Caption = await _collectorRepository.GetVideoCaption(contentId),
                 Video = new VideoFile(contentStream, contentId.ToString()),
+                ChatId = await _collectorRepository.GetChatId(contentId) ?? default
+            });
+        }
+        else
+        {
+            await _tBot.SendMessageAsync(new SendMessageParameters
+            {
+                Text = $"Failed to save content:\n{@event.OriginalLink}\nIf possible, the bot will try again 🥰",
                 ChatId = await _collectorRepository.GetChatId(contentId) ?? default
             });
         }
