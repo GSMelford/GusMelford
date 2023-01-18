@@ -27,39 +27,39 @@ pipeline {
         stage("Build Micro Services") {
             steps {    
                 echo "====== Building image... ======"
-                sh "docker build -f contentcollector.Dockerfile -t $DOCKER_REPO/$CONTAINER_NAME_CONTENT:$DOCKER_CONTAINER_TAG ."
+                sh "sudo docker build -f contentcollector.Dockerfile -t $DOCKER_REPO/$CONTAINER_NAME_CONTENT:$DOCKER_CONTAINER_TAG ."
                 echo "====== Build completed ======"
             }
         }
         stage("Deploy") {
             steps {
                 echo "====== Pushing image to docker hub... ======"
-                sh "echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin"
-                sh "docker push $DOCKER_REPO/$CONTAINER_NAME_CONTENT:$DOCKER_CONTAINER_TAG"
-                sh "docker push $DOCKER_REPO/$CONTAINER_NAME:$DOCKER_CONTAINER_TAG"
+                sh "echo $DOCKERHUB_CREDENTIALS_PSW | sudo docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin"
+                sh "sudo docker push $DOCKER_REPO/$CONTAINER_NAME_CONTENT:$DOCKER_CONTAINER_TAG"
+                sh "sudo docker push $DOCKER_REPO/$CONTAINER_NAME:$DOCKER_CONTAINER_TAG"
                 echo "====== Push completed ======"
 
                 echo "====== Stoping the old docker-compose... ======"
-                sh "docker-compose down"
+                sh "sudo docker-compose down"
                 echo "====== The old docker-compose stoped ======"
 
                 echo "====== Pulling docker images... ======"
-                sh "docker-compose pull"
+                sh "sudo docker-compose pull"
                 echo "====== Pull completed  ======"
 
                 echo "====== Running docker-compose ======"
-                sh "docker-compose up -d"
+                sh "sudo docker-compose up -d"
                 echo "====== Docker-compose launched ======"
 
                 echo "======Docker prune ======"
-                sh "docker system prune -a -f"
+                sh "sudo sudo docker system prune -a -f"
                 echo "====== Docker pruned ======" 
             }
         }
     }
     post {
         always {
-            sh "docker logout"
+            sh "sudo docker logout"
         }
     }
 }
