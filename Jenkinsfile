@@ -39,9 +39,7 @@ pipeline {
                 sh "sudo docker push $DOCKER_REPO/$CONTAINER_NAME:$DOCKER_CONTAINER_TAG"
                 echo "====== Push completed ======"
 
-                echo "====== Stoping the old docker-compose... ======"
-                sh "sudo docker-compose down"
-                echo "====== The old docker-compose stoped ======"
+                
 
                 echo "====== Pulling docker images... ======"
                 sh "sudo docker-compose pull"
