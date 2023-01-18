@@ -20,7 +20,7 @@ pipeline {
         stage("Build") {
             steps {
                 echo "====== Building image... ======"
-                sh "docker build -t $DOCKER_REPO/$CONTAINER_NAME:$DOCKER_CONTAINER_TAG ."
+                sh "sudo docker build -t $DOCKER_REPO/$CONTAINER_NAME:$DOCKER_CONTAINER_TAG ."
                 echo "====== Build completed ======"
             }
         }
