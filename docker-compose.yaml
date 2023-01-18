@@ -1,19 +1,6 @@
 version: "3.9"
 
 services:
-  db:
-    container_name: db
-    image: postgres:latest
-    restart: always
-    ports:
-      - 5432:5432
-    environment:
-      - POSTGRES_USER=$POSTGRES_USER
-      - POSTGRES_PASSWORD=$POSTGRES_PASSWORD
-      - PGDATA=/var/lib/postgresql/data/pgdata
-    volumes:
-      - /media/pi/KINGSTON/data/var/lib/postgresql/data:/var/lib/postgresql/data
-
   gusmelford.contentcollector:
     container_name: gusmelford.contentcollector
     image: $DOCKER_REPO/$CONTAINER_NAME_CONTENT:$DOCKER_CONTAINER_TAG
@@ -23,77 +10,24 @@ services:
     ports:
       - 5670:80
     environment:
-      - AppSettings:KafkaSettings:BootstrapServers=kafka
-      - AppSettings:FtpSettings:FtpUrl=$FTP_URL
-      - AppSettings:FtpSettings:UserName=$FTP_USER
-      - AppSettings:FtpSettings:Password=$FTP_PASSWORD 
+      - AppSettings:KafkaSettings:BootstrapServers=localhost
     volumes:
-      - /media/pi/KINGSTON/data:/app/contents
+      - /home/melf/gusmelfordbot/contents:/app/contents
 
   gusmelfordbot:
     container_name: gusmelfordbot
     image: $DOCKER_REPO/$CONTAINER_NAME:$DOCKER_CONTAINER_TAG
     restart: always
-    depends_on:
-      - db
-      - kafka
     ports:
       - 5665:80
     environment:
-      - AppSettings:AuthSettings:Key=$BOT_KEY
+      - AppSettings:AuthSettings:Key=$GUSMELFORD_BOT_KEY
       - AppSettings:TelegramBotSettings:Token=$GUSMELFORDBOT_TELEGRAM_TOKEN
-      - AppSettings:KafkaSettings:BootstrapServers=kafka
-      - AppSettings:DatabaseSettings:Host=db
+      - AppSettings:KafkaSettings:BootstrapServers=localhost
+      - AppSettings:DatabaseSettings:Host=localhost
       - AppSettings:DatabaseSettings:Port=5432
       - AppSettings:DatabaseSettings:Database=gusmelford.app
       - AppSettings:DatabaseSettings:Username=$POSTGRES_USER
       - AppSettings:DatabaseSettings:Password=$POSTGRES_PASSWORD
-      - AppSettings:FtpSettings:FtpUrl=$FTP_URL
-      - AppSettings:FtpSettings:Username=$FTP_USER
-      - AppSettings:FtpSettings:Password=$FTP_PASSWORD
     volumes:
-      - /media/pi/KINGSTON/data:/app/contents
-
-  zookeeper:
-   image: confluentinc/cp-zookeeper:latest
-   restart: always
-   container_name: zookeeper
-   environment:
-     ZOOKEEPER_CLIENT_PORT: 2181
-     ZOOKEEPER_TICK_TIME: 2000
-   ports:
-     - 22181:2181
-   volumes:
-      - /media/pi/KINGSTON/data/zookeeperdata:/var/lib/zookeeper/data
-      - /media/pi/KINGSTON/data/zookeeperdatalog:/var/lib/zookeeper/log
-
-  kafka:
-    image: confluentinc/cp-kafka:latest
-    restart: always
-    container_name: kafka
-    depends_on:
-      - zookeeper
-    ports:
-      - 9092:9092
-      - 29092:29092
-    environment:
-      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
-      KAFKA_BROKER_ID: 1
-      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
-      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
-      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
-
-  kafka-ui:
-    container_name: kafka-ui
-    restart: always
-    image: provectuslabs/kafka-ui:latest
-    depends_on:
-      - kafka
-    ports:
-      - 9001:8080
-    environment:
-      SERVER_SERVLET_CONTEXT_PATH: /kafka-ui
-      KAFKA_CLUSTERS_0_NAME: local
-      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:9092
+      - /home/melf/gusmelfordbot/contents:/app/contents
