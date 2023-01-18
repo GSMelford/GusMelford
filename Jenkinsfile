@@ -17,59 +17,14 @@ pipeline {
     }
 
     stages {
-        stage('Only Deploy') {
-            steps {
-                script {
-
-                    USER_INPUT_DEPLOY = input(
-                            message: 'Just restart services?',
-                            parameters: [
-                                    [$class: 'ChoiceParameterDefinition',
-                                     choices: ['no','yes'].join('\n'),
-                                     name: 'input',
-                                     description: 'Menu - select box option']
-                            ])
-
-                    echo "The answer is: ${USER_INPUT}"
-                }
-            }
-        }
-        stage('Micro Services approval') {
-            when {
-                expression { USER_INPUT_DEPLOY == 'no' }
-            }
-            steps {
-                script {
-
-                    USER_INPUT = input(
-                            message: 'Build Micro Services?',
-                            parameters: [
-                                    [$class: 'ChoiceParameterDefinition',
-                                     choices: ['no','yes'].join('\n'),
-                                     name: 'input',
-                                     description: 'Menu - select box option']
-                            ])
-
-                    echo "The answer is: ${USER_INPUT}"
-                }
-            }
-        }
         stage("Build") {
-            when {
-                expression { USER_INPUT_DEPLOY == 'no' }
-            }
             steps {
-                script {
-                    echo "====== Building image... ======"
-                    sh "docker build -t $DOCKER_REPO/$CONTAINER_NAME:$DOCKER_CONTAINER_TAG ."
-                    echo "====== Build completed ======"
-                }
+                echo "====== Building image... ======"
+                sh "docker build -t $DOCKER_REPO/$CONTAINER_NAME:$DOCKER_CONTAINER_TAG ."
+                echo "====== Build completed ======"
             }
         }
         stage("Build Micro Services") {
-            when {
-                expression { USER_INPUT == 'yes' && USER_INPUT_DEPLOY == 'no' }
-            }
             steps {    
                 echo "====== Building image... ======"
                 sh "docker build -f contentcollector.Dockerfile -t $DOCKER_REPO/$CONTAINER_NAME_CONTENT:$DOCKER_CONTAINER_TAG ."
