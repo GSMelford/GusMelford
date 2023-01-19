@@ -19,7 +19,7 @@ builder.Services.AddCors(options => options.AddPolicy("CorsPolicy",
 WebApplication app = builder.Build();
 
 AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
-app.InitializeDatabase(appSettings.DatabaseSettings);
+await app.InitializeDatabaseAsync(appSettings.DatabaseSettings);
 app.UseCors("CorsPolicy");
 app.MapGet("/", () => "GusMelfordBot 2.0");
 app.SetEnvironmentSettings(builder);

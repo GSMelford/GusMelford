@@ -5,7 +5,7 @@ namespace GusMelfordBot.Infrastructure.Interfaces;
 
 public interface IDatabaseContext
 {
-    Task InitializeDatabase(DatabaseSettings databaseSettings);
+    Task InitializeDatabaseAsync(DatabaseSettings databaseSettings);
     void Update<TEntity>(TEntity entity);
     
     ValueTask<EntityEntry<TEntity>> AddAsync<TEntity>(TEntity entity, 

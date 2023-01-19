@@ -29,10 +29,10 @@ public static class WebApplicationExtensions
         }
     }
 
-    public static void InitializeDatabase(this WebApplication app, DatabaseSettings databaseSettings)
+    public static async Task InitializeDatabaseAsync(this WebApplication app, DatabaseSettings databaseSettings)
     {
         IDatabaseContext databaseContext = app.Services.GetRequiredService<IDatabaseContext>();
-        databaseContext.InitializeDatabase(databaseSettings);
+        await databaseContext.InitializeDatabaseAsync(databaseSettings);
     }
 
     public static void SubscribeOnEvents(this WebApplication app, AppSettings appSettings)

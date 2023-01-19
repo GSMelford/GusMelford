@@ -27,7 +27,7 @@ public class DatabaseContext : DbContext, IDatabaseContext
         });
     }
     
-    public async Task InitializeDatabase(DatabaseSettings databaseSettings) 
+    public async Task InitializeDatabaseAsync(DatabaseSettings databaseSettings) 
     {
         ConnectionString = BuildConnectionString(databaseSettings);
         await Database.MigrateAsync();
