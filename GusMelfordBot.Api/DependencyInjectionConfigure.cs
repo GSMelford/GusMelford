@@ -10,7 +10,6 @@ using GusMelfordBot.Domain.Application.ContentCollector;
 using GusMelfordBot.Domain.Auth;
 using GusMelfordBot.Domain.Telegram;
 using GusMelfordBot.Extensions.Services.DataLake;
-using GusMelfordBot.Extensions.Services.Ftp;
 using GusMelfordBot.Infrastructure;
 using GusMelfordBot.Infrastructure.Interfaces;
 using GusMelfordBot.Infrastructure.Repositories.Application;
@@ -30,9 +29,8 @@ public static class DependencyInjectionConfigure
     {
         serviceCollection.AddHttpClient();
         serviceCollection.AddSignalR();
-        serviceCollection.AddTBotClient(appSettings.TelegramBotSettings.Token);
-        serviceCollection.AddTransient<IDatabaseContext, DatabaseContext>(_ =>
-            new DatabaseContext(appSettings.DatabaseSettings));
+        serviceCollection.AddTBotClient(appSettings.TelegramBotSettings!.Token);
+        serviceCollection.AddTransient<IDatabaseContext, DatabaseContext>(_ => new DatabaseContext(appSettings.DatabaseSettings));
         serviceCollection.AddTransient<IUpdateService, UpdateService>();
         serviceCollection.AddSingleton<IContentCollectorRoomFactory, ContentCollectorRoomFactory>();
         serviceCollection.AddTransient<IAuthService, AuthService>();
@@ -44,16 +42,13 @@ public static class DependencyInjectionConfigure
         serviceCollection.AddTransient<ICommandService, CommandService>();
         serviceCollection.AddTransient<ICommandRepository, CommandRepository>();
         serviceCollection.AddSingleton<ILongCommandService, LongCommandService>();
-        serviceCollection.AddTransient<IFtpServerService, FtpServerService>(
-            provider => new FtpServerService(appSettings.FtpSettings, 
-                provider.GetRequiredService<ILogger<IFtpServerService>>()));
         serviceCollection.AddSingleton(appSettings);
         serviceCollection.AddHealthChecks();
         serviceCollection.AddControllers();
         serviceCollection.AddHostedService<ContentCollectorHostedService>();
         serviceCollection.AddKafkaProducer<string>(new ProducerConfig
         {
-            BootstrapServers = appSettings.KafkaSettings.BootstrapServers
+            BootstrapServers = appSettings.KafkaSettings!.BootstrapServers
         });
         serviceCollection.AddKafkaConsumersFactory();
         serviceCollection.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -63,11 +58,11 @@ public static class DependencyInjectionConfigure
                 options.TokenValidationParameters = new TokenValidationParameters
                 {
                     ValidateIssuer = true,
-                    ValidIssuer = appSettings.AuthSettings.Issuer,
+                    ValidIssuer = appSettings.AuthSettings?.Issuer,
                     ValidateAudience = true,
-                    ValidAudience = appSettings.AuthSettings.Audience,
+                    ValidAudience = appSettings.AuthSettings?.Audience,
                     ValidateLifetime = true,
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(appSettings.AuthSettings.Key)),
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(appSettings.AuthSettings!.Key)),
                     ValidateIssuerSigningKey = true,
                 };
                 options.Events = new JwtBearerEvents
