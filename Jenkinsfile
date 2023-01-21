@@ -22,12 +22,5 @@ pipeline {
                 echo "====== Build completed ======"
             }
         }
-        stage("Deploy") {
-            steps {    
-                echo "====== Deployment is requested... ======"
-                sh "curl https://dev.gusmelford.com/job/infrastructure.gusmelfordbot/build?token=dfghjw4l489lsfdDFjh4"
-                echo "====== Deploy launched ======"
-            }
-        }
     }
 }
