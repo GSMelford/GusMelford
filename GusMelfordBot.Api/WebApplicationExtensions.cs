@@ -1,7 +1,7 @@
 ﻿using Confluent.Kafka;
-using GusMelfordBot.Api.KafkaEventHandlers.Events;
-using GusMelfordBot.Api.KafkaEventHandlers.Handlers;
+using GusMelfordBot.Api.Handlers;
 using GusMelfordBot.Api.Settings;
+using GusMelfordBot.Events;
 using GusMelfordBot.Infrastructure;
 using GusMelfordBot.Infrastructure.Interfaces;
 using GusMelfordBot.SimpleKafka.Interfaces;
@@ -44,6 +44,6 @@ public static class WebApplicationExtensions
 
     private static ConsumerConfig BuildConsumerConfig(AppSettings appSettings)
     {
-        return new ConsumerConfig { BootstrapServers = appSettings.KafkaSettings.BootstrapServers };
+        return new ConsumerConfig { BootstrapServers = appSettings.KafkaSettings!.BootstrapServers };
     }
 }

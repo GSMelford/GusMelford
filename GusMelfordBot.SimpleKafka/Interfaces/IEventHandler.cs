@@ -2,5 +2,5 @@
 
 public interface IEventHandler<in TEvent>
 {
-    Task Handle(TEvent @event);
+    Task HandleAsync(TEvent @event);
 }

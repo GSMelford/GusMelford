@@ -16,6 +16,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\GusMelfordBot.Events\GusMelfordBot.Events.csproj" />
       <ProjectReference Include="..\GusMelfordBot.Extensions\GusMelfordBot.Extensions.csproj" />
       <ProjectReference Include="..\GusMelfordBot.SimpleKafka\GusMelfordBot.SimpleKafka.csproj" />
     </ItemGroup>

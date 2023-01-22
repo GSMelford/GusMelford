@@ -1,6 +1,5 @@
 ﻿using System.Text;
 using Confluent.Kafka;
-using GusMelfordBot.Api.HostedServices;
 using GusMelfordBot.Api.Services.Applications.ContentCollector;
 using GusMelfordBot.Api.Services.Auth;
 using GusMelfordBot.Api.Services.Telegram;
@@ -13,7 +12,6 @@ using GusMelfordBot.Extensions.Services.DataLake;
 using GusMelfordBot.Infrastructure;
 using GusMelfordBot.Infrastructure.Interfaces;
 using GusMelfordBot.Infrastructure.Repositories.Application;
-using GusMelfordBot.Infrastructure.Repositories.Application.ContentCollector;
 using GusMelfordBot.Infrastructure.Repositories.Auth;
 using GusMelfordBot.Infrastructure.Repositories.Telegram;
 using GusMelfordBot.SimpleKafka;
@@ -31,21 +29,18 @@ public static class DependencyInjectionConfigure
         serviceCollection.AddSignalR();
         serviceCollection.AddTBotClient(appSettings.TelegramBotSettings!.Token);
         serviceCollection.AddTransient<IDatabaseContext, DatabaseContext>(_ => new DatabaseContext(appSettings.DatabaseSettings));
-        serviceCollection.AddTransient<IUpdateService, UpdateService>();
+        serviceCollection.AddTransient<IUpdateService, TelegramService>();
         serviceCollection.AddSingleton<IContentCollectorRoomFactory, ContentCollectorRoomFactory>();
         serviceCollection.AddTransient<IAuthService, AuthService>();
         serviceCollection.AddTransient<IDataLakeService, DataLakeService>();
         serviceCollection.AddTransient<IAuthRepository, AuthRepository>();
-        serviceCollection.AddTransient<IApplicationRepository, ApplicationRepository>();
-        serviceCollection.AddTransient<IContentCollectorRepository, ContentCollectorRepository>();
+        serviceCollection.AddTransient<IFeatureRepository, FeatureRepository>();
         serviceCollection.AddTransient<IContentCollectorService, ContentCollectorService>();
         serviceCollection.AddTransient<ICommandService, CommandService>();
         serviceCollection.AddTransient<ICommandRepository, CommandRepository>();
-        serviceCollection.AddSingleton<ILongCommandService, LongCommandService>();
         serviceCollection.AddSingleton(appSettings);
         serviceCollection.AddHealthChecks();
         serviceCollection.AddControllers();
-        serviceCollection.AddHostedService<ContentCollectorHostedService>();
         serviceCollection.AddKafkaProducer<string>(new ProducerConfig
         {
             BootstrapServers = appSettings.KafkaSettings!.BootstrapServers

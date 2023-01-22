@@ -1,5 +1,6 @@
 ﻿using ContentProcessor.Worker.Domain.ContentProviders.TikTok;
 using ContentProcessor.Worker.Services.ContentProviders.TikTok.TikTokContentHandlers.Abstractions;
+using GusMelfordBot.Domain;
 using GusMelfordBot.Extensions.Services.DataLake;
 
 namespace ContentProcessor.Worker.Services.ContentProviders.TikTok.TikTokContentHandlers;
@@ -19,7 +20,7 @@ public class SaveHandler : AbstractTikTokContentHandler
     {
         try {
             _dataLakeService.CreateDirectoryIfNotExist(Constants.ContentFolder);
-            await _dataLakeService.WriteFile($"{processTikTokContent.Id}.mp4", processTikTokContent.Bytes);
+            await _dataLakeService.WriteFile(Path.Combine(Constants.ContentFolder, $"{processTikTokContent.Id}.mp4"), processTikTokContent.Bytes);
             processTikTokContent.IsSaved = true;
         }
         catch (Exception exception) {

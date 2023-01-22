@@ -4,5 +4,5 @@ namespace GusMelfordBot.Domain.Telegram;
 
 public interface IUpdateService
 {
-    Task ProcessUpdate(UpdateDomain updateDomain);
+    Task ProcessUpdateAsync(UpdateDomain updateDomain);
 }

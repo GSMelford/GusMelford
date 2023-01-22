@@ -1,9 +1,9 @@
 using Confluent.Kafka;
 using ContentProcessor.Worker.Domain.ContentProviders.TikTok;
-using ContentProcessor.Worker.KafkaEventHandlers.Events;
-using ContentProcessor.Worker.KafkaEventHandlers.Handlers;
+using ContentProcessor.Worker.Handlers;
 using ContentProcessor.Worker.Services.ContentProviders.TikTok;
 using ContentProcessor.Worker.Settings;
+using GusMelfordBot.Events;
 using GusMelfordBot.Extensions.Services.DataLake;
 using GusMelfordBot.SimpleKafka;
 using GusMelfordBot.SimpleKafka.Interfaces;

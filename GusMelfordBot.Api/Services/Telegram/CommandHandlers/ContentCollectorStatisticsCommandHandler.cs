@@ -18,21 +18,21 @@ public class ContentCollectorStatisticsCommandHandler : AbstractCommandHandler
         _contentCollectorRepository = contentCollectorRepository;
     }
 
-    public override async Task<Command> Handle(Command command)
+    public override async Task<TelegramCommand> Handle(TelegramCommand telegramCommand)
     {
-        if (command.Name == Commands.ContentCollectorStatistics)
+        if (telegramCommand.Name == Commands.ContentCollectorStatistics)
         {
             ContentCollectorStatistic contentCollectorStatistic = await _contentCollectorRepository.GetStatistics();
             await _tBot.SendMessageAsync(new SendMessageParameters
             {
                 Text = BuildMessage(contentCollectorStatistic),
-                ChatId = command.ChatId
+                ChatId = telegramCommand.ChatId
             });
 
-            return command;
+            return telegramCommand;
         }
         
-        return await base.Handle(command);
+        return await base.Handle(telegramCommand);
     }
 
     private string BuildMessage(ContentCollectorStatistic contentCollectorStatistic)

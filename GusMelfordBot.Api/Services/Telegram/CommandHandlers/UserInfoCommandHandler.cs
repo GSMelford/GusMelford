@@ -17,22 +17,22 @@ public class UserInfoCommandHandler : AbstractCommandHandler
         _commandRepository = commandRepository;
     }
     
-    public override async Task<Command> Handle(Command command)
+    public override async Task<TelegramCommand> Handle(TelegramCommand telegramCommand)
     {
-        if (command.Name == Commands.UserInfo)
+        if (telegramCommand.Name == Commands.UserInfo)
         {
-            TelegramUserDomain telegramUserDomain = await _commandRepository.GetUser(command.TelegramId);
+            TelegramUserDomain telegramUserDomain = await _commandRepository.GetUser(telegramCommand.TelegramId);
             await _tBot.SendMessageAsync(new SendMessageParameters
             {
                 Text = BuildUserInfoMessage(telegramUserDomain),
-                ChatId = command.ChatId,
+                ChatId = telegramCommand.ChatId,
                 ParseMode = ParseMode.Markdown
             });
             
-            return command;
+            return telegramCommand;
         }
 
-        return await base.Handle(command);
+        return await base.Handle(telegramCommand);
     }
 
     private string BuildUserInfoMessage(TelegramUserDomain telegramUserDomain)

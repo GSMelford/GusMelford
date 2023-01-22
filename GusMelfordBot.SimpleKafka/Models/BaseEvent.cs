@@ -2,5 +2,5 @@
 
 public abstract class BaseEvent
 {
-    public Guid Id { get; set; }
+    public Guid SessionId { get; set; }
 }

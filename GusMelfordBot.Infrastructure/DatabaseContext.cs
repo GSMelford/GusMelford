@@ -7,16 +7,17 @@ namespace GusMelfordBot.Infrastructure;
 public class DatabaseContext : DbContext, IDatabaseContext
 {
     private string ConnectionString { get; set; }
-    
-    public DbSet<AuthorizationUserDatum>? AuthorizationUserData { get; set; }
-    public DbSet<Content>? Contents { get; set; }
-    public DbSet<Feature>? Features { get; set; }
-    public DbSet<Group>? Groups { get; set; }
-    public DbSet<MetaContent>? MetaContents { get; set; }
-    public DbSet<Role>? Roles { get; set; }
-    public DbSet<TelegramUser>? TelegramUsers { get; set; }
-    public DbSet<User>? Users { get; set; }
-    public DbSet<UserContentComment>? UserContentComments { get; set; }
+
+    public DbSet<AttemptMessage> AttemptMessages { get; set; } = null!;
+    public DbSet<AuthorizationUserDatum> AuthorizationUserData { get; set; } = null!;
+    public DbSet<Content> Contents { get; set; } = null!;
+    public DbSet<Feature> Features { get; set; } = null!;
+    public DbSet<Group> Groups { get; set; } = null!;
+    public DbSet<MetaContent> MetaContents { get; set; } = null!;
+    public DbSet<Role> Roles { get; set; } = null!;
+    public DbSet<TelegramUser> TelegramUsers { get; set; } = null!;
+    public DbSet<User> Users { get; set; } = null!;
+    public DbSet<UserContentComment>? UserContentComments { get; set; } = null!;
     
     
     public DatabaseContext(DatabaseSettings? databaseSettings = null)

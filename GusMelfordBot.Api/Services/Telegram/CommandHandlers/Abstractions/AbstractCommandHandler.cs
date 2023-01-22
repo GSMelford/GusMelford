@@ -12,13 +12,13 @@ public class AbstractCommandHandler : IHandler
         return handler;
     }
 
-    public virtual async Task<Command> Handle(Command command)
+    public virtual async Task<TelegramCommand> Handle(TelegramCommand telegramCommand)
     {
         if (_nextHandler is not null)
         {
-            return await _nextHandler.Handle(command);
+            return await _nextHandler.Handle(telegramCommand);
         }
         
-        return command;
+        return telegramCommand;
     }
 }

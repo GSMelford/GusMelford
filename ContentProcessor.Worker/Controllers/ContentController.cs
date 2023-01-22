@@ -1,4 +1,4 @@
-﻿using ContentProcessor.Worker.KafkaEventHandlers.Events;
+﻿using GusMelfordBot.Events;
 using GusMelfordBot.SimpleKafka.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 

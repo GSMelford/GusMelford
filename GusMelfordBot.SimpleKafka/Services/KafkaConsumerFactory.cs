@@ -62,7 +62,7 @@ public class KafkaConsumerFactory : IKafkaConsumerFactory
         THandler eventHandler = ActivatorUtilities.CreateInstance<THandler>(_serviceProvider);
 
         if (@event != null) {
-            await eventHandler.Handle(@event);
+            await eventHandler.HandleAsync(@event);
         }
             
     }

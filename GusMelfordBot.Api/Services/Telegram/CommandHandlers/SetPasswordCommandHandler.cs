@@ -19,31 +19,34 @@ public class SetPasswordCommandHandler : AbstractCommandHandler
         _longCommandService = longCommandService;
     }
 
-    public override async Task<Command> Handle(Command command)
+    public override async Task<TelegramCommand> Handle(TelegramCommand telegramCommand)
     {
-        if (command.Name == Commands.SetPassword)
+        LongCommand? longCommand = _longCommandService.GetLongCommand(telegramCommand.TelegramId);
+        if (longCommand is not null && longCommand.Name == Commands.SetPassword)
         {
-            if (!command.IsLongCommandActive) {
-                _longCommandService.TryAdd(command.TelegramId, command.Name);
-                await _tBot.SendMessageAsync(new SendMessageParameters
-                {
-                    Text = "Write your new password in the next message 🥵",
-                    ChatId = command.ChatId
-                });
-            }
-            else {
-                await _authRepository.UpdatePasswordAsync(command.TelegramId, command.Arguments.FirstOrDefault() ?? string.Empty);
-                await _tBot.SendMessageAsync(new SendMessageParameters
-                {
-                    Text = "Congratulations! Your password has been updated 🥸",
-                    ChatId = command.ChatId
-                });
-                _longCommandService.Remove(command.TelegramId);
-            }
-            
-            return command;
+            await _authRepository.UpdatePasswordAsync(telegramCommand.TelegramId, telegramCommand.Arguments.FirstOrDefault() ?? string.Empty);
+            await _tBot.SendMessageAsync(new SendMessageParameters
+            {
+                Text = "Congratulations! Your password has been updated 🥸",
+                ChatId = telegramCommand.ChatId
+            });
+            _longCommandService.Remove(telegramCommand.TelegramId);
+
+            return telegramCommand;
         }
         
-        return await base.Handle(command);
+        if (telegramCommand.Name == Commands.SetPassword)
+        {
+            _longCommandService.TryAdd(telegramCommand.TelegramId, telegramCommand.Name);
+            await _tBot.SendMessageAsync(new SendMessageParameters
+            {
+                Text = "Write your new password in the next message 🥵",
+                ChatId = telegramCommand.ChatId
+            });
+
+            return telegramCommand;
+        }
+        
+        return await base.Handle(telegramCommand);
     }
 }

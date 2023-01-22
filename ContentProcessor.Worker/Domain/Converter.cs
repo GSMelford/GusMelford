@@ -1,6 +1,6 @@
 ﻿using System.Text.RegularExpressions;
 using ContentProcessor.Worker.Domain.ContentProviders.TikTok;
-using ContentProcessor.Worker.KafkaEventHandlers.Events;
+using GusMelfordBot.Events;
 
 namespace ContentProcessor.Worker.Domain;
 
@@ -11,7 +11,7 @@ public static class Converter
         string messageText = contentEvent.Message;
         return new ProcessTikTokContent
         {
-            Id = contentEvent.Id,
+            Id = contentEvent.SessionId,
             UserComment = messageText.Replace(messageText, "").Trim(),
             OriginalLink = new Regex(@"https://\w*.tiktok.com/\S*")
                 .Matches(messageText)
@@ -27,14 +27,16 @@ public static class Converter
     {
         return new ContentProcessedEvent
         {
-            Id = processTikTokContent.Id,
+            SessionId = processTikTokContent.Id,
             Provider = processTikTokContent.Provider,
             UserComment = processTikTokContent.UserComment,
             OriginalLink = processTikTokContent.OriginalLink,
             IsSaved = processTikTokContent.IsSaved,
             Height = processTikTokContent.Height,
             Width = processTikTokContent.Width,
-            Duration = processTikTokContent.Duration
+            Duration = processTikTokContent.Duration,
+            UserId = processTikTokContent.UserId,
+            GroupId = processTikTokContent.GroupId
         };
     }
     
@@ -42,7 +44,7 @@ public static class Converter
     {
         return new AttemptContentEvent
         {
-            Id = processTikTokContent.Id,
+            SessionId = processTikTokContent.Id,
             Message = processTikTokContent.OriginalLink,
             Attempt = processTikTokContent.Attempt,
             UserId = processTikTokContent.UserId,

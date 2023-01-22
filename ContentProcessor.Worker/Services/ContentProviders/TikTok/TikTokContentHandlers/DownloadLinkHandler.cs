@@ -1,5 +1,6 @@
 ﻿using ContentProcessor.Worker.Domain.ContentProviders.TikTok;
 using ContentProcessor.Worker.Services.ContentProviders.TikTok.TikTokContentHandlers.Abstractions;
+using GusMelfordBot.Domain;
 using RestSharp;
 
 namespace ContentProcessor.Worker.Services.ContentProviders.TikTok.TikTokContentHandlers;

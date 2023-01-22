@@ -1,6 +1,7 @@
 ﻿using GusMelfordBot.Domain.Telegram;
 using GusMelfordBot.Infrastructure.Interfaces;
 using GusMelfordBot.Infrastructure.Models;
+using GusMelfordBot.Infrastructure.Repositories.Auth;
 using Microsoft.EntityFrameworkCore;
 
 namespace GusMelfordBot.Infrastructure.Repositories.Telegram;
@@ -16,10 +17,6 @@ public class CommandRepository : ICommandRepository
 
     public async Task<TelegramUserDomain> GetUser(long telegramId)
     {
-        return (await _databaseContext
-            .Set<TelegramUser>()
-            .Include(x => x.User)
-            .FirstOrDefaultAsync(x => x.TelegramId == telegramId))
-            .ToDomain();
+        return null;
     }
 }
