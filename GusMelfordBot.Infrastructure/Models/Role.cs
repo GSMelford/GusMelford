@@ -1,7 +1,7 @@
 ﻿namespace GusMelfordBot.Infrastructure.Models;
 
-public class Role : BaseEntity
+public class Role : AuditableEntity
 {
-    public string Name { get; set; }
+    public string Name { get; set; } = null!;
     public ICollection<User> Users { get; set; } = new List<User>();
 }

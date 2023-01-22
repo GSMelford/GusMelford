@@ -8,12 +8,16 @@ public class DatabaseContext : DbContext, IDatabaseContext
 {
     private string ConnectionString { get; set; }
     
-    public DbSet<Application>? Applications { get; set; }
+    public DbSet<AuthorizationUserDatum>? AuthorizationUserData { get; set; }
     public DbSet<Content>? Contents { get; set; }
+    public DbSet<Feature>? Features { get; set; }
+    public DbSet<Group>? Groups { get; set; }
+    public DbSet<MetaContent>? MetaContents { get; set; }
     public DbSet<Role>? Roles { get; set; }
-    public DbSet<TelegramChat>? TelegramChats { get; set; }
     public DbSet<TelegramUser>? TelegramUsers { get; set; }
     public DbSet<User>? Users { get; set; }
+    public DbSet<UserContentComment>? UserContentComments { get; set; }
+    
     
     public DatabaseContext(DatabaseSettings? databaseSettings = null)
     {
@@ -36,6 +40,13 @@ public class DatabaseContext : DbContext, IDatabaseContext
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<User>().HasIndex(u => u.Email).IsUnique();
+        modelBuilder.Entity<TelegramUser>().HasIndex(u => u.TelegramId).IsUnique();
+        modelBuilder.Entity<Content>().HasIndex(u => u.OriginalLink).IsUnique();
+        modelBuilder.Entity<Feature>().HasIndex(u => u.Name).IsUnique();
+        modelBuilder.Entity<Role>().HasIndex(u => u.Name).IsUnique();
+        
+        modelBuilder.InitRoles();
+        modelBuilder.InitFeatures();
     }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -45,9 +56,10 @@ public class DatabaseContext : DbContext, IDatabaseContext
 
     public new void Update<TEntity>(TEntity entity)
     {
-        if (entity is BaseEntity baseEntity)
+        if (entity is AuditableEntity baseEntity)
         {
             baseEntity.ModifiedOn = DateTime.UtcNow;
+            base.Update(baseEntity);
         }
     }
 

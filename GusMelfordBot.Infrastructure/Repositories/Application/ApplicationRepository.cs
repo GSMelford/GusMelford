@@ -16,9 +16,9 @@ public class ApplicationRepository : IApplicationRepository
     
     public async Task<ApplicationService> GetApplicationService(long chatId)
     {
-        Models.Application? application = (await _databaseContext.Set<TelegramChat>()
-            .Include(x => x.Application)
-            .FirstOrDefaultAsync(x => x.ChatId == chatId))?.Application;
+        Feature? application = (await _databaseContext.Set<Group>()
+            .Include(x => x.Feature)
+            .FirstOrDefaultAsync(x => x.ChatId == chatId))?.Feature;
 
         return application?.Name switch
         {

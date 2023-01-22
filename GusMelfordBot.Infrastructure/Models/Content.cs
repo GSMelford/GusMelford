@@ -1,22 +1,11 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿namespace GusMelfordBot.Infrastructure.Models;
 
-namespace GusMelfordBot.Infrastructure.Models;
-
-public class Content : BaseEntity
+public class Content : AuditableEntity
 {
-    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-    public long Number { get; set; }
-    public TelegramChat Chat { get; set; }
-    public string? Provider { get; set; }
+    public string Provider { get; set; } = null!;
     public string? OriginalLink { get; set; }
-    public string? Path { get; set; }
-    public long? MessageId { get; set; }
-    public string? AccompanyingCommentary { get; set; }
-    public int? Height { get; set; }
-    public int? Width { get; set; }
-    public int? Duration { get; set; }
-    public bool? IsValid { get; set; }
-    public bool IsViewed { get; set; }
-    public bool IsSaved { get; set; }
+    public Group Group { get; set; } = null!;
+    public MetaContent MetaContent { get; set; } = null!;
+    public ICollection<UserContentComment> UserContentComments { get; set; } = new List<UserContentComment>();
     public ICollection<User> Users { get; set; } = new List<User>();
 }

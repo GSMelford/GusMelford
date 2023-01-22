@@ -1,12 +1,12 @@
 ﻿namespace GusMelfordBot.Infrastructure.Models;
 
-public class User : BaseEntity
+public class User : AuditableEntity
 {
-    public Role? Role { get; set; }
-    public string FirstName { get; set; }
+    public string FirstName { get; set; } = null!;
     public string? LastName { get; set; }
-    public string Email { get; set; }
+    public string? Email { get; set; }
     public string? RefreshToken { get; set; }
     public string? Password { get; set; }
-    public ICollection<Content> Contents { get; set; } = new List<Content>();
+    public Role Role { get; set; } = null!;
+    public AuthorizationUserDatum AuthorizationUserDatum { get; set; } = null!;
 }
