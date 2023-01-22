@@ -12,14 +12,14 @@ builder.Services.AddCors(options => options.AddPolicy("CorsPolicy",
     {
         x.AllowAnyHeader()
             .AllowAnyMethod()
-            .SetIsOriginAllowed((_) => true)
+            .SetIsOriginAllowed(_ => true)
             .AllowCredentials();
     }));
 
 WebApplication app = builder.Build();
 
 AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
-await app.InitializeDatabaseAsync(appSettings.DatabaseSettings);
+await app.InitializeDatabaseAsync(appSettings.DatabaseSettings!);
 app.UseCors("CorsPolicy");
 app.MapGet("/", () => "GusMelfordBot 2.0");
 app.SetEnvironmentSettings(builder);

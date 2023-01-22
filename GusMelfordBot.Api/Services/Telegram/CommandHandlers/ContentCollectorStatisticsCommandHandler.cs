@@ -10,19 +10,17 @@ namespace GusMelfordBot.Api.Services.Telegram.CommandHandlers;
 public class ContentCollectorStatisticsCommandHandler : AbstractCommandHandler
 {
     private readonly ITBot _tBot;
-    private readonly IContentCollectorRepository _contentCollectorRepository;
     
-    public ContentCollectorStatisticsCommandHandler(ITBot tBot, IContentCollectorRepository contentCollectorRepository)
+    public ContentCollectorStatisticsCommandHandler(ITBot tBot)
     {
         _tBot = tBot;
-        _contentCollectorRepository = contentCollectorRepository;
     }
 
     public override async Task<TelegramCommand> Handle(TelegramCommand telegramCommand)
     {
         if (telegramCommand.Name == Commands.ContentCollectorStatistics)
         {
-            ContentCollectorStatistic contentCollectorStatistic = await _contentCollectorRepository.GetStatistics();
+            ContentCollectorStatistic contentCollectorStatistic = null;
             await _tBot.SendMessageAsync(new SendMessageParameters
             {
                 Text = BuildMessage(contentCollectorStatistic),

@@ -8,14 +8,11 @@ namespace GusMelfordBot.Api.WebSoketHandlers;
 public class ContentCollectorHub : Hub
 {
     private readonly IContentCollectorRoomFactory _contentCollectorRoomFactory;
-    private readonly IContentCollectorRepository _contentCollectorRepository;
     
     public ContentCollectorHub(
-        IContentCollectorRoomFactory contentCollectorRoomFactory, 
-        IContentCollectorRepository contentCollectorRepository)
+        IContentCollectorRoomFactory contentCollectorRoomFactory)
     {
         _contentCollectorRoomFactory = contentCollectorRoomFactory;
-        _contentCollectorRepository = contentCollectorRepository;
     }
 
     public async Task JoinToRoom(object roomCode)
@@ -25,7 +22,7 @@ public class ContentCollectorHub : Hub
             return;
         }
         
-        ContentCollectorUser contentCollectorUser = await _contentCollectorRepository.GetUserAsync(Context.GetHttpContext()!.GetUserId());
+        ContentCollectorUser contentCollectorUser = null;
         contentCollectorUser.ConnectionId = Context.ConnectionId;
         contentCollectorRoom.AddUser(contentCollectorUser);
         
