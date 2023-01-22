@@ -9,4 +9,5 @@ public class User : AuditableEntity
     public string? Password { get; set; }
     public Role Role { get; set; } = null!;
     public AuthorizationUserDatum AuthorizationUserDatum { get; set; } = null!;
+    public ICollection<Content> Contents { get; set; } = new List<Content>();
 }
