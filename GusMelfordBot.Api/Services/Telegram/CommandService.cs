@@ -37,7 +37,7 @@ public class CommandService : ICommandService
         
         abstractCommandHandler
             .SetNext(ActivatorUtilities.CreateInstance<SetPasswordCommandHandler>(_serviceProvider))
-            .SetNext(ActivatorUtilities.CreateInstance<ContentCollectorStatisticsCommandHandler>(_serviceProvider));
+            .SetNext(ActivatorUtilities.CreateInstance<AbyssStatisticsCommandHandler>(_serviceProvider));
         
         await abstractCommandHandler.Handle(telegramCommand);
     }

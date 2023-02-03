@@ -1,4 +1,5 @@
-﻿using GusMelfordBot.Domain.Telegram;
+﻿using GusMelfordBot.Domain.Auth;
+using GusMelfordBot.Domain.Telegram;
 using GusMelfordBot.Domain.Telegram.Models;
 using GusMelfordBot.Events;
 using GusMelfordBot.SimpleKafka.Interfaces;
@@ -10,10 +11,16 @@ public class TelegramService : IUpdateService
     private readonly ILogger<TelegramService> _logger;
     private readonly IKafkaProducer<string> _kafkaProducer;
 
-    public TelegramService(ILogger<TelegramService> logger, IKafkaProducer<string> kafkaProducer)
+    private readonly IAuthRepository _authRepository;
+
+    public TelegramService(
+        ILogger<TelegramService> logger, 
+        IKafkaProducer<string> kafkaProducer, 
+        IAuthRepository authRepository)
     {
         _logger = logger;
         _kafkaProducer = kafkaProducer;
+        _authRepository = authRepository;
     }
     
     public async Task ProcessUpdateAsync(UpdateDomain update)
@@ -26,11 +33,24 @@ public class TelegramService : IUpdateService
         
         if (update.Message is not null)
         {
+            await ImplicitRegistrationAsync(update.Message.From!);
             await _kafkaProducer.ProduceAsync(new TelegramMessageReceivedEvent
             {
                 SessionId = internalUpdateId,
                 Message = update.Message
             });
+        }
+    }
+
+    private async Task ImplicitRegistrationAsync(TelegramObjectUserDomain userDomain)
+    {
+        if (await _authRepository.IsTelegramUserExistAsync(userDomain.Id!.Value))
+        {
+            await _authRepository.SaveTelegramUserAsync(new RegisterData(
+                userDomain.FirstName!,
+                userDomain.LastName,
+                string.Empty,
+                string.Empty), userDomain.Id.Value, userDomain.Username!);
         }
     }
 }

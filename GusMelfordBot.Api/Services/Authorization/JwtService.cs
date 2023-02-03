@@ -4,41 +4,26 @@ using System.Security.Cryptography;
 using System.Text;
 using GusMelfordBot.Api.Settings;
 using GusMelfordBot.Domain.Auth;
-using GusMelfordBot.Extensions;
 using GusMelfordBot.Extensions.Exceptions;
 using Microsoft.IdentityModel.Tokens;
 
-namespace GusMelfordBot.Api.Services.Auth;
+namespace GusMelfordBot.Api.Services.Authorization;
 
-public class AuthService : IAuthService
+public class JwtService : IJwtService
 {
     private readonly AppSettings _appSettings;
-    private readonly IAuthRepository _authRepository;
-    
-    public AuthService(AppSettings appSettings, IAuthRepository authRepository)
+
+    public JwtService(AppSettings appSettings)
     {
         _appSettings = appSettings;
-        _authRepository = authRepository;
     }
 
-    public async Task<Jwt> LoginAsync(TelegramLoginData telegramLoginData)
-    {
-        AuthUserDomain? authUserDomain = await _authRepository.AuthenticateUser(
-            telegramLoginData.TelegramId, telegramLoginData.Password.ToSha512());
-
-        authUserDomain.IfNullThrow(new UnauthorizedException("Telegram id or password is incorrect!"));
-
-        Jwt jwt = BuildJwtToken(authUserDomain);
-        await _authRepository.UpdateRefreshTokenAsync(authUserDomain.Id, jwt.RefreshToken);
-        return jwt;
-    }
-    
-    private Jwt BuildJwtToken(AuthUserDomain authUserDomain)
+    public Jwt BuildJwtToken(AuthUserDomain authUserDomain)
     {
         ClaimsIdentity claimsIdentity = GetIdentity(authUserDomain);
 
         DateTime utcNow = DateTime.UtcNow;
-        TimeSpan lifeTime = TimeSpan.FromHours(_appSettings.AuthSettings.Lifetime);
+        TimeSpan lifeTime = TimeSpan.FromHours(_appSettings.AuthSettings!.Lifetime);
         DateTime expires = utcNow.Add(lifeTime);
 
         var jwtSecurityToken = new JwtSecurityToken(
@@ -51,12 +36,10 @@ public class AuthService : IAuthService
                 new SymmetricSecurityKey(Encoding.ASCII.GetBytes(_appSettings.AuthSettings.Key)), 
                 SecurityAlgorithms.HmacSha256));
 
-        string accessToken = new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken);
-
         return new Jwt(
             string.Join(" ", authUserDomain.FirstName, authUserDomain.LastName),
             authUserDomain.Role,
-            accessToken,
+            new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken),
             expires,
             GenerateRefreshToken(128));
     }
@@ -82,34 +65,14 @@ public class AuthService : IAuthService
             ClaimsIdentity.DefaultRoleClaimType);
     }
     
-    public async Task<Jwt> RefreshTokenAsync(TokensDomain tokensDomain)
-    {
-        ClaimsPrincipal claimsPrincipal = ClaimsPrincipalFromExpiredToken(tokensDomain.AccessToken);
-        string? userIdString = claimsPrincipal.Claims.FirstOrDefault(x => x.Type == "UserId")?.Value;
-        
-        if (!Guid.TryParse(userIdString, out Guid userId)) {
-            throw new UnauthorizedException("Invalid Access token");
-        }
-        
-        AuthUserDomain authUserDomain = await _authRepository.AuthenticateUser(userId);
-        if (authUserDomain.RefreshToken == tokensDomain.RefreshToken)
-        {
-            Jwt jwt = BuildJwtToken(authUserDomain);
-            await _authRepository.UpdateRefreshTokenAsync(userId, jwt.RefreshToken);
-            return jwt;
-        }
-
-        throw new UnauthorizedException("Refresh token is not valid");
-    }
-    
-    private ClaimsPrincipal ClaimsPrincipalFromExpiredToken(string accessToken)
+    public bool IsValidToken(string accessToken, out Guid userId)
     {
         var tokenValidationParameters = new TokenValidationParameters
         {
             ValidateAudience = false,
             ValidateIssuer = false,
             ValidateIssuerSigningKey = true,
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(_appSettings.AuthSettings.Key)),
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(_appSettings.AuthSettings!.Key)),
             ValidateLifetime = false
         };
         
@@ -122,8 +85,12 @@ public class AuthService : IAuthService
                 SecurityAlgorithms.HmacSha256, StringComparison.InvariantCultureIgnoreCase);
         }
         
-        return tokenIsValid
-            ? claimsPrincipal 
-            : throw new SecurityTokenException("Invalid token");
+        string? userIdString = claimsPrincipal.Claims.FirstOrDefault(x => x.Type == "UserId")?.Value;
+        
+        if (!Guid.TryParse(userIdString, out userId)) {
+            throw new UnauthorizedException("Invalid Access token");
+        }
+        
+        return tokenIsValid;
     }
 }

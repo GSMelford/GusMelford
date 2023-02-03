@@ -1,5 +1,6 @@
 ﻿using GusMelfordBot.Api.Dto.ContentCollector;
-using GusMelfordBot.Api.Services.Applications.ContentCollector;
+using GusMelfordBot.Api.Services.Features.Abyss;
+using GusMelfordBot.Api.Services.Features.WatchTogether;
 using GusMelfordBot.Domain.Application.ContentCollector;
 using Microsoft.AspNetCore.Mvc;
 
@@ -10,14 +11,14 @@ namespace GusMelfordBot.Api.Controllers;
 public class ContentCollectorController : Controller
 {
     private readonly IContentCollectorService _contentCollectorService;
-    private readonly IContentCollectorRoomFactory _contentCollectorRoomFactory;
+    private readonly IWatchTogetherRoomFactory _watchTogetherRoomFactory;
     
     public ContentCollectorController(
         IContentCollectorService contentCollectorService,
-        IContentCollectorRoomFactory contentCollectorRoomFactory)
+        IWatchTogetherRoomFactory watchTogetherRoomFactory)
     {
         _contentCollectorService = contentCollectorService;
-        _contentCollectorRoomFactory = contentCollectorRoomFactory;
+        _watchTogetherRoomFactory = watchTogetherRoomFactory;
     }
     
     [HttpGet("contents")]
@@ -50,13 +51,13 @@ public class ContentCollectorController : Controller
     [HttpGet("room/content/info")]
     public ContentDto GetContentInfo([FromQuery] string roomCode)
     {
-        return _contentCollectorRoomFactory.GetRoomByRoomCode(roomCode)?.GetContentInfo().ToDto() ?? new ContentDto();
+        return _watchTogetherRoomFactory.GetRoomByRoomCode(roomCode)?.GetContentInfo().ToDto() ?? new ContentDto();
     }
     
     [HttpPost("room")]
     public string CreateRoom([FromQuery] ContentFilterDto contentFilterDto)
     {
-        return _contentCollectorRoomFactory.Create(
+        return _watchTogetherRoomFactory.Create(
             _contentCollectorService.GetContents(contentFilterDto.ToDomain()).ToList());
     }
 }

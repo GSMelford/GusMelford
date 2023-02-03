@@ -1,6 +1,6 @@
 ﻿using GusMelfordBot.Domain.Telegram;
 
-namespace GusMelfordBot.Api.Services.Telegram.CommandHandlers;
+namespace GusMelfordBot.Api.Services.Telegram;
 
 public class LongCommandService : ILongCommandService
 {

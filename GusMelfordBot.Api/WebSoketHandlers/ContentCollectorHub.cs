@@ -1,4 +1,5 @@
-﻿using GusMelfordBot.Api.Services.Applications.ContentCollector;
+﻿using GusMelfordBot.Api.Services.Features.Abyss;
+using GusMelfordBot.Api.Services.Features.WatchTogether;
 using GusMelfordBot.Domain.Application.ContentCollector;
 using GusMelfordBot.Extensions;
 using Microsoft.AspNetCore.SignalR;
@@ -7,17 +8,17 @@ namespace GusMelfordBot.Api.WebSoketHandlers;
 
 public class ContentCollectorHub : Hub
 {
-    private readonly IContentCollectorRoomFactory _contentCollectorRoomFactory;
+    private readonly IWatchTogetherRoomFactory _watchTogetherRoomFactory;
     
     public ContentCollectorHub(
-        IContentCollectorRoomFactory contentCollectorRoomFactory)
+        IWatchTogetherRoomFactory watchTogetherRoomFactory)
     {
-        _contentCollectorRoomFactory = contentCollectorRoomFactory;
+        _watchTogetherRoomFactory = watchTogetherRoomFactory;
     }
 
     public async Task JoinToRoom(object roomCode)
     {
-        ContentCollectorRoom? contentCollectorRoom = _contentCollectorRoomFactory.GetRoomByRoomCode(roomCode.ToString()!);
+        WatchTogetherRoom? contentCollectorRoom = _watchTogetherRoomFactory.GetRoomByRoomCode(roomCode.ToString()!);
         if (contentCollectorRoom is null) {
             return;
         }
@@ -35,38 +36,38 @@ public class ContentCollectorHub : Hub
     
     public async Task NextContent(string roomCode)
     {
-        _contentCollectorRoomFactory.GetRoomByRoomCode(roomCode)?.Next();
+        _watchTogetherRoomFactory.GetRoomByRoomCode(roomCode)?.Next();
         await Clients.All.SendAsync("VideoChanged");
     }
     
     public async Task PrevContent(string roomCode)
     {
-        _contentCollectorRoomFactory.GetRoomByRoomCode(roomCode)?.Prev();
+        _watchTogetherRoomFactory.GetRoomByRoomCode(roomCode)?.Prev();
         await Clients.All.SendAsync("VideoChanged");
     }
     
     public async Task ChangePause(string roomCode)
     {
-        bool isPaused = _contentCollectorRoomFactory.GetRoomByRoomCode(roomCode)?.ChangePause() ?? false;
+        bool isPaused = _watchTogetherRoomFactory.GetRoomByRoomCode(roomCode)?.ChangePause() ?? false;
         await Clients.All.SendAsync("PauseChanged", isPaused);
     }
     
     public async Task ChangeRotate(string roomCode)
     {
-        int rotate = _contentCollectorRoomFactory.GetRoomByRoomCode(roomCode)?.ChangeRotate() ?? 90;
+        int rotate = _watchTogetherRoomFactory.GetRoomByRoomCode(roomCode)?.ChangeRotate() ?? 90;
         await Clients.All.SendAsync("RotateChanged", rotate);
     }
 
     public override async Task<Task> OnDisconnectedAsync(Exception? exception)
     {
         Guid userId = Context.GetHttpContext()!.GetUserId();
-        ContentCollectorRoom? contentCollectorRoom = _contentCollectorRoomFactory.GetRoomByUserId(userId);
+        WatchTogetherRoom? contentCollectorRoom = _watchTogetherRoomFactory.GetRoomByUserId(userId);
         if (contentCollectorRoom is null) {
             return base.OnDisconnectedAsync(exception);
         }
         
         contentCollectorRoom.RemoveUser(userId);
-        _contentCollectorRoomFactory.DestroyRoomIfEmpty(contentCollectorRoom.RoomCode);
+        _watchTogetherRoomFactory.DestroyRoomIfEmpty(contentCollectorRoom.RoomCode);
         
         await Clients.All.SendAsync("UserLeft", new
         {
@@ -79,7 +80,7 @@ public class ContentCollectorHub : Hub
     
     public async Task StartWatch(string roomCode)
     {
-        ContentCollectorRoom? contentCollectorRoom = _contentCollectorRoomFactory.GetRoomByRoomCode(roomCode);
+        WatchTogetherRoom? contentCollectorRoom = _watchTogetherRoomFactory.GetRoomByRoomCode(roomCode);
         if (contentCollectorRoom is null) {
             return;
         }

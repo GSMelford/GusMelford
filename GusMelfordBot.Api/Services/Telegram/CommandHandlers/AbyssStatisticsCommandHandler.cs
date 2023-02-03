@@ -7,11 +7,11 @@ using TBot.Client.Api.Telegram.SendMessage;
 
 namespace GusMelfordBot.Api.Services.Telegram.CommandHandlers;
 
-public class ContentCollectorStatisticsCommandHandler : AbstractCommandHandler
+public class AbyssStatisticsCommandHandler : AbstractCommandHandler
 {
     private readonly ITBot _tBot;
     
-    public ContentCollectorStatisticsCommandHandler(ITBot tBot)
+    public AbyssStatisticsCommandHandler(ITBot tBot)
     {
         _tBot = tBot;
     }

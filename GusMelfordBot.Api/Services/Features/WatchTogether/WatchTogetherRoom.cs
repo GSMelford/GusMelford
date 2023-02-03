@@ -1,9 +1,8 @@
 ﻿using GusMelfordBot.Domain.Application.ContentCollector;
-using GusMelfordBot.Infrastructure.Models;
 
-namespace GusMelfordBot.Api.Services.Applications.ContentCollector;
+namespace GusMelfordBot.Api.Services.Features.WatchTogether;
 
-public class ContentCollectorRoom
+public class WatchTogetherRoom
 {
     public string RoomCode { get; }
     private List<ContentCollectorUser> Users { get; set; } = new ();
@@ -12,7 +11,7 @@ public class ContentCollectorRoom
     private bool _isPause;
     private int _rotate;
 
-    public ContentCollectorRoom(string roomCode, List<ContentDomain> contents)
+    public WatchTogetherRoom(string roomCode, List<ContentDomain> contents)
     {
         RoomCode = roomCode;
         _contents = contents;

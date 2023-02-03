@@ -8,7 +8,7 @@ using TBot.Client.Api.Telegram.DeleteMessage;
 using TBot.Client.Api.Telegram.SendMessage;
 using TBot.Client.Api.Telegram.SendVideo;
 
-namespace GusMelfordBot.Api.Services.Applications.ContentCollector;
+namespace GusMelfordBot.Api.Services.Features.Abyss;
 
 public class AbyssService : IAbyssService
 {

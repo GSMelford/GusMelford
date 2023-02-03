@@ -1,4 +1,4 @@
-﻿using GusMelfordBot.Api.Services.Applications.ContentCollector;
+﻿using GusMelfordBot.Api.Services.Features.Abyss;
 using GusMelfordBot.Domain.Application;
 using GusMelfordBot.Domain.Application.ContentCollector;
 using GusMelfordBot.Domain.Telegram;

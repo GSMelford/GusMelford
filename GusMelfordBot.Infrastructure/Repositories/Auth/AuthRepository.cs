@@ -31,8 +31,48 @@ public class AuthRepository : IAuthRepository
                 .Include(x => x.Role)
                 .FirstOrDefaultAsync(x => x.Id == userId))
             !.ToDomain();
-    } 
+    }
 
+    public async Task SaveUserAsync(RegisterData registerData)
+    {
+        User user = await BuildUserAsync(registerData);
+
+        await _databaseContext.AddAsync(user);
+        await _databaseContext.SaveChangesAsync();
+    }
+    
+    public async Task SaveTelegramUserAsync(RegisterData registerData, long telegramUserId, string userName)
+    {
+        User user = await BuildUserAsync(registerData);
+        TelegramUser telegramUser = new TelegramUser
+        {
+            User = user,
+            TelegramId = telegramUserId,
+            UserName = userName
+        };
+
+        await _databaseContext.AddAsync(telegramUser);
+        await _databaseContext.SaveChangesAsync();
+    }
+
+    public async Task<bool> IsTelegramUserExistAsync(long telegramUserId)
+    {
+        return await _databaseContext.Set<TelegramUser>()
+            .FirstOrDefaultAsync(x=> x.TelegramId == telegramUserId) is not null;
+    }
+
+    private async Task<User> BuildUserAsync(RegisterData registerData)
+    {
+        return new User
+        {
+            Email = registerData.Email,
+            FirstName = registerData.FirstName,
+            LastName = registerData.LastName,
+            Role = (await _databaseContext.Set<Role>().FirstOrDefaultAsync(x => x.Name == "User"))!,
+            Password = registerData.Password
+        };
+    }
+    
     public async Task UpdatePasswordAsync(long telegramId, string password)
     {
         TelegramUser? telegramUser = await _databaseContext.Set<TelegramUser>()

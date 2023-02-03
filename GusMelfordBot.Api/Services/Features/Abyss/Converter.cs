@@ -1,7 +1,7 @@
 ﻿using GusMelfordBot.Domain.Application.ContentCollector;
 using GusMelfordBot.Events;
 
-namespace GusMelfordBot.Api.Services.Applications.ContentCollector;
+namespace GusMelfordBot.Api.Services.Features.Abyss;
 
 public static class Converter
 {
