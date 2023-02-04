@@ -179,12 +179,16 @@ public class AbyssRepository : IAbyssRepository
     public async Task<string> GetFunnyPhraseAsync(Guid userId)
     {
         bool isPersonalPhrase = new Random().Next(0, 10) < 4;
-
-        var funnyPhrase = isPersonalPhrase
-            ? await _databaseContext.Set<FunnyPhrase>().Where(x => x.UserId == userId).ToListAsync()
-            : await _databaseContext.Set<FunnyPhrase>().ToListAsync();
+        var funnyPhrases = await _databaseContext.Set<FunnyPhrase>().ToListAsync();
         
-        return funnyPhrase[new Random().Next(0, funnyPhrase.Count)].Text;
+        if (isPersonalPhrase)
+        {
+            funnyPhrases = funnyPhrases.Where(x => x.UserId == userId).ToList();
+        }
+
+        return !funnyPhrases.Any() 
+            ? "😠 The bot has nothing to say... Literally, the base is empty" 
+            : funnyPhrases[new Random().Next(0, funnyPhrases.Count)].Text;
     }
 
     public async Task SaveTelegramMessageIdAsync(Guid contentId, int messageId)
