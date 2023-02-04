@@ -5,6 +5,8 @@ using GusMelfordBot.Events;
 using GusMelfordBot.Infrastructure;
 using GusMelfordBot.Infrastructure.Interfaces;
 using GusMelfordBot.SimpleKafka.Interfaces;
+using TBot.Client;
+using TBot.Client.Api.Telegram.SendMessage;
 
 namespace GusMelfordBot.Api;
 
@@ -46,5 +48,16 @@ public static class WebApplicationExtensions
     private static ConsumerConfig BuildConsumerConfig(AppSettings appSettings)
     {
         return new ConsumerConfig { BootstrapServers = appSettings.KafkaSettings!.BootstrapServers };
+    }
+
+    public static async Task NotifyAboutRestartAsync(this WebApplication app)
+    {
+        //TODO Dev tool
+        ITBot tBot = app.Services.GetRequiredService<ITBot>();
+        await tBot.SendMessageAsync(new SendMessageParameters
+        {
+            Text = "🤖 The bot has been restarted.",
+            ChatId = -1001529315725
+        });
     }
 }

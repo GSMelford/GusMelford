@@ -33,4 +33,5 @@ app.SubscribeOnEvents(appSettings);
 app.UseEndpoints(endpoints => { endpoints.MapHealthChecks("/health"); });
 app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
 app.UseEndpoints(endpoints => { endpoints.MapHub<ContentCollectorHub>("/content-viewer-hub"); });
+await app.NotifyAboutRestartAsync();
 await app.RunAsync();
