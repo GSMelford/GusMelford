@@ -39,7 +39,7 @@ public class TikTokService : ITikTokService
         
         processedContent = (await handler.HandleAsync(processedContent)).IfNullThrow();
 
-        if (processedContent is { IsSaved: false, Attempt: <= 5 }) {
+        if (processedContent is { IsSaved: false, Attempt: <= 10 }) {
             await _kafkaProducer.ProduceAsync(processedContent.ToAttemptContentEvent());
             return;
         }

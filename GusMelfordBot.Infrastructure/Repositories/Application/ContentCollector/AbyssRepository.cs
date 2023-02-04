@@ -123,23 +123,26 @@ public class AbyssRepository : IAbyssRepository
 
     public async Task<IEnumerable<AttemptContent>> GetAttemptContentAsync(int take)
     {
-        const int maxAttempt = 5;
+        const int maxAttempt = 10;
         int localTake = take;
         
         List<AttemptMessage> attemptMessages = new List<AttemptMessage>();
 
+        var messages = _databaseContext.Set<AttemptMessage>();
+        
         for (int i = maxAttempt; i > 0; i--)
         {
             var temp = i;
-            attemptMessages.AddRange(_databaseContext
-                .Set<AttemptMessage>()
-                .Where(x=>x.Attempt == temp).Take(localTake));
-
+            attemptMessages.AddRange(await messages
+                .Where(x => x.Attempt == temp)
+                .Take(localTake)
+                .ToListAsync());
+            
             if (attemptMessages.Count == take) {
                 break;
             }
             
-            localTake -= attemptMessages.Count;
+            localTake = take - attemptMessages.Count;
         }
 
         var attemptContents = attemptMessages.Select(x => x.ToDomain());
