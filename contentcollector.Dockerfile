@@ -7,7 +7,7 @@ EXPOSE 443
 
 FROM mcr.microsoft.com/dotnet/sdk:6.0.405 AS build
 WORKDIR /src
-COPY ["ContentProcessor.Worker/ContentProcessor.Worker.csproj", "ContentCollector.MicroService/"]
+COPY ["ContentProcessor.Worker/ContentProcessor.Worker.csproj", "ContentProcessor.Worker/"]
 COPY ["GusMelfordBot.Extensions/GusMelfordBot.Extensions.csproj", "GusMelfordBot.Extensions/"]
 COPY ["GusMelfordBot.SimpleKafka/GusMelfordBot.SimpleKafka.csproj", "GusMelfordBot.SimpleKafka/"]
 RUN dotnet restore "ContentProcessor.Worker/ContentProcessor.Worker.csproj"
