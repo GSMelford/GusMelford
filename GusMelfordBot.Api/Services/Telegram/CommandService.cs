@@ -55,6 +55,11 @@ public class CommandService : ICommandService
             
         telegramCommand.Name = match.Groups[1].Value.Replace(GUS_MELFORD_BOT_NAME, "");
         telegramCommand.Arguments = match.Groups[2].Value.Split(' ').ToList();
+
+        if (string.IsNullOrEmpty(telegramCommand.Name))
+        {
+            telegramCommand.Arguments = input.Split(' ').ToList();
+        }
         
         return telegramCommand;
     }

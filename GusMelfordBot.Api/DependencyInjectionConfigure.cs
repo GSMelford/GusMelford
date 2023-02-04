@@ -41,7 +41,7 @@ public static class DependencyInjectionConfigure
         serviceCollection.AddTransient<IAuthRepository, AuthRepository>();
         serviceCollection.AddTransient<IFeatureRepository, FeatureRepository>();
         serviceCollection.AddTransient<ICommandService, CommandService>();
-        serviceCollection.AddTransient<ILongCommandService, LongCommandService>();
+        serviceCollection.AddSingleton<ILongCommandService, LongCommandService>();
         serviceCollection.AddTransient<ICommandRepository, CommandRepository>();
         serviceCollection.AddTransient<IAbyssService, AbyssService>();
         serviceCollection.AddTransient<IAbyssRepository, AbyssRepository>();
