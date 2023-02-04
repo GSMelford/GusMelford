@@ -9,13 +9,15 @@ public static class Converter
     public static ProcessTikTokContent ToDomain(this ContentEvent contentEvent)
     {
         string messageText = contentEvent.Message;
+        string originalLink = new Regex(@"https://\w*.tiktok.com/\S*")
+            .Matches(messageText)
+            .FirstOrDefault()?.Value ?? string.Empty;
+        
         return new ProcessTikTokContent
         {
             Id = contentEvent.SessionId,
-            UserComment = messageText.Replace(messageText, "").Trim(),
-            OriginalLink = new Regex(@"https://\w*.tiktok.com/\S*")
-                .Matches(messageText)
-                .FirstOrDefault()?.Value ?? string.Empty,
+            UserComment = messageText.Replace(originalLink, "").Trim(),
+            OriginalLink = originalLink,
             Provider = nameof(ContentProvider.TikTok),
             Attempt = contentEvent.Attempt,
             UserId = contentEvent.UserId,
@@ -45,7 +47,7 @@ public static class Converter
         return new AttemptContentEvent
         {
             SessionId = processTikTokContent.Id,
-            Message = processTikTokContent.OriginalLink,
+            Message = $"{processTikTokContent.OriginalLink} {processTikTokContent.UserComment}",
             Attempt = processTikTokContent.Attempt,
             UserId = processTikTokContent.UserId,
             GroupId = processTikTokContent.GroupId

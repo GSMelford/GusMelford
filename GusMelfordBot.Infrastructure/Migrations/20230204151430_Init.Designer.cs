@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace GusMelfordBot.Infrastructure.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    [Migration("20230122153107_Init")]
+    [Migration("20230204151430_Init")]
     partial class Init
     {
         /// <inheritdoc />
@@ -52,7 +52,10 @@ namespace GusMelfordBot.Infrastructure.Migrations
                     b.Property<DateTime>("CreatedOn")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<Guid?>("FeatureId")
+                    b.Property<Guid>("FeatureId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("GroupId")
                         .HasColumnType("uuid");
 
                     b.Property<string>("Message")
@@ -62,9 +65,19 @@ namespace GusMelfordBot.Infrastructure.Migrations
                     b.Property<DateTime>("ModifiedOn")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<Guid>("SessionId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
                     b.HasKey("Id");
 
                     b.HasIndex("FeatureId");
+
+                    b.HasIndex("GroupId");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("AttemptMessages");
                 });
@@ -159,11 +172,37 @@ namespace GusMelfordBot.Infrastructure.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("68f403f4-9e3a-4697-b612-619e9e7bd425"),
-                            CreatedOn = new DateTime(2023, 1, 22, 15, 31, 7, 170, DateTimeKind.Utc).AddTicks(3046),
-                            ModifiedOn = new DateTime(2023, 1, 22, 15, 31, 7, 170, DateTimeKind.Utc).AddTicks(3046),
+                            Id = new Guid("2d4cde7f-d469-4acd-ae22-5afe940c64fe"),
+                            CreatedOn = new DateTime(2023, 2, 4, 15, 14, 30, 742, DateTimeKind.Utc).AddTicks(7625),
+                            ModifiedOn = new DateTime(2023, 2, 4, 15, 14, 30, 742, DateTimeKind.Utc).AddTicks(7625),
                             Name = "Abyss"
                         });
+                });
+
+            modelBuilder.Entity("GusMelfordBot.Infrastructure.Models.FunnyPhrase", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime>("ModifiedOn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Text")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<Guid?>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("FunnyPhrases");
                 });
 
             modelBuilder.Entity("GusMelfordBot.Infrastructure.Models.Group", b =>
@@ -249,16 +288,16 @@ namespace GusMelfordBot.Infrastructure.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("b9889b93-a419-4227-987d-67981644ed18"),
-                            CreatedOn = new DateTime(2023, 1, 22, 15, 31, 7, 170, DateTimeKind.Utc).AddTicks(2920),
-                            ModifiedOn = new DateTime(2023, 1, 22, 15, 31, 7, 170, DateTimeKind.Utc).AddTicks(2922),
+                            Id = new Guid("114a09a9-801e-4863-b5d7-388c49291e8c"),
+                            CreatedOn = new DateTime(2023, 2, 4, 15, 14, 30, 742, DateTimeKind.Utc).AddTicks(7544),
+                            ModifiedOn = new DateTime(2023, 2, 4, 15, 14, 30, 742, DateTimeKind.Utc).AddTicks(7546),
                             Name = "Admin"
                         },
                         new
                         {
-                            Id = new Guid("ada47f9c-8f33-4538-b653-5e5d7a074c15"),
-                            CreatedOn = new DateTime(2023, 1, 22, 15, 31, 7, 170, DateTimeKind.Utc).AddTicks(3006),
-                            ModifiedOn = new DateTime(2023, 1, 22, 15, 31, 7, 170, DateTimeKind.Utc).AddTicks(3006),
+                            Id = new Guid("f5ed7961-ad8a-4f4d-9144-d6678df1c557"),
+                            CreatedOn = new DateTime(2023, 2, 4, 15, 14, 30, 742, DateTimeKind.Utc).AddTicks(7590),
+                            ModifiedOn = new DateTime(2023, 2, 4, 15, 14, 30, 742, DateTimeKind.Utc).AddTicks(7590),
                             Name = "User"
                         });
                 });
@@ -342,7 +381,7 @@ namespace GusMelfordBot.Infrastructure.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<Guid?>("ContentId")
+                    b.Property<Guid>("ContentId")
                         .HasColumnType("uuid");
 
                     b.Property<DateTime>("CreatedOn")
@@ -386,9 +425,27 @@ namespace GusMelfordBot.Infrastructure.Migrations
                 {
                     b.HasOne("GusMelfordBot.Infrastructure.Models.Feature", "Feature")
                         .WithMany()
-                        .HasForeignKey("FeatureId");
+                        .HasForeignKey("FeatureId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("GusMelfordBot.Infrastructure.Models.Group", "Group")
+                        .WithMany()
+                        .HasForeignKey("GroupId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("GusMelfordBot.Infrastructure.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Feature");
+
+                    b.Navigation("Group");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("GusMelfordBot.Infrastructure.Models.AuthorizationUserDatum", b =>
@@ -419,6 +476,15 @@ namespace GusMelfordBot.Infrastructure.Migrations
                     b.Navigation("Group");
 
                     b.Navigation("MetaContent");
+                });
+
+            modelBuilder.Entity("GusMelfordBot.Infrastructure.Models.FunnyPhrase", b =>
+                {
+                    b.HasOne("GusMelfordBot.Infrastructure.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("GusMelfordBot.Infrastructure.Models.Group", b =>
@@ -456,15 +522,19 @@ namespace GusMelfordBot.Infrastructure.Migrations
 
             modelBuilder.Entity("GusMelfordBot.Infrastructure.Models.UserContentComment", b =>
                 {
-                    b.HasOne("GusMelfordBot.Infrastructure.Models.Content", null)
+                    b.HasOne("GusMelfordBot.Infrastructure.Models.Content", "Content")
                         .WithMany("UserContentComments")
-                        .HasForeignKey("ContentId");
+                        .HasForeignKey("ContentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("GusMelfordBot.Infrastructure.Models.User", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Content");
 
                     b.Navigation("User");
                 });

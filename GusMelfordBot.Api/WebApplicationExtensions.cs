@@ -40,6 +40,7 @@ public static class WebApplicationExtensions
         IKafkaConsumerFactory kafkaConsumerFactory = app.Services.GetRequiredService<IKafkaConsumerFactory>();
         kafkaConsumerFactory.Subscribe<TelegramMessageReceivedEvent, TelegramMessageReceivedHandler>(BuildConsumerConfig(appSettings));
         kafkaConsumerFactory.Subscribe<ContentProcessedEvent, ContentProcessedHandler>(BuildConsumerConfig(appSettings));
+        kafkaConsumerFactory.Subscribe<AttemptContentEvent, AttemptContentHandler>(BuildConsumerConfig(appSettings));
     }
 
     private static ConsumerConfig BuildConsumerConfig(AppSettings appSettings)

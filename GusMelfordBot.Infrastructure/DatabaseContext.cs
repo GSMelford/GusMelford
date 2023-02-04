@@ -18,8 +18,8 @@ public class DatabaseContext : DbContext, IDatabaseContext
     public DbSet<TelegramUser> TelegramUsers { get; set; } = null!;
     public DbSet<User> Users { get; set; } = null!;
     public DbSet<UserContentComment>? UserContentComments { get; set; } = null!;
-    
-    
+    public DbSet<FunnyPhrase>? FunnyPhrases { get; set; } = null!;
+
     public DatabaseContext(DatabaseSettings? databaseSettings = null)
     {
         ConnectionString = BuildConnectionString(databaseSettings ?? new DatabaseSettings

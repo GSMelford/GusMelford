@@ -44,12 +44,12 @@ public class TelegramService : IUpdateService
 
     private async Task ImplicitRegistrationAsync(TelegramObjectUserDomain userDomain)
     {
-        if (await _authRepository.IsTelegramUserExistAsync(userDomain.Id!.Value))
+        if (!await _authRepository.IsTelegramUserExistAsync(userDomain.Id!.Value))
         {
             await _authRepository.SaveTelegramUserAsync(new RegisterData(
                 userDomain.FirstName!,
                 userDomain.LastName,
-                string.Empty,
+                $"{DateTime.UtcNow:ddMMyyyy.hhmmss}@temp.mail.com",
                 string.Empty), userDomain.Id.Value, userDomain.Username!);
         }
     }

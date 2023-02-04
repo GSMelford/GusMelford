@@ -30,11 +30,11 @@ public class TelegramMessageReceivedHandler : IEventHandler<TelegramMessageRecei
             return;
         }
 
-        if (_commandService.IsCommand(messageText) && _commandService.IsCommandInProgress(@event.Message!.From!.Id!.Value))
+        if (_commandService.IsCommand(messageText) || _commandService.IsCommandInProgress(@event.Message!.From!.Id!.Value))
         {
             await _commandService.ExecuteAsync(
                 @event.Message!.Chat!.Id!.Value, 
-                @event.Message.From.Id.Value, 
+                @event.Message.From!.Id!.Value, 
                 messageText);
             
             return;

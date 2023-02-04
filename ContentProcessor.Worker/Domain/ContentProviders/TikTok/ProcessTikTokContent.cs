@@ -14,11 +14,12 @@ public class ProcessTikTokContent
     public int? Width { get; set; }
     public int? Duration { get; set; }
     public bool IsAvailable { get; set; } = true;
-    public string GroupId { get; set; } = null!;
-    public string UserId { get; set; } = null!;
+    public Guid GroupId { get; set; }
+    public Guid UserId { get; set; }
 
     public ProcessTikTokContent MarkAsProcessFailed()
     {
+        IsAvailable = false;
         Attempt++;
         return this;
     }

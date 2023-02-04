@@ -1,4 +1,6 @@
 ﻿using GusMelfordBot.Domain.Application.ContentCollector;
+using GusMelfordBot.Extensions;
+using GusMelfordBot.Infrastructure.Models;
 using Content = GusMelfordBot.Domain.Application.ContentCollector.Content;
 using MetaContent = GusMelfordBot.Domain.Application.ContentCollector.MetaContent;
 
@@ -21,5 +23,28 @@ public static class Convertor
                 content.MetaContent.Duration,
                 content.MetaContent.TelegramMessageId),
             content.UserContentComments.Select(x=>new UserComment(x.UserId, x.Message)).ToList());
+    }
+
+    public static AttemptMessage ToDal(this AttemptContent attemptContent, Guid featureId, Guid sessionId)
+    {
+        return new AttemptMessage
+        {
+            Attempt = attemptContent.Attempt,
+            Message = attemptContent.Message,
+            UserId = attemptContent.UserId,
+            FeatureId = featureId,
+            SessionId = sessionId,
+            GroupId = attemptContent.GroupId
+        };
+    }
+
+    public static AttemptContent ToDomain(this AttemptMessage attemptMessage)
+    {
+        return new AttemptContent(
+            attemptMessage.SessionId, 
+            attemptMessage.GroupId, 
+            attemptMessage.UserId,
+            attemptMessage.Message, 
+            attemptMessage.Attempt);
     }
 }

@@ -9,13 +9,7 @@ public class DataLakeService : IDataLakeService
             Directory.CreateDirectory(directoryPath);
         }
     }
-    
-    public async Task WriteFile2(string path, byte[] bytes)
-    {
-        await using var fs = new FileStream(path, FileMode.Create, FileAccess.Write);
-        await fs.WriteAsync(bytes);
-    }
-    
+
     public Task WriteFile(string path, byte[] bytes)
     {
         return File.WriteAllBytesAsync(path, bytes);
@@ -24,5 +18,17 @@ public class DataLakeService : IDataLakeService
     public Task<byte[]> ReadFileAsync(string path)
     {
         return File.ReadAllBytesAsync(path);
+    }
+
+    public void RemoveFile(string path)
+    {
+        try
+        {
+            File.Delete(path);
+        }
+        catch
+        {
+            //
+        }
     }
 }

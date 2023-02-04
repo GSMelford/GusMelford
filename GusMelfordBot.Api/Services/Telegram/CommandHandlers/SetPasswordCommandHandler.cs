@@ -19,7 +19,7 @@ public class SetPasswordCommandHandler : AbstractCommandHandler
         _longCommandService = longCommandService;
     }
 
-    public override async Task<TelegramCommand> Handle(TelegramCommand telegramCommand)
+    public override async Task<TelegramCommand> HandleAsync(TelegramCommand telegramCommand)
     {
         LongCommand? longCommand = _longCommandService.GetLongCommand(telegramCommand.TelegramId);
         if (longCommand is not null && longCommand.Name == Commands.SetPassword)
@@ -47,6 +47,6 @@ public class SetPasswordCommandHandler : AbstractCommandHandler
             return telegramCommand;
         }
         
-        return await base.Handle(telegramCommand);
+        return await base.HandleAsync(telegramCommand);
     }
 }

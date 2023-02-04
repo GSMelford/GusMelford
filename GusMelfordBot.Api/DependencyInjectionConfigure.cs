@@ -1,5 +1,6 @@
 ﻿using System.Text;
 using Confluent.Kafka;
+using GusMelfordBot.Api.HostedServices;
 using GusMelfordBot.Api.Services.Authorization;
 using GusMelfordBot.Api.Services.Features.Abyss;
 using GusMelfordBot.Api.Services.Features.WatchTogether;
@@ -30,6 +31,7 @@ public static class DependencyInjectionConfigure
     {
         serviceCollection.AddHttpClient();
         serviceCollection.AddSignalR();
+        serviceCollection.AddHostedService<TryHarderHostedService>();
         serviceCollection.AddTBotClient(appSettings.TelegramBotSettings!.Token);
         serviceCollection.AddTransient<IDatabaseContext, DatabaseContext>(_ => new DatabaseContext(appSettings.DatabaseSettings));
         serviceCollection.AddTransient<IUpdateService, TelegramService>();

@@ -16,7 +16,7 @@ public class AbyssStatisticsCommandHandler : AbstractCommandHandler
         _tBot = tBot;
     }
 
-    public override async Task<TelegramCommand> Handle(TelegramCommand telegramCommand)
+    public override async Task<TelegramCommand> HandleAsync(TelegramCommand telegramCommand)
     {
         if (telegramCommand.Name == Commands.ContentCollectorStatistics)
         {
@@ -30,7 +30,7 @@ public class AbyssStatisticsCommandHandler : AbstractCommandHandler
             return telegramCommand;
         }
         
-        return await base.Handle(telegramCommand);
+        return await base.HandleAsync(telegramCommand);
     }
 
     private string BuildMessage(ContentCollectorStatistic contentCollectorStatistic)

@@ -19,12 +19,12 @@ public static class Converter
     {
         return new Content(
             contentProcessedEvent.SessionId,
-            Guid.Parse(contentProcessedEvent.GroupId), 
-            new List<Guid> { Guid.Parse(contentProcessedEvent.UserId) },
+            contentProcessedEvent.GroupId, 
+            new List<Guid> { contentProcessedEvent.UserId },
             contentProcessedEvent.Provider ?? throw new Exception(),
             contentProcessedEvent.OriginalLink ?? throw new Exception(),
             contentProcessedEvent.ToMetaContentDomain(),
-            contentProcessedEvent.UserComment is not null
+            !string.IsNullOrEmpty(contentProcessedEvent.UserComment)
                 ? new List<UserComment> { contentProcessedEvent.ToUserCommentDomain() }
                 : new List<UserComment>());
     }
@@ -40,6 +40,16 @@ public static class Converter
 
     public static UserComment ToUserCommentDomain(this ContentProcessedEvent contentProcessedEvent)
     {
-        return new UserComment(Guid.Parse(contentProcessedEvent.UserId), contentProcessedEvent.UserComment!);
+        return new UserComment(contentProcessedEvent.UserId, contentProcessedEvent.UserComment!);
+    }
+
+    public static AttemptContent ToDomain(this AttemptContentEvent attemptContentEvent)
+    {
+        return new AttemptContent(
+            attemptContentEvent.SessionId,
+            attemptContentEvent.GroupId,
+            attemptContentEvent.UserId, 
+            attemptContentEvent.Message,
+            attemptContentEvent.Attempt);
     }
 }

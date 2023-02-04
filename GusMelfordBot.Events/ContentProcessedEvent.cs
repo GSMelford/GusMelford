@@ -4,8 +4,8 @@ namespace GusMelfordBot.Events;
 
 public class ContentProcessedEvent : BaseEvent
 {
-    public string GroupId { get; set; } = null!;
-    public string UserId { get; set; } = null!;
+    public Guid GroupId { get; set; }
+    public Guid UserId { get; set; }
     public string Provider { get; set; } = null!;
     public string OriginalLink { get; set; } = null!;
     public string? UserComment { get; set; }

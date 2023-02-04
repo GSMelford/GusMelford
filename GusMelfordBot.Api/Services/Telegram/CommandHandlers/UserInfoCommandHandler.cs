@@ -17,7 +17,7 @@ public class UserInfoCommandHandler : AbstractCommandHandler
         _commandRepository = commandRepository;
     }
     
-    public override async Task<TelegramCommand> Handle(TelegramCommand telegramCommand)
+    public override async Task<TelegramCommand> HandleAsync(TelegramCommand telegramCommand)
     {
         if (telegramCommand.Name == Commands.UserInfo)
         {
@@ -32,7 +32,7 @@ public class UserInfoCommandHandler : AbstractCommandHandler
             return telegramCommand;
         }
 
-        return await base.Handle(telegramCommand);
+        return await base.HandleAsync(telegramCommand);
     }
 
     private string BuildUserInfoMessage(TelegramUserDomain telegramUserDomain)

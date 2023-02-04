@@ -10,7 +10,7 @@ public class CommandService : ICommandService
     private readonly IServiceProvider _serviceProvider;
     private readonly ILongCommandService _longCommandService;
 
-    private const string GUS_MELFORD_BOT_NAME = "@GusMelfordBot";
+    private const string GUS_MELFORD_BOT_NAME = "@GusMelfordBot"; 
     
     public CommandService(IServiceProvider serviceProvider, ILongCommandService longCommandService)
     {
@@ -36,10 +36,11 @@ public class CommandService : ICommandService
             ActivatorUtilities.CreateInstance<UserInfoCommandHandler>(_serviceProvider);
         
         abstractCommandHandler
+            .SetNext(ActivatorUtilities.CreateInstance<RegisterAbyssCommandHandler>(_serviceProvider))
             .SetNext(ActivatorUtilities.CreateInstance<SetPasswordCommandHandler>(_serviceProvider))
             .SetNext(ActivatorUtilities.CreateInstance<AbyssStatisticsCommandHandler>(_serviceProvider));
         
-        await abstractCommandHandler.Handle(telegramCommand);
+        await abstractCommandHandler.HandleAsync(telegramCommand);
     }
     
     private TelegramCommand BuildTelegramCommand(long groupId, long telegramUserId, string input)

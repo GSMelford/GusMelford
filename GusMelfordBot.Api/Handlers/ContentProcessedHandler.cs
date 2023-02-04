@@ -18,6 +18,8 @@ public class ContentProcessedHandler : IEventHandler<ContentProcessedEvent>
     
     public async Task HandleAsync(ContentProcessedEvent @event)
     {
-        await _abyssService.SaveContentAsync(@event.ToDomain());
+        var processedContent = @event.ToDomain();
+        await _abyssService.SaveContentAsync(processedContent);
+        _logger.LogInformation("New content saved. Content id: {Id}", processedContent.Id);
     }
 }

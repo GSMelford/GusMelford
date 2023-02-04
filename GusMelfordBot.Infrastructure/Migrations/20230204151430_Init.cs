@@ -60,27 +60,6 @@ namespace GusMelfordBot.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "AttemptMessages",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    FeatureId = table.Column<Guid>(type: "uuid", nullable: true),
-                    Message = table.Column<string>(type: "text", nullable: false),
-                    Attempt = table.Column<int>(type: "integer", nullable: false),
-                    CreatedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    ModifiedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_AttemptMessages", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_AttemptMessages_Features_FeatureId",
-                        column: x => x.FeatureId,
-                        principalTable: "Features",
-                        principalColumn: "Id");
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Groups",
                 columns: table => new
                 {
@@ -156,6 +135,43 @@ namespace GusMelfordBot.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "AttemptMessages",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    FeatureId = table.Column<Guid>(type: "uuid", nullable: false),
+                    SessionId = table.Column<Guid>(type: "uuid", nullable: false),
+                    UserId = table.Column<Guid>(type: "uuid", nullable: false),
+                    GroupId = table.Column<Guid>(type: "uuid", nullable: false),
+                    Message = table.Column<string>(type: "text", nullable: false),
+                    Attempt = table.Column<int>(type: "integer", nullable: false),
+                    CreatedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    ModifiedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AttemptMessages", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_AttemptMessages_Features_FeatureId",
+                        column: x => x.FeatureId,
+                        principalTable: "Features",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_AttemptMessages_Groups_GroupId",
+                        column: x => x.GroupId,
+                        principalTable: "Groups",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_AttemptMessages_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "AuthorizationUserData",
                 columns: table => new
                 {
@@ -174,6 +190,26 @@ namespace GusMelfordBot.Infrastructure.Migrations
                         principalTable: "Users",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "FunnyPhrases",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    Text = table.Column<string>(type: "text", nullable: false),
+                    UserId = table.Column<Guid>(type: "uuid", nullable: true),
+                    CreatedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    ModifiedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_FunnyPhrases", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_FunnyPhrases_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -228,8 +264,8 @@ namespace GusMelfordBot.Infrastructure.Migrations
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     UserId = table.Column<Guid>(type: "uuid", nullable: false),
+                    ContentId = table.Column<Guid>(type: "uuid", nullable: false),
                     Message = table.Column<string>(type: "text", nullable: false),
-                    ContentId = table.Column<Guid>(type: "uuid", nullable: true),
                     CreatedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     ModifiedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
@@ -240,7 +276,8 @@ namespace GusMelfordBot.Infrastructure.Migrations
                         name: "FK_UserContentComments_Contents_ContentId",
                         column: x => x.ContentId,
                         principalTable: "Contents",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_UserContentComments_Users_UserId",
                         column: x => x.UserId,
@@ -252,21 +289,31 @@ namespace GusMelfordBot.Infrastructure.Migrations
             migrationBuilder.InsertData(
                 table: "Features",
                 columns: new[] { "Id", "CreatedOn", "ModifiedOn", "Name" },
-                values: new object[] { new Guid("68f403f4-9e3a-4697-b612-619e9e7bd425"), new DateTime(2023, 1, 22, 15, 31, 7, 170, DateTimeKind.Utc).AddTicks(3046), new DateTime(2023, 1, 22, 15, 31, 7, 170, DateTimeKind.Utc).AddTicks(3046), "Abyss" });
+                values: new object[] { new Guid("2d4cde7f-d469-4acd-ae22-5afe940c64fe"), new DateTime(2023, 2, 4, 15, 14, 30, 742, DateTimeKind.Utc).AddTicks(7625), new DateTime(2023, 2, 4, 15, 14, 30, 742, DateTimeKind.Utc).AddTicks(7625), "Abyss" });
 
             migrationBuilder.InsertData(
                 table: "Roles",
                 columns: new[] { "Id", "CreatedOn", "ModifiedOn", "Name" },
                 values: new object[,]
                 {
-                    { new Guid("ada47f9c-8f33-4538-b653-5e5d7a074c15"), new DateTime(2023, 1, 22, 15, 31, 7, 170, DateTimeKind.Utc).AddTicks(3006), new DateTime(2023, 1, 22, 15, 31, 7, 170, DateTimeKind.Utc).AddTicks(3006), "User" },
-                    { new Guid("b9889b93-a419-4227-987d-67981644ed18"), new DateTime(2023, 1, 22, 15, 31, 7, 170, DateTimeKind.Utc).AddTicks(2920), new DateTime(2023, 1, 22, 15, 31, 7, 170, DateTimeKind.Utc).AddTicks(2922), "Admin" }
+                    { new Guid("114a09a9-801e-4863-b5d7-388c49291e8c"), new DateTime(2023, 2, 4, 15, 14, 30, 742, DateTimeKind.Utc).AddTicks(7544), new DateTime(2023, 2, 4, 15, 14, 30, 742, DateTimeKind.Utc).AddTicks(7546), "Admin" },
+                    { new Guid("f5ed7961-ad8a-4f4d-9144-d6678df1c557"), new DateTime(2023, 2, 4, 15, 14, 30, 742, DateTimeKind.Utc).AddTicks(7590), new DateTime(2023, 2, 4, 15, 14, 30, 742, DateTimeKind.Utc).AddTicks(7590), "User" }
                 });
 
             migrationBuilder.CreateIndex(
                 name: "IX_AttemptMessages_FeatureId",
                 table: "AttemptMessages",
                 column: "FeatureId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AttemptMessages_GroupId",
+                table: "AttemptMessages",
+                column: "GroupId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AttemptMessages_UserId",
+                table: "AttemptMessages",
+                column: "UserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_AuthorizationUserData_UserId",
@@ -300,6 +347,11 @@ namespace GusMelfordBot.Infrastructure.Migrations
                 table: "Features",
                 column: "Name",
                 unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_FunnyPhrases_UserId",
+                table: "FunnyPhrases",
+                column: "UserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Groups_FeatureId",
@@ -356,6 +408,9 @@ namespace GusMelfordBot.Infrastructure.Migrations
 
             migrationBuilder.DropTable(
                 name: "ContentUser");
+
+            migrationBuilder.DropTable(
+                name: "FunnyPhrases");
 
             migrationBuilder.DropTable(
                 name: "TelegramUsers");

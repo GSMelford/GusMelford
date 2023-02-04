@@ -4,8 +4,8 @@ namespace GusMelfordBot.Events;
 
 public class AttemptContentEvent : BaseEvent
 {
-    public string GroupId { get; set; } = null!;
-    public string UserId { get; set; } = null!;
+    public Guid GroupId { get; set; }
+    public Guid UserId { get; set; }
     public string Message { get; set; } = null!;
     public int Attempt { get; set; }
 }
