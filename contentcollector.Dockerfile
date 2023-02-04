@@ -7,18 +7,18 @@ EXPOSE 443
 
 FROM mcr.microsoft.com/dotnet/sdk:6.0.405 AS build
 WORKDIR /src
-COPY ["ContentCollector.MicroService/ContentCollector.MicroService.csproj", "ContentCollector.MicroService/"]
+COPY ["ContentProcessor.Worker/ContentProcessor.Worker.csproj", "ContentCollector.MicroService/"]
 COPY ["GusMelfordBot.Extensions/GusMelfordBot.Extensions.csproj", "GusMelfordBot.Extensions/"]
 COPY ["GusMelfordBot.SimpleKafka/GusMelfordBot.SimpleKafka.csproj", "GusMelfordBot.SimpleKafka/"]
-RUN dotnet restore "ContentCollector.MicroService/ContentCollector.MicroService.csproj"
+RUN dotnet restore "ContentProcessor.Worker/ContentProcessor.Worker.csproj"
 COPY . .
-WORKDIR "/src/ContentCollector.MicroService"
-RUN dotnet build "ContentCollector.MicroService.csproj" -c Release -o /app/build
+WORKDIR "/src/ContentProcessor.Worker"
+RUN dotnet build "ContentProcessor.Worker.csproj" -c Release -o /app/build
 
 FROM build AS publish
-RUN dotnet publish "ContentCollector.MicroService.csproj" -c Release -o /app/publish
+RUN dotnet publish "ContentProcessor.Worker.csproj" -c Release -o /app/publish
 
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-ENTRYPOINT ["dotnet", "ContentCollector.MicroService.dll"]
+ENTRYPOINT ["dotnet", "ContentProcessor.Worker.dll"]
