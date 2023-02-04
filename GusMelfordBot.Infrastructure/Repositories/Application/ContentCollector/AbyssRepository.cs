@@ -117,7 +117,7 @@ public class AbyssRepository : IAbyssRepository
         Guid featureId = (await _databaseContext.Set<Feature>()
             .FirstOrDefaultAsync(x => x.Name == Constants.Feature.Abyss))!.Id;
 
-        var attemptContentDal = await _databaseContext.Set<AttemptContent>()
+        var attemptContentDal = await _databaseContext.Set<AttemptMessage>()
             .FirstOrDefaultAsync(x => x.Message == attemptContent.Message);
         
         if (attemptContentDal is not null)
