@@ -84,7 +84,7 @@ public class AbyssService : IAbyssService
                 ChatId = chatId,
                 Text = $"{await _abyssRepository.GetTelegramUserNameAsync(content.UserIds.First())} posted the same content as\n" +
                        $"{string.Join(" and ", names)} 😁👍",
-                ReplyToMessageId = contentFromDb.MetaContent.TelegramMessageId!.Value
+                ReplyToMessageId = contentFromDb.MetaContent.TelegramMessageId ?? default
             });
 
             await _abyssRepository.AddUserToContentAsync(contentFromDb.Id, content);
