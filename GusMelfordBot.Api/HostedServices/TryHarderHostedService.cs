@@ -27,7 +27,7 @@ public class TryHarderHostedService : IHostedService, IDisposable
     {
         _logger.LogInformation("TryHarderHostedService running.");
 
-        _timer = new Timer(TryGetContent, null, TimeSpan.Zero, TimeSpan.FromMinutes(1));
+        _timer = new Timer(TryGetContent, null, TimeSpan.Zero, TimeSpan.FromMinutes(5));
 
         return Task.CompletedTask;
     }
