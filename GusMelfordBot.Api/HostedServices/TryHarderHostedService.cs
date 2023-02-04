@@ -1,4 +1,5 @@
-﻿using GusMelfordBot.Domain.Application.ContentCollector;
+﻿using GusMelfordBot.Api.Settings;
+using GusMelfordBot.Domain.Application.ContentCollector;
 using GusMelfordBot.Events;
 using GusMelfordBot.SimpleKafka.Interfaces;
 
@@ -6,14 +7,14 @@ namespace GusMelfordBot.Api.HostedServices;
 
 public class TryHarderHostedService : IHostedService, IDisposable
 {
-    private const int ATTEMPT_CONTENT_TEMP = 10;
-    
     private Timer? _timer;
+    private readonly AbyssSettings _abyssSettings;
     private readonly ILogger<TryHarderHostedService> _logger;
     private readonly IAbyssRepository _abyssRepository;
     private readonly IKafkaProducer<string> _kafkaProducer;
 
     public TryHarderHostedService(
+        AppSettings appSettings,
         ILogger<TryHarderHostedService> logger,
         IAbyssRepository abyssRepository, 
         IKafkaProducer<string> kafkaProducer)
@@ -21,20 +22,24 @@ public class TryHarderHostedService : IHostedService, IDisposable
         _logger = logger;
         _abyssRepository = abyssRepository;
         _kafkaProducer = kafkaProducer;
+        _abyssSettings = appSettings.FeatureSettings.AbyssSettings;
     }
 
     public Task StartAsync(CancellationToken stoppingToken)
     {
         _logger.LogInformation("TryHarderHostedService running.");
 
-        _timer = new Timer(TryGetContent, null, TimeSpan.Zero, TimeSpan.FromMinutes(5));
+        _timer = new Timer(TryGetContentAsync, null, TimeSpan.Zero, TimeSpan.FromMinutes(_abyssSettings.MinuteTimeBetweenAttempts));
 
         return Task.CompletedTask;
     }
 
-    private async void TryGetContent(object? state)
+    private async void TryGetContentAsync(object? state)
     {
-        foreach (AttemptContent attemptContent in await _abyssRepository.GetAttemptContentAsync(ATTEMPT_CONTENT_TEMP))
+        var contents = 
+            await _abyssRepository.GetAttemptContentAsync(_abyssSettings.NumberOfAttempt, _abyssSettings.Attempt);
+        
+        foreach (AttemptContent attemptContent in contents)
         {
             await _kafkaProducer.ProduceAsync(new ContentEvent
             {

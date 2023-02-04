@@ -1,6 +1,6 @@
 ﻿using Confluent.Kafka;
+using GusMelfordBot.SimpleKafka.Events;
 using GusMelfordBot.SimpleKafka.Interfaces;
-using GusMelfordBot.SimpleKafka.Models;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;

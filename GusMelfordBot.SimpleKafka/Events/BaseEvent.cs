@@ -1,4 +1,4 @@
-﻿namespace GusMelfordBot.SimpleKafka.Models;
+﻿namespace GusMelfordBot.SimpleKafka.Events;
 
 public abstract class BaseEvent
 {

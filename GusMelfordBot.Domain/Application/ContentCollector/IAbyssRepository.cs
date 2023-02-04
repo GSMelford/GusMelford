@@ -10,7 +10,7 @@ public interface IAbyssRepository
     Task SaveContentAsync(Content content);
     Task<int> GetContentCountAsync();
     Task AddAttemptMessageAsync(AttemptContent attemptContent);
-    Task<IEnumerable<AttemptContent>> GetAttemptContentAsync(int take);
+    Task<IEnumerable<AttemptContent>> GetAttemptContentAsync(int take, int maxAttempt);
     Task<bool> RegisterGroupAsAbyssAsync(long chatId);
     Task<string> GetFunnyPhraseAsync(Guid userId);
     Task SaveTelegramMessageIdAsync(Guid contentId, int messageId);

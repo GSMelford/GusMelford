@@ -127,11 +127,9 @@ public class AbyssRepository : IAbyssRepository
         }
     }
 
-    public async Task<IEnumerable<AttemptContent>> GetAttemptContentAsync(int take)
+    public async Task<IEnumerable<AttemptContent>> GetAttemptContentAsync(int take, int maxAttempt)
     {
-        const int maxAttempt = 10;
         int localTake = take;
-        
         List<AttemptMessage> attemptMessages = new List<AttemptMessage>();
 
         var messages = _databaseContext.Set<AttemptMessage>();
