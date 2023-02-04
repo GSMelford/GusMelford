@@ -181,10 +181,9 @@ public class AbyssRepository : IAbyssRepository
         bool isPersonalPhrase = new Random().Next(0, 10) < 4;
         var funnyPhrases = await _databaseContext.Set<FunnyPhrase>().ToListAsync();
         
-        if (isPersonalPhrase)
-        {
-            funnyPhrases = funnyPhrases.Where(x => x.UserId == userId).ToList();
-        }
+        funnyPhrases = isPersonalPhrase 
+            ? funnyPhrases.Where(x => x.UserId == userId).ToList() 
+            : funnyPhrases.Where(x => x.UserId == null).ToList();
 
         return !funnyPhrases.Any() 
             ? "😠 The bot has nothing to say... Literally, the base is empty" 
