@@ -37,7 +37,7 @@ public class TryHarderHostedService : IHostedService, IDisposable
     private async void TryGetContentAsync(object? state)
     {
         var contents = 
-            await _abyssRepository.GetAttemptContentAsync(_abyssSettings.NumberOfAttempt, _abyssSettings.Attempt);
+            await _abyssRepository.GetAttemptContentAsync(_abyssSettings.NumberOfAttempt);
         
         foreach (AttemptContent attemptContent in contents)
         {
