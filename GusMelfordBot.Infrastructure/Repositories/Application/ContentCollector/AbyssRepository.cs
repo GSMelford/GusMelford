@@ -120,7 +120,7 @@ public class AbyssRepository : IAbyssRepository
         var attemptContentDal = await _databaseContext.Set<AttemptMessage>()
             .FirstOrDefaultAsync(x => x.Message == attemptContent.Message);
         
-        if (attemptContentDal is not null)
+        if (attemptContentDal is null)
         {
             await _databaseContext.AddAsync(attemptContent.ToDal(featureId, attemptContent.SessionId));
             await _databaseContext.SaveChangesAsync();
