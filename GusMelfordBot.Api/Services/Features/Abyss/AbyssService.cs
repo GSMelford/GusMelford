@@ -104,6 +104,7 @@ public class AbyssService : IAbyssService
         HttpResponseMessage httpResponseMessage = await _tBot.SendVideoAsync(new SendVideoParameters
         {
             Caption = $"🥰 Content {await _abyssRepository.GetContentCountAsync()}\n" +
+                      $"😊 {await _abyssRepository.GetUserNameAsync(content.UserIds.First())}" +
                       $"👾 {content.Id}\n" +
                       $"{await _abyssRepository.GetFunnyPhraseAsync(content.UserIds.First())}\n" +
                       $"🥑 {content.OriginalLink}",

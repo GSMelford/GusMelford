@@ -178,7 +178,7 @@ public class AbyssRepository : IAbyssRepository
 
     public async Task<string> GetFunnyPhraseAsync(Guid userId)
     {
-        bool isPersonalPhrase = new Random().Next(0, 10) < 4;
+        bool isPersonalPhrase = new Random().Next(0, 10) < 3;
         var funnyPhrases = await _databaseContext.Set<FunnyPhrase>().ToListAsync();
         
         funnyPhrases = isPersonalPhrase 
@@ -186,7 +186,7 @@ public class AbyssRepository : IAbyssRepository
             : funnyPhrases.Where(x => x.UserId == null).ToList();
 
         return !funnyPhrases.Any() 
-            ? "😠 The bot has nothing to say... Literally, the base is empty" 
+            ? "😠 The bot has nothing to say... Literally, the database is empty" 
             : funnyPhrases[new Random().Next(0, funnyPhrases.Count)].Text;
     }
 
