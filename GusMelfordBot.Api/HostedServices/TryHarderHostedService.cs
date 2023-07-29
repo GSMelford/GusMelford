@@ -1,7 +1,7 @@
 ﻿using GusMelfordBot.Api.Settings;
 using GusMelfordBot.Domain.Application.ContentCollector;
 using GusMelfordBot.Events;
-using GusMelfordBot.SimpleKafka.Interfaces;
+using Kyoto.Kafka.Interfaces;
 
 namespace GusMelfordBot.Api.HostedServices;
 

@@ -4,7 +4,7 @@ using GusMelfordBot.Api.Settings;
 using GusMelfordBot.Events;
 using GusMelfordBot.Infrastructure;
 using GusMelfordBot.Infrastructure.Interfaces;
-using GusMelfordBot.SimpleKafka.Interfaces;
+using Kyoto.Kafka.Interfaces;
 using TBot.Client;
 using TBot.Client.Api.Telegram.SendMessage;
 
@@ -37,12 +37,12 @@ public static class WebApplicationExtensions
         await databaseContext.InitializeDatabaseAsync(databaseSettings);
     }
 
-    public static void SubscribeOnEvents(this WebApplication app, AppSettings appSettings)
+    public static async Task SubscribeOnEvents(this WebApplication app, AppSettings appSettings)
     {
         IKafkaConsumerFactory kafkaConsumerFactory = app.Services.GetRequiredService<IKafkaConsumerFactory>();
-        kafkaConsumerFactory.Subscribe<TelegramMessageReceivedEvent, TelegramMessageReceivedHandler>(BuildConsumerConfig(appSettings));
-        kafkaConsumerFactory.Subscribe<ContentProcessedEvent, ContentProcessedHandler>(BuildConsumerConfig(appSettings));
-        kafkaConsumerFactory.Subscribe<AttemptContentEvent, AttemptContentHandler>(BuildConsumerConfig(appSettings));
+        await kafkaConsumerFactory.SubscribeAsync<TelegramMessageReceivedEvent, TelegramMessageReceivedHandler>(BuildConsumerConfig(appSettings));
+        await kafkaConsumerFactory.SubscribeAsync<ContentProcessedEvent, ContentProcessedHandler>(BuildConsumerConfig(appSettings));
+        await kafkaConsumerFactory.SubscribeAsync<AttemptContentEvent, AttemptContentHandler>(BuildConsumerConfig(appSettings));
     }
 
     private static ConsumerConfig BuildConsumerConfig(AppSettings appSettings)

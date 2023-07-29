@@ -2,7 +2,7 @@
 using GusMelfordBot.Domain.Telegram;
 using GusMelfordBot.Domain.Telegram.Models;
 using GusMelfordBot.Events;
-using GusMelfordBot.SimpleKafka.Interfaces;
+using Kyoto.Kafka.Interfaces;
 
 namespace GusMelfordBot.Api.Services.Telegram;
 

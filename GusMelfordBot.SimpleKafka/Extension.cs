@@ -1,24 +1,20 @@
 ﻿using Confluent.Kafka;
-using GusMelfordBot.SimpleKafka.Interfaces;
-using GusMelfordBot.SimpleKafka.Services;
+using Kyoto.Kafka.Interfaces;
+using Kyoto.Kafka.Services;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 
-namespace GusMelfordBot.SimpleKafka;
+namespace Kyoto.Kafka;
 
 public static class Extension
 {
     public static void AddKafkaProducer<TKey>(this IServiceCollection serviceCollection, ProducerConfig config)
     {
-        serviceCollection.AddSingleton<IKafkaProducer<TKey>>(provider =>
-        {
-            ILogger<IKafkaProducer<TKey>>? logger = provider.GetService<ILogger<IKafkaProducer<TKey>>>();
-            return new KafkaProducer<TKey>(logger, config);
-        });
+        serviceCollection.AddSingleton<IKafkaProducer<TKey>>(_ => new KafkaProducerService<TKey>(config));
     }
     
     public static void AddKafkaConsumersFactory(this IServiceCollection serviceCollection)
     {
+        serviceCollection.AddSingleton<IKafkaTopicFactory, KafkaTopicFactory>();
         serviceCollection.AddSingleton<IKafkaConsumerFactory, KafkaConsumerFactory>();
     }
 }

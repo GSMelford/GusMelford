@@ -8,8 +8,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GusMelfordBot.Domain", "Gus
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Features", "Features", "{BEE7298B-24F2-4141-A120-D50B55284C24}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ContentProcessor.Worker", "ContentProcessor.Worker\ContentProcessor.Worker.csproj", "{FAF77666-B14F-4AE4-A3C3-E2D80AABCEF4}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Abyss", "Abyss", "{8034EF3D-64C6-426A-B8A4-9456D9C4FE0D}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GusMelfordBot.Extensions", "GusMelfordBot.Extensions\GusMelfordBot.Extensions.csproj", "{988F5C1A-3979-4986-80B5-4A2B46C73B3D}"
@@ -17,6 +15,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GusMelfordBot.SimpleKafka", "GusMelfordBot.SimpleKafka\GusMelfordBot.SimpleKafka.csproj", "{6DC80D55-D673-48C7-8CEF-C0CC547EA765}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GusMelfordBot.Events", "GusMelfordBot.Events\GusMelfordBot.Events.csproj", "{4C27E784-EF03-4146-8078-9E7ED5F62780}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GusMelfordBot.Abyss.ContentProcessor.Worker", "GusMelfordBot.Abyss.ContentProcessor.Worker\GusMelfordBot.Abyss.ContentProcessor.Worker.csproj", "{5B4B9E5D-A0A5-45FF-8FA2-FABB38033B5F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -36,10 +36,6 @@ Global
 		{5B186686-8A92-47F8-B96C-BCBF663DDEE0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5B186686-8A92-47F8-B96C-BCBF663DDEE0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5B186686-8A92-47F8-B96C-BCBF663DDEE0}.Release|Any CPU.Build.0 = Release|Any CPU
-		{FAF77666-B14F-4AE4-A3C3-E2D80AABCEF4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{FAF77666-B14F-4AE4-A3C3-E2D80AABCEF4}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{FAF77666-B14F-4AE4-A3C3-E2D80AABCEF4}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{FAF77666-B14F-4AE4-A3C3-E2D80AABCEF4}.Release|Any CPU.Build.0 = Release|Any CPU
 		{988F5C1A-3979-4986-80B5-4A2B46C73B3D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{988F5C1A-3979-4986-80B5-4A2B46C73B3D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{988F5C1A-3979-4986-80B5-4A2B46C73B3D}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -52,9 +48,13 @@ Global
 		{4C27E784-EF03-4146-8078-9E7ED5F62780}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4C27E784-EF03-4146-8078-9E7ED5F62780}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4C27E784-EF03-4146-8078-9E7ED5F62780}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5B4B9E5D-A0A5-45FF-8FA2-FABB38033B5F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5B4B9E5D-A0A5-45FF-8FA2-FABB38033B5F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5B4B9E5D-A0A5-45FF-8FA2-FABB38033B5F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5B4B9E5D-A0A5-45FF-8FA2-FABB38033B5F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{8034EF3D-64C6-426A-B8A4-9456D9C4FE0D} = {BEE7298B-24F2-4141-A120-D50B55284C24}
-		{FAF77666-B14F-4AE4-A3C3-E2D80AABCEF4} = {8034EF3D-64C6-426A-B8A4-9456D9C4FE0D}
+		{5B4B9E5D-A0A5-45FF-8FA2-FABB38033B5F} = {8034EF3D-64C6-426A-B8A4-9456D9C4FE0D}
 	EndGlobalSection
 EndGlobal

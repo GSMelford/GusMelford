@@ -1,16 +1,16 @@
 ﻿using GusMelfordBot.Api.Services.Features.Abyss;
 using GusMelfordBot.Domain.Application.ContentCollector;
 using GusMelfordBot.Events;
-using GusMelfordBot.SimpleKafka.Interfaces;
+using Kyoto.Kafka.Interfaces;
 
 namespace GusMelfordBot.Api.Handlers;
 
-public class ContentProcessedHandler : IEventHandler<ContentProcessedEvent>
+public class ContentProcessedHandler : IKafkaHandler<ContentProcessedEvent>
 {
-    private readonly ILogger<IEventHandler<ContentProcessedEvent>> _logger;
+    private readonly ILogger<IKafkaHandler<ContentProcessedEvent>> _logger;
     private readonly IAbyssService _abyssService;
 
-    public ContentProcessedHandler(ILogger<IEventHandler<ContentProcessedEvent>> logger,IAbyssService abyssService)
+    public ContentProcessedHandler(ILogger<IKafkaHandler<ContentProcessedEvent>> logger,IAbyssService abyssService)
     {
         _logger = logger;
         _abyssService = abyssService;

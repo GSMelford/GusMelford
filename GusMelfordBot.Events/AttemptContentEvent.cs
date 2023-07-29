@@ -1,4 +1,4 @@
-﻿using GusMelfordBot.SimpleKafka.Events;
+﻿using Kyoto.Kafka.Modules;
 
 namespace GusMelfordBot.Events;
 
