@@ -1,14 +1,13 @@
 ﻿using Confluent.Kafka;
-using Kyoto.Kafka.Modules;
 
-namespace Kyoto.Kafka.Interfaces;
+namespace GusMelfordBot.SimpleKafka.Interfaces;
 
 public interface IKafkaConsumerFactory : IDisposable
 {
-    Task SubscribeAsync<TEvent, THandler>(ConsumerConfig? config = null,
-        string? topicPrefix = null,
+    void Subscribe<TEvent, THandler>(
+        ConsumerConfig? config = null,
+        string? topic = null,
         string? groupId = null,
         bool? enableAutoCommit = true)
-        where THandler : class, IKafkaHandler<TEvent>
-        where TEvent : BaseEvent;
+        where THandler : IEventHandler<TEvent>;
 }

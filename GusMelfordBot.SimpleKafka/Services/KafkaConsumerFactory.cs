@@ -1,37 +1,34 @@
 ﻿using Confluent.Kafka;
-using Kyoto.Kafka.Interfaces;
-using Kyoto.Kafka.Modules;
+using GusMelfordBot.SimpleKafka.Events;
+using GusMelfordBot.SimpleKafka.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 
-namespace Kyoto.Kafka.Services;
+namespace GusMelfordBot.SimpleKafka.Services;
 
 public class KafkaConsumerFactory : IKafkaConsumerFactory
 {
     private readonly ILogger<IKafkaConsumerFactory>? _logger;
     private readonly IServiceProvider _serviceProvider;
-    private readonly IKafkaTopicFactory _kafkaTopicFactory;
 
-    private readonly Dictionary<string, IKafkaConsumerService> _consumers = new();
+    private readonly Dictionary<string, IKafkaConsumer> _consumers = new();
 
     public KafkaConsumerFactory(IServiceProvider serviceProvider)
     {
         _serviceProvider = serviceProvider;
-        _kafkaTopicFactory = _serviceProvider.GetRequiredService<IKafkaTopicFactory>();
         _logger = _serviceProvider.GetService<ILogger<IKafkaConsumerFactory>>();
     } 
     
-    public async Task SubscribeAsync<TEvent, THandler>(
+    public void Subscribe<TEvent, THandler>(
         ConsumerConfig? config = null,
-        string? topicPrefix = null,
+        string? topic = null,
         string? groupId = null,
-        bool? enableAutoCommit = true) where THandler : class, IKafkaHandler<TEvent> where TEvent : BaseEvent
+        bool? enableAutoCommit = true) where THandler : IEventHandler<TEvent>
     {
-        var eventName = typeof(TEvent).Name;
-        string topic = eventName;
-        if (!string.IsNullOrEmpty(topicPrefix)) {
-            topic = $"{topicPrefix}.{topic}";
+        string eventName = typeof(TEvent).Name;
+        if (string.IsNullOrEmpty(topic)) {
+            topic = eventName;
         }
         
         string handlerName = typeof(THandler).Name;
@@ -39,57 +36,35 @@ public class KafkaConsumerFactory : IKafkaConsumerFactory
             groupId = handlerName;
         }
 
-        await _kafkaTopicFactory.CreateTopicIfNotExistAsync(topic, new Dictionary<string, string>{{"bootstrap.servers", config!.BootstrapServers}});
         if (!_consumers.ContainsKey(topic))
         {
             _consumers[topic] = BuildConsumer(topic, groupId, enableAutoCommit, config);
         }
-        
-        _consumers[topic].Received += KafkaConsumerOnReceived<TEvent, THandler>;
-        _logger?.LogInformation("Subscribed to {Event}: {Handler}", eventName, handlerName);
+
+        _consumers[topic].Received += async (sender, args) => 
+            await KafkaConsumerOnReceived<TEvent, THandler>(sender, args);
     }
 
-    private IKafkaConsumerService BuildConsumer(
+    private IKafkaConsumer BuildConsumer(
         string topic,
         string groupId, 
         bool? enableAutoCommit,
         ConsumerConfig? config)
     {
-        IKafkaConsumerService kafkaConsumerService = new KafkaConsumerService(config, _serviceProvider.GetService<ILogger<IKafkaConsumerService>>());
-        kafkaConsumerService.Consume(topic, groupId, enableAutoCommit ?? true);
-        _logger?.LogInformation("Consume has been started. Topic: {Topic}", topic);
-        return kafkaConsumerService;
+        IKafkaConsumer kafkaConsumer = new KafkaConsumer(config, _serviceProvider.GetService<ILogger<IKafkaConsumer>>());
+        kafkaConsumer.Consume(topic, groupId, enableAutoCommit ?? true);
+        return kafkaConsumer;
     }
 
-    private void KafkaConsumerOnReceived<TEvent, THandler>(object? _, ReceivedEventDetails e) where THandler : class, IKafkaHandler<TEvent> where TEvent : BaseEvent
+    private async Task KafkaConsumerOnReceived<TEvent, THandler>(object? _, ReceivedEventArgs e) where THandler : IEventHandler<TEvent>
     {
-        var @event = JsonConvert.DeserializeObject<TEvent>(e.Message);
-        
-        using var scope = _serviceProvider.CreateScope();
-        var handler = ActivatorUtilities.CreateInstance(scope.ServiceProvider, typeof(THandler)) as THandler;
-        var method = handler?.GetType().GetMethod("HandleAsync");
-            
-        if (@event != null)
-        {
-            _logger?.LogInformation("{CommandHandler} started processing. SessionId: {SessionId}",
-                typeof(THandler).Name, @event.SessionId);
+        TEvent? @event = JsonConvert.DeserializeObject<TEvent>(e.Message);
+        THandler eventHandler = ActivatorUtilities.CreateInstance<THandler>(_serviceProvider);
 
-            try
-            {
-                if (method!.Invoke(handler, new object[] { @event }) is Task task)
-                {
-                    task.Wait();
-                }
-            }
-            catch (Exception exception)
-            {
-                _logger?.LogError(exception,"{CommandHandler} caught an exception. SessionId: {SessionId}",
-                    typeof(THandler).Name, @event.SessionId);
-            }
-                
-            _logger?.LogInformation("{CommandHandler} has been processed. SessionId: {SessionId}",
-                typeof(THandler).Name, @event.SessionId);
+        if (@event != null) {
+            await eventHandler.HandleAsync(@event);
         }
+            
     }
     
     public void Dispose() 

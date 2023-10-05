@@ -3,7 +3,7 @@ using GusMelfordBot.Domain.Application.ContentCollector;
 using GusMelfordBot.Events;
 using GusMelfordBot.Extensions;
 using GusMelfordBot.Extensions.Services.DataLake;
-using Kyoto.Kafka.Interfaces;
+using GusMelfordBot.SimpleKafka.Interfaces;
 using Newtonsoft.Json.Linq;
 using TBot.Client;
 using TBot.Client.Api.Telegram.DeleteMessage;

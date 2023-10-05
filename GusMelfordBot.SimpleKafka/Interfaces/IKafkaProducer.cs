@@ -1,6 +1,6 @@
 ﻿using Confluent.Kafka;
 
-namespace Kyoto.Kafka.Interfaces;
+namespace GusMelfordBot.SimpleKafka.Interfaces;
 
 public interface IKafkaProducer<TKey> : IDisposable
 {

@@ -1,11 +1,11 @@
 ﻿using GusMelfordBot.Api.Services.Features.Abyss;
 using GusMelfordBot.Domain.Application.ContentCollector;
 using GusMelfordBot.Events;
-using Kyoto.Kafka.Interfaces;
+using GusMelfordBot.SimpleKafka.Interfaces;
 
 namespace GusMelfordBot.Api.Handlers;
 
-public class AttemptContentHandler : IKafkaHandler<AttemptContentEvent>
+public class AttemptContentHandler : IEventHandler<AttemptContentEvent>
 {
     private readonly IAbyssRepository _abyssRepository;
 

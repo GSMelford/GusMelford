@@ -1,5 +1,5 @@
 ﻿using GusMelfordBot.Domain.Telegram.Models;
-using Kyoto.Kafka.Modules;
+using GusMelfordBot.SimpleKafka.Events;
 
 namespace GusMelfordBot.Events;
 

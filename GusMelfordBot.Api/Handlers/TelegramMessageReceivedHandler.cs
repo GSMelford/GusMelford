@@ -3,11 +3,11 @@ using GusMelfordBot.Domain.Application;
 using GusMelfordBot.Domain.Application.ContentCollector;
 using GusMelfordBot.Domain.Telegram;
 using GusMelfordBot.Events;
-using Kyoto.Kafka.Interfaces;
+using GusMelfordBot.SimpleKafka.Interfaces;
 
 namespace GusMelfordBot.Api.Handlers;
 
-public class TelegramMessageReceivedHandler : IKafkaHandler<TelegramMessageReceivedEvent>
+public class TelegramMessageReceivedHandler : IEventHandler<TelegramMessageReceivedEvent>
 {
     private readonly ICommandService _commandService;
     private readonly IFeatureRepository _featureRepository;
